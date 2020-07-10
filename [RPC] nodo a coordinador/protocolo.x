@@ -6,9 +6,9 @@ program PROY2DFS
 	{
 		Mensaje LS(Mensaje)=1;
 		Mensaje GETADDRESS(Mensaje)=2;
-		Mensaje MKDIR(Mensaje)=3; //el coordinador si no puede crear esa direccion debe retornar que no pudo hacerlo
-		Mensaje CD(Mensaje)=4; //el coordinador debe indicar si no existe la direccion
-		Mensaje RM(Mensaje)=5; //el coordinador si no puede remover ese archivo debe retornar que no pudo hacerlo
+		Mensaje MKDIR(Mensaje)=3; 
+		Mensaje CD(Mensaje)=4; 
+		Mensaje RM(Mensaje)=5; 
 		Mensaje CPY(Mensaje)=6; 
 		Mensaje MV(Mensaje)=7;		
 	}=1;

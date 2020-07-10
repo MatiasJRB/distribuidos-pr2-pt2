@@ -10,7 +10,7 @@ xdr_Mensaje (XDR *xdrs, Mensaje *objp)
 {
 	register int32_t *buf;
 
-	 if (!xdr_array (xdrs, (char **)&objp->Mensaje_val, (u_int *) &objp->Mensaje_len, 8,
+	 if (!xdr_array (xdrs, (char **)&objp->Mensaje_val, (u_int *) &objp->Mensaje_len, ~0,
 		sizeof (char), (xdrproc_t) xdr_char))
 		 return FALSE;
 	return TRUE;
