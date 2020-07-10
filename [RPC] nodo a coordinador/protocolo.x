@@ -1,4 +1,4 @@
-typedef char Mensaje<128>;
+typedef char Mensaje<8>;
 
 program PROY2DFS
 {
