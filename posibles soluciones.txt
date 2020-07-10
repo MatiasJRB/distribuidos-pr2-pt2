@@ -1,3 +1,10 @@
+Metodos que proveemos para la comunicacion nodo a coordinador
+Mensaje LS(Mensaje)=1;
+Mensaje GET_ADDRESS(Mensaje)=2; devuelve la direccion IP del nodo que contiene X archivo
+Mensaje UPDATE_ADDRESS(Mensaje)=3; actualiza la direccion de X archivo
+Mensaje REPORT_CREATE(Mensaje)=4; reporta la creacion de un archivo
+Mensaje REPORT_DELETE(Mensaje)=5; reporta la eliminacion de un archivo
+Mensaje IS_VALID(Mensaje)=6; retorna si un directorio o archivo es valido (o sea, si existe)
 
 
 function ls
