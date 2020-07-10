@@ -23,6 +23,10 @@ struct listado
 
 
 void * insertar(char *nombre, char *ip, char *direccion, char *permiso, int  version, int  tipo, char *ruta){
+    
+    // Inicializo el motor de mysql  
+    MYSQL *con = mysql_init(NULL);
+    mysql_real_connect(con, "localhost", "ruso", "rusopass", "proyecto", 0, NULL, 0);
     //Si lo que tengo que agregar es un archivo tengo que hacer un cambio de version en los demas.
     char query[200];
     strcpy(query, "INSERT INTO indexado (nombre, ip, direccion, permiso, version, tipo, ruta)VALUES ('");
@@ -42,11 +46,17 @@ void * insertar(char *nombre, char *ip, char *direccion, char *permiso, int  ver
     strcat(query, "');");
 
     if (tipo = 0){ //Agrego un archivo , por lo tanto tengo que cambiar las versiones de los demas y pasarlos a lectura y luego recien ejecuto la query.
-        
-    } else { // Agrego una carpeta, ejecuto la query directamente
-
+        char queryupdate[200];
+        strcpy(queryupdate, "UPDATE indexado SET permiso = 'R',version = version + 1 WHERE nombre = '");
+        strcat(queryupdate, nombre);
+        strcat(queryupdate, "';");
+        mysql_query(con, update); //Ejecuto la query para updatear los registros
     }
 
+    mysql_query(con, query); //Ejecuto la query para agregar el registro
+    mysql_close(conn);
+    printf("\n Termine de ejecutar el metodo de insertar \n");
+    
 }
 
 struct listado *funcionLS(char *direccion){
@@ -71,11 +81,10 @@ struct listado *funcionLS(char *direccion){
     // Obtengo el resultado de esa consulta
     res = mysql_use_result(con);
     int i=0;
-    printf("________________________________________________\n");
+
     while ((row = mysql_fetch_row(res)) != NULL) /* recorrer la variable res con todos los registros obtenidos para su uso */
     {   
         resultado->cantidad = resultado->cantidad +1 ; 
-        printf("%s \t %s \t %s \t %s \t %s \t %s \t %s \n", row[0],row[1],row[2],row[3],row[4],row[5],row[6]);
 
         struct archivo *actual = (struct archivo *)malloc(sizeof (struct archivo));
         actual->nombre = (char*)malloc (50*sizeof(char));
@@ -95,7 +104,7 @@ struct listado *funcionLS(char *direccion){
         resultado->elementos[i] = *actual;
         i=i+1;
     } 
-    printf("________________________________________________\n" );
+    mysql_close(conn);
     return resultado;
 
 }
@@ -127,10 +136,8 @@ struct archivo *buscarArchivo(char *nombre){
     res = mysql_use_result(con);
    
 
-    printf("________________________________________________\n");
     while ((row = mysql_fetch_row(res)) != NULL) /* recorrer la variable res con todos los registros obtenidos para su uso */
     {   
-        printf("%s \t %s \t %s \t %s \t %s \t %s \t %s \n", row[0],row[1],row[2],row[3],row[4],row[5],row[6]);
         strcpy(resultado->nombre, row[0]);
         strcpy(resultado->ip, row[1]);
         strcpy(resultado->direccion, row[2]);
@@ -139,7 +146,7 @@ struct archivo *buscarArchivo(char *nombre){
         resultado->tipo = atoi(row[5]);
         strcpy(resultado->ruta, row[6]);
     } 
-    printf("________________________________________________\n ");
+    mysql_close(conn);
     return resultado;
 }
 
@@ -148,31 +155,64 @@ struct archivo *buscarArchivo(char *nombre){
 // Funciones las cuales utilizaran ustedes Max y Mauro
 int main(int argc, char **argv)
 {  
-    printf("\n METODO DE BUSQUEDA \n");
+    printf("METODO DE BUSQUEDA \n");
     printf("Nombre \t Ip \t direccion \t permiso \t version \t tipo \t ruta \n");
-    char * nombreArchivo = "ArchivoA.txt";
-    struct archivo mostrar;
-    mostrar = *buscarArchivo(nombreArchivo);    
-    printf("%s \t %s \t %s \t %s \t %d \t %d \t %s \n", mostrar.nombre, mostrar.ip, mostrar.direccion, mostrar.permiso, mostrar.version, mostrar.tipo, mostrar.ruta);
-    printf("\n FIN DE METODO DE BUSQUEDA \n");
+        char * nombreArchivo = "ArchivoA.txt";
+        struct archivo mostrar;
+        mostrar = *buscarArchivo(nombreArchivo);    
+        printf("%s \t %s \t %s \t %s \t %d \t %d \t %s \n", mostrar.nombre, mostrar.ip, mostrar.direccion, mostrar.permiso, mostrar.version, mostrar.tipo, mostrar.ruta);
+    printf("__________________________________________________ \n");
 
 
-
-
-    printf("\n METODO DE LS \n");
+    printf("METODO DE LS \n");
     printf("Nombre \t Ip \t direccion \t permiso \t version \t tipo \t ruta \n");
-    char * nombreDirectorio = "Carpeta1";
-    struct listado mostrarlistado;
-    mostrarlistado = *funcionLS(nombreDirectorio); 
+        char * nombreDirectorio = "Carpeta1";
+        struct listado mostrarlistado;
+        mostrarlistado = *funcionLS(nombreDirectorio); 
 
-    int limite = mostrarlistado.cantidad;
-    int i=0;
+        int limite = mostrarlistado.cantidad;
+        int i=0;
 
-    while (i<limite){
-        printf("%s \t %s \t %s \t %s \t %d \t %d \t %s \n", mostrarlistado.elementos[i].nombre, mostrarlistado.elementos[i].ip, mostrarlistado.elementos[i].direccion, mostrarlistado.elementos[i].permiso,mostrarlistado.elementos[i].version, mostrarlistado.elementos[i].tipo, mostrarlistado.elementos[i].ruta);
-        i = i+1; 
-    }
-    printf("\n FIN DE METODO DE LS \n");
+        while (i<limite){
+            printf("%s \t %s \t %s \t %s \t %d \t %d \t %s \n", mostrarlistado.elementos[i].nombre, mostrarlistado.elementos[i].ip, mostrarlistado.elementos[i].direccion, mostrarlistado.elementos[i].permiso,mostrarlistado.elementos[i].version, mostrarlistado.elementos[i].tipo, mostrarlistado.elementos[i].ruta);
+            i = i+1; 
+        }
+    printf("__________________________________________________\n");
 
 
+    printf("METODO DE INSERTAR \n");
+        // Inserto un nuevo archivo con la modificacion que actualiza los valores de los anteriores con el mismo nombre.
+        char *nombre = "ArchivoA.txt";            // Nombre del archivo
+        char *ip = "192.168.1.99";                // ip del archivo
+        char *direccion "Carpeta1";         // direccion del padre del archivo
+        char *permiso "W";           // w o r, segun escritura o lectura
+        int  version = 0;            // numero de version con numero 0, es la mas actual
+        int  tipo = 1;               // 0 si es archivo, 1 si es carpeta
+        char *ruta = "raiz/Carpeta1/ArchivoA.txt";
+    printf("Comienzo a insertar un archivo, y actualizo versiones \n");
+    insertar(char *nombre, char *ip, char *direccion, char *permiso, int  version, int  tipo, char *ruta);
+
+    // Inserto un nuevo archivo que no tiene versiones anteriores
+        nombre = "ArchivoH.txt";            // Nombre del archivo
+        ip = "192.168.1.99";                // ip del archivo
+        direccion "Carpeta1";         // direccion del padre del archivo
+        permiso "W";           // w o r, segun escritura o lectura
+        version = 0;            // numero de version con numero 0, es la mas actual
+        tipo = 1;               // 0 si es archivo, 1 si es carpeta
+        ruta = "raiz/Carpeta1/ArchivoH.txt";
+    printf("Comienzo a insertar un archivo \n");
+    insertar(char *nombre, char *ip, char *direccion, char *permiso, int  version, int  tipo, char *ruta);
+
+    // Inserto una carpeta
+        nombre = "Carpeta4";            // Nombre del archivo
+        ip = "-";                // ip del archivo
+        direccion "raiz";         // direccion del padre del archivo
+        permiso "R";           // w o r, segun escritura o lectura
+        version = 0;            // numero de version con numero 0, es la mas actual
+        tipo = 0;               // 0 si es archivo, 1 si es carpeta
+        ruta = "raiz/Carpeta4";
+        printf("Comienzo a insertar una carpeta \n");
+    insertar(char *nombre, char *ip, char *direccion, char *permiso, int  version, int  tipo, char *ruta);
+
+    printf("__________________________________________________ \n");
 }
