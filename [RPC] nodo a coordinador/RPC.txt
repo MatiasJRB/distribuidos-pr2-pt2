@@ -22,37 +22,32 @@ function vim
 function mkdir 
 
 1 el cliente solicita a la shell ejecutar mkdir con el nombre de la carpeta N que desea crear [COM5] 
-2 el nodo le pide al coordinador que resuelva la funcion mkdir de la direccion completa R (dirActual+N) [COM3Y6] 
-3 el coordinador utiliza su tabla para saber si R es una direccion valida a ser creada [COM8][COM4]
-4 si la ruta es valida el coordinador actualiza su tabla y retorna true, false en caso contrario [COM8][COM4]
+2 el nodo le pregunta al coordinador si la direccion N es valido [COM3Y6]
+3 el coordinador utiliza su tabla para saber si N es una direccion valida a ser creada [COM8][COM4]
+4 si la ruta es valida el coordinador retorna true, false en caso contrario [COM8][COM4]
 5 en caso de recibir false muestra por pantalla mensaje de error [COM5]
 6 en caso de recibir true, el nodo crea el directorio R [COM5]
+7 el nodo notifica al coordinador que se creo el directorio N[COM3Y6]
 
 function cd
 
 1 el cliente solicita a la shell ejecutar cd con el nombre de la carpeta N que desea acceder [COM5]
-2 el nodo le pide al coordinaro que resuelva la funcion cd con la direccion completa R dirActual+N [COM3Y6] 
-3 el coordinador utiliza su tabla para saber si R es una direccion valida para ser accedida [COM8][COM4]
+2 el nodo le pregunta al coordinador si la direccion N es valido [COM3Y6]
+3 el coordinador utiliza su tabla para saber si N es una direccion valida para ser accedida [COM8][COM4]
 4 si la ruta es valida el coordinador retorna true, false en caso contrario [COM8][COM4]
 5 en caso de recibir false muestra por pantalla mensaje de error [COM5]
-6 en caso de recibir true, el nodo accede al directorio R y actualiza su dirActual[COM5]
+6 en caso de recibir true, el nodo accede al directorio NR y actualiza su dirActual[COM5]
+
 
 function rm
 
 1 el cliente solicita a la shell ejecutar rm con el nombre de la carpeta/archivo N que desea eliminar [COM5] 
-2 el nodo le pide al coordinador que resuelva la funcion rm de la direccion completa R (dirActual+N) [COM3Y6] 
-3 el coordinador utiliza su tabla para saber si R es una direccion o archivo valido a ser eliminado [COM8][COM4]
-4 si la ruta/archivo es valido el coordinador actualiza su tabla quitando este y retorna true, false en caso contrario [COM8][COM4]
+2 el nodo le pregunta al coordinador si la direccion/archivo N es valido [COM3Y6] 
+3 el coordinador utiliza su tabla para saber si N es una direccion o archivo valido a ser eliminado [COM8][COM4]
+4 si la ruta/archivo es valido el coordinador retorna true, false en caso contrario [COM8][COM4]
 5 en caso de recibir false muestra por pantalla mensaje de error [COM5]
 6 en caso de recibir true, el nodo elimina el directorio/archivo R [COM5]
-
-
-Mensaje LS(Mensaje)=1;
-		Mensaje GET_ADDRESS(Mensaje)=2;
-		Mensaje UPDATE_ADDRESS(Mensaje)=3;
-		Mensaje REPORT_CREATE(Mensaje)=4;
-		Mensaje REPORT_DELETE(Mensaje)=5;
-		Mensaje IS_VALID(Mensaje)=6;
+7 el nodo notifica al coordinador que se elimino el archivo N del directorio actual o se elimino el directorio N [COM3Y6]
 		
 funcion cpy
 
@@ -65,10 +60,7 @@ funcion cpy
 7 el coordinador utiliza su tabla para poder contestar el nodo N2 que contiene A1 [COM8][COM4]
 8 el coordinador utiliza su tabla para poder contestar el nodo N3 que la direccion R [COM8][COM4]
 9 se fijan como transferir archivos (podes decirle a n2 que cargue el archivo en el nodo n3 o a n3 que descargue el archivo desde n2)[COM1Y2]
-10 el nodo le informa al coordinador que creo un archivo copia en R  [COM3Y6] 
-
-
-
+10 el nodo le informa al coordinador que creo un archivo copia en R [COM3Y6] 
 
 
 
