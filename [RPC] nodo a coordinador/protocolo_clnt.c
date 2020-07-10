@@ -38,3 +38,78 @@ getaddress_1(Mensaje *argp, CLIENT *clnt)
 	}
 	return (&clnt_res);
 }
+
+Mensaje *
+mkdir_1(Mensaje *argp, CLIENT *clnt)
+{
+	static Mensaje clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, MKDIR,
+		(xdrproc_t) xdr_Mensaje, (caddr_t) argp,
+		(xdrproc_t) xdr_Mensaje, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}
+
+Mensaje *
+cd_1(Mensaje *argp, CLIENT *clnt)
+{
+	static Mensaje clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, CD,
+		(xdrproc_t) xdr_Mensaje, (caddr_t) argp,
+		(xdrproc_t) xdr_Mensaje, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}
+
+Mensaje *
+rm_1(Mensaje *argp, CLIENT *clnt)
+{
+	static Mensaje clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, RM,
+		(xdrproc_t) xdr_Mensaje, (caddr_t) argp,
+		(xdrproc_t) xdr_Mensaje, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}
+
+Mensaje *
+cpy_1(Mensaje *argp, CLIENT *clnt)
+{
+	static Mensaje clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, CPY,
+		(xdrproc_t) xdr_Mensaje, (caddr_t) argp,
+		(xdrproc_t) xdr_Mensaje, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}
+
+Mensaje *
+mv_1(Mensaje *argp, CLIENT *clnt)
+{
+	static Mensaje clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, MV,
+		(xdrproc_t) xdr_Mensaje, (caddr_t) argp,
+		(xdrproc_t) xdr_Mensaje, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}

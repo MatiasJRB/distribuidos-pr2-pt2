@@ -22,6 +22,11 @@ proy2dfs_1(struct svc_req *rqstp, register SVCXPRT *transp)
 	union {
 		Mensaje ls_1_arg;
 		Mensaje getaddress_1_arg;
+		Mensaje mkdir_1_arg;
+		Mensaje cd_1_arg;
+		Mensaje rm_1_arg;
+		Mensaje cpy_1_arg;
+		Mensaje mv_1_arg;
 	} argument;
 	char *result;
 	xdrproc_t _xdr_argument, _xdr_result;
@@ -42,6 +47,36 @@ proy2dfs_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		_xdr_argument = (xdrproc_t) xdr_Mensaje;
 		_xdr_result = (xdrproc_t) xdr_Mensaje;
 		local = (char *(*)(char *, struct svc_req *)) getaddress_1_svc;
+		break;
+
+	case MKDIR:
+		_xdr_argument = (xdrproc_t) xdr_Mensaje;
+		_xdr_result = (xdrproc_t) xdr_Mensaje;
+		local = (char *(*)(char *, struct svc_req *)) mkdir_1_svc;
+		break;
+
+	case CD:
+		_xdr_argument = (xdrproc_t) xdr_Mensaje;
+		_xdr_result = (xdrproc_t) xdr_Mensaje;
+		local = (char *(*)(char *, struct svc_req *)) cd_1_svc;
+		break;
+
+	case RM:
+		_xdr_argument = (xdrproc_t) xdr_Mensaje;
+		_xdr_result = (xdrproc_t) xdr_Mensaje;
+		local = (char *(*)(char *, struct svc_req *)) rm_1_svc;
+		break;
+
+	case CPY:
+		_xdr_argument = (xdrproc_t) xdr_Mensaje;
+		_xdr_result = (xdrproc_t) xdr_Mensaje;
+		local = (char *(*)(char *, struct svc_req *)) cpy_1_svc;
+		break;
+
+	case MV:
+		_xdr_argument = (xdrproc_t) xdr_Mensaje;
+		_xdr_result = (xdrproc_t) xdr_Mensaje;
+		local = (char *(*)(char *, struct svc_req *)) mv_1_svc;
 		break;
 
 	default:

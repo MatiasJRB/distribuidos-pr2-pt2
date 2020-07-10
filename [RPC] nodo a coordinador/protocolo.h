@@ -29,6 +29,21 @@ extern  Mensaje * ls_1_svc(Mensaje *, struct svc_req *);
 #define GETADDRESS 2
 extern  Mensaje * getaddress_1(Mensaje *, CLIENT *);
 extern  Mensaje * getaddress_1_svc(Mensaje *, struct svc_req *);
+#define MKDIR 3
+extern  Mensaje * mkdir_1(Mensaje *, CLIENT *);
+extern  Mensaje * mkdir_1_svc(Mensaje *, struct svc_req *);
+#define CD 4
+extern  Mensaje * cd_1(Mensaje *, CLIENT *);
+extern  Mensaje * cd_1_svc(Mensaje *, struct svc_req *);
+#define RM 5
+extern  Mensaje * rm_1(Mensaje *, CLIENT *);
+extern  Mensaje * rm_1_svc(Mensaje *, struct svc_req *);
+#define CPY 6
+extern  Mensaje * cpy_1(Mensaje *, CLIENT *);
+extern  Mensaje * cpy_1_svc(Mensaje *, struct svc_req *);
+#define MV 7
+extern  Mensaje * mv_1(Mensaje *, CLIENT *);
+extern  Mensaje * mv_1_svc(Mensaje *, struct svc_req *);
 extern int proy2dfs_1_freeresult (SVCXPRT *, xdrproc_t, caddr_t);
 
 #else /* K&R C */
@@ -38,6 +53,21 @@ extern  Mensaje * ls_1_svc();
 #define GETADDRESS 2
 extern  Mensaje * getaddress_1();
 extern  Mensaje * getaddress_1_svc();
+#define MKDIR 3
+extern  Mensaje * mkdir_1();
+extern  Mensaje * mkdir_1_svc();
+#define CD 4
+extern  Mensaje * cd_1();
+extern  Mensaje * cd_1_svc();
+#define RM 5
+extern  Mensaje * rm_1();
+extern  Mensaje * rm_1_svc();
+#define CPY 6
+extern  Mensaje * cpy_1();
+extern  Mensaje * cpy_1_svc();
+#define MV 7
+extern  Mensaje * mv_1();
+extern  Mensaje * mv_1_svc();
 extern int proy2dfs_1_freeresult ();
 #endif /* K&R C */
 
