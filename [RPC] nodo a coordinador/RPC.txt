@@ -1,0 +1,107 @@
+
+
+function ls
+
+1 el cliente solicita a la shell ejecutar ls con la direccion completa R  [COM5]
+2 el nodo le pide al coordinador que resuelva function_ls [COM3Y6]
+3 el coordinador utiliza su tabla para cargar en struct_retorno_ls los directorios 
+    y archivos que estan contenidos en R [COM8]
+4 el nodo utiliza struct_retorno_ls para mostrar su contenido en la
+    interfaz de la shell [COM5]
+
+function vim
+
+1 el cliente solicita a la shell ejecutar cat con la direccion completa R  [COM5]
+2 el nodo le pide al coordinador que resuelva en que nodo esta R [COM3Y6]
+3 el coordinador utiliza su tabla para retornar en que nodo está la ultima version de R [COM8][COM4]
+4 el nodo utiliza la direccion que obtuvo en 3 para descargar el archivo R desde el nodo que lo contiene [COM1Y2]
+5 el nodo abre el archivo descargado con el editor de texto implementado y
+        procede a modificarlo [COM7]
+6 el nodo le pide al coordinador que haga un update de R [COM3Y6]
+
+function mkdir
+
+1 el cliente reporta al coordinador que desea crear la direccion completa R
+2 
+
+
+
+Nosotros vamos a especificar que esperamos recibir
+para resolver una tarea y como va a ser el formato del 
+retorno. Las rutas r tienen que ser completa
+
+Especificamente:
+
+
+struct_retorno_ls function_ls(string r)
+	le pido al coordinador que me resuelva funcion_ls
+	la ruta r tiene que ser completa
+	el struct_retorno_ls contendra todas las rutas completas
+		de los archivos
+		
+direccion_nodo get_addres(string r)
+	retorna la direccion del nodo en donde está el archivo especificado en r1
+	
+
+void update_address(string r1, string r2)
+	updatea la direccion r1 con r2
+	
+		
+boolean function_cd(string r)
+	/*
+		el coordinador debe verificar que aún 
+		exista el diretorio
+	*/
+	retorna si aun es valido el directorio
+
+
+/////////////////
+	
+proceso de eliminiacion
+	le pido al coordinador donde esta el archivo especificado en r
+	le digo al nodo que lo tiene que elimine ese archivo
+	
+
+boolean function_rm(string r)
+	/*
+		el coordinador debe verificar que aun
+		exista el directorio o archivo 
+	*/
+	retorna si se pudo eliminar
+
+/////////////////
+
+\\\\\\\\\\\\\\\\\\\\
+
+
+boolean report_function_cpy(string r1, string r2)
+	r1 especifica el archivo a copiar
+	r2 especifica el directorio destino
+	retorna si se pudo copiar
+
+\\\\\\\\\\\\\\\\\\\
+
+
+boolean report_function_mv(string r1, string r2)
+	r1 especifica el archivo a copiar
+	r2 especifica el directorio destino
+	retorna si se pudo mover
+
+
+
+boolean report_function_mkdir(string r)
+	retorna si se pudo crear
+
+
+	
+
+modificar/guardar
+    el cliente nos tieen que mandar la ruta completa
+    retornar boolean
+	
+	
+	
+
+
+
+
