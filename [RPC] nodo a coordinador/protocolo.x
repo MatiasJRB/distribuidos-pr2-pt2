@@ -5,12 +5,11 @@ program PROY2DFS
 	version PROY2DFSVERS
 	{
 		Mensaje LS(Mensaje)=1;
-		Mensaje GETADDRESS(Mensaje)=2;
-		Mensaje MKDIR(Mensaje)=3; 
-		Mensaje CD(Mensaje)=4; 
-		Mensaje RM(Mensaje)=5; 
-		Mensaje CPY(Mensaje)=6; 
-		Mensaje MV(Mensaje)=7;		
+		Mensaje GET_ADDRESS(Mensaje)=2;
+		Mensaje UPDATE_ADDRESS(Mensaje)=3;
+		Mensaje REPORT_CREATE(Mensaje)=4;
+		Mensaje REPORT_DELETE(Mensaje)=5;
+		Mensaje IS_VALID(Mensaje)=6;
 	}=1;
 	
 }=0x20001003;
