@@ -1,4 +1,11 @@
 Metodos que proveemos para la comunicacion nodo a coordinador
+
+typedef struct {
+	u_int Mensaje_len;
+	char *Mensaje_val;
+} Mensaje;
+
+
 Mensaje LS(Mensaje)=1;
 Mensaje GET_ADDRESS(Mensaje)=2; devuelve la direccion IP del nodo que contiene X archivo
 Mensaje UPDATE_ADDRESS(Mensaje)=3; actualiza la direccion de X archivo
