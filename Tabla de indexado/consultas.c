@@ -22,12 +22,13 @@ struct listado
 };
 
 
-void * insertar(char *nombre, char *ip, char *direccion, char *permiso, int  version, int  tipo, char *ruta){
+void * insertar(char *nombre, char *ip, char *direccion, char *permiso, char  *version, char  *tipo, char *ruta){
     
     // Inicializo el motor de mysql  
     MYSQL *con = mysql_init(NULL);
     mysql_real_connect(con, "localhost", "ruso", "rusopass", "proyecto", 0, NULL, 0);
     //Si lo que tengo que agregar es un archivo tengo que hacer un cambio de version en los demas.
+    
     char query[200];
     strcpy(query, "INSERT INTO indexado (nombre, ip, direccion, permiso, version, tipo, ruta)VALUES ('");
     strcat(query, nombre);
@@ -45,16 +46,16 @@ void * insertar(char *nombre, char *ip, char *direccion, char *permiso, int  ver
     strcat(query, ruta);
     strcat(query, "');");
 
-    if (tipo = 0){ //Agrego un archivo , por lo tanto tengo que cambiar las versiones de los demas y pasarlos a lectura y luego recien ejecuto la query.
+    if (tipo = "1"){ //Agrego un archivo , por lo tanto tengo que cambiar las versiones de los demas y pasarlos a lectura y luego recien ejecuto la query.
         char queryupdate[200];
         strcpy(queryupdate, "UPDATE indexado SET permiso = 'R',version = version + 1 WHERE nombre = '");
         strcat(queryupdate, nombre);
         strcat(queryupdate, "';");
-        mysql_query(con, update); //Ejecuto la query para updatear los registros
+        mysql_query(con, queryupdate); //Ejecuto la query para updatear los registros
     }
 
     mysql_query(con, query); //Ejecuto la query para agregar el registro
-    mysql_close(conn);
+    mysql_close(con);
     printf("\n Termine de ejecutar el metodo de insertar \n");
     
 }
@@ -104,7 +105,7 @@ struct listado *funcionLS(char *direccion){
         resultado->elementos[i] = *actual;
         i=i+1;
     } 
-    mysql_close(conn);
+    mysql_close(con);
     return resultado;
 
 }
@@ -146,7 +147,7 @@ struct archivo *buscarArchivo(char *nombre){
         resultado->tipo = atoi(row[5]);
         strcpy(resultado->ruta, row[6]);
     } 
-    mysql_close(conn);
+    mysql_close(con);
     return resultado;
 }
 
@@ -184,35 +185,34 @@ int main(int argc, char **argv)
         // Inserto un nuevo archivo con la modificacion que actualiza los valores de los anteriores con el mismo nombre.
         char *nombre = "ArchivoA.txt";            // Nombre del archivo
         char *ip = "192.168.1.99";                // ip del archivo
-        char *direccion "Carpeta1";         // direccion del padre del archivo
-        char *permiso "W";           // w o r, segun escritura o lectura
-        int  version = 0;            // numero de version con numero 0, es la mas actual
-        int  tipo = 1;               // 0 si es archivo, 1 si es carpeta
+        char *direccion = "Carpeta1";         // direccion del padre del archivo
+        char *permiso = "W";           // w o r, segun escritura o lectura
+        char  *version = "0";            // numero de version con numero 0, es la mas actual
+        char  *tipo = "1";               // 0 si es archivo, 1 si es carpeta
         char *ruta = "raiz/Carpeta1/ArchivoA.txt";
     printf("Comienzo a insertar un archivo, y actualizo versiones \n");
-    insertar(char *nombre, char *ip, char *direccion, char *permiso, int  version, int  tipo, char *ruta);
-
+    insertar(nombre, ip, direccion, permiso, version, tipo,ruta);
+    
     // Inserto un nuevo archivo que no tiene versiones anteriores
         nombre = "ArchivoH.txt";            // Nombre del archivo
         ip = "192.168.1.99";                // ip del archivo
-        direccion "Carpeta1";         // direccion del padre del archivo
-        permiso "W";           // w o r, segun escritura o lectura
-        version = 0;            // numero de version con numero 0, es la mas actual
-        tipo = 1;               // 0 si es archivo, 1 si es carpeta
+        direccion = "Carpeta1";         // direccion del padre del archivo
+        permiso = "W";           // w o r, segun escritura o lectura
+        version = "0";            // numero de version con numero 0, es la mas actual
+        tipo = "1";               // 0 si es archivo, 1 si es carpeta
         ruta = "raiz/Carpeta1/ArchivoH.txt";
     printf("Comienzo a insertar un archivo \n");
-    insertar(char *nombre, char *ip, char *direccion, char *permiso, int  version, int  tipo, char *ruta);
-
+    insertar(nombre, ip, direccion, permiso, version, tipo,ruta);
     // Inserto una carpeta
         nombre = "Carpeta4";            // Nombre del archivo
         ip = "-";                // ip del archivo
-        direccion "raiz";         // direccion del padre del archivo
-        permiso "R";           // w o r, segun escritura o lectura
-        version = 0;            // numero de version con numero 0, es la mas actual
-        tipo = 0;               // 0 si es archivo, 1 si es carpeta
+        direccion = "raiz";         // direccion del padre del archivo
+        permiso = "R";           // w o r, segun escritura o lectura
+        version = "0";            // numero de version con numero 0, es la mas actual
+        tipo = "0";               // 0 si es archivo, 1 si es carpeta
         ruta = "raiz/Carpeta4";
         printf("Comienzo a insertar una carpeta \n");
-    insertar(char *nombre, char *ip, char *direccion, char *permiso, int  version, int  tipo, char *ruta);
+    insertar(nombre, ip, direccion, permiso, version, tipo,ruta);
 
     printf("__________________________________________________ \n");
 }
