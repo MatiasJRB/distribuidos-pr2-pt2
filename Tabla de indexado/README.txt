@@ -1,4 +1,4 @@
-sudo apt-get install mariadb-client mariadb0server -y
+sudo apt-get install mariadb-client mariadb-server -y
 sudo apt-get install libmysqlclient.dev
 sudo apt-get install zlib1g-dev
 
