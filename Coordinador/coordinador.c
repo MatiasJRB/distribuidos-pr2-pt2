@@ -3,7 +3,7 @@
 #include "consultas.h"
 #include <string.h>
 
-#define N 40
+#define N 100
 
 
 // Funcion encargada del LS
@@ -13,23 +13,28 @@ char* funcionListar(char* Direccion)
 {	
 	struct listado list = *funcionLS(Direccion);
 	
-	char* temp[N];
+	char temp[N];
+	
+	// Revisar porque es necesario esto, pero si no lo pones no anda
+	strcpy(temp,"");
+	
 	int i;
 	struct archivo archivoaux;
-	char * nombreaux;
+	char* nombreaux;
 	
 	for (i=0;i<list.cantidad;i++)
 	{	
-		archivoaux= list.elementos[i];
+		archivoaux = list.elementos[i];
 		nombreaux = archivoaux.nombre;
 		strcat(temp, nombreaux);
 		strcat(temp, ",");
 	}
 
-	char* toRet = "";
+
 	int size = strlen(temp);
-	toRet = malloc(sizeof(*temp)*size);
-	strcat(toRet,temp);
+	char *toRet;
+	toRet = malloc(sizeof(temp)*size);
+	strcpy(toRet,temp);
 	
 	return (toRet);	
 }
@@ -48,6 +53,14 @@ char* obtenerIP(char* Archivo)
 int main()
 {
 	char *respuesta = funcionListar("Carpeta1");
+	printf("%s",respuesta);
+	printf("\n");
+	
+	respuesta = funcionListar("Carpeta1");
+	printf("%s",respuesta);
+	printf("\n");
+	
+	respuesta = funcionListar("Carpeta1");
 	printf("%s",respuesta);
 	printf("\n");
 	
