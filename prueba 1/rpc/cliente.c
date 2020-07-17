@@ -6,13 +6,20 @@
 #include <dirent.h>
 #include "protocolo.h"
 
+/*
+ typedef struct {
+    u_int Mensaje_len;
+    char *Mensaje_val;
+ }Mensaje; 
+*/
+
 #define max_args 2  //Numero maximo de argumentos (-1) cuando se trate de un comando externo
 #define max 100  //Numero de caracteres maximo para comando las variables de ambiente*/
 
 /*Declara variables*/
 char comando[max]; //comando va a leer el comando que ingrese el usuario
 char* args[max_args];
-char* pwd;
+char* path;
 CLIENT *clnt;
 
 /*Declara funciones*/
@@ -25,33 +32,36 @@ void editor();
 /* Structs para el manejo del current working directory */
 
 typedef struct{
-    char* nombre;
-}SubNombre;
+    char* name;
+    uint size;
+}SubDirectorio;
+SubDirectorio sd_actual;
+
 
 /*
 *	Struct que contiene cada parte del directorio
 * 	/carpeta -> ["/", "carpeta"]
 */
 typedef struct{
-    SubNombre sub_rutas[2];
+    SubDirectorio sub_directorios[2];
     int cont;
 }PWD;
 
 
 /* A partir de un PWD obtengo en string la ruta completa */
+
 char* getPath(PWD* ruta){
 
 	int i;
-	int cantMemory = 1;
+	u_int cantMemory = 0;
 	char* pathStr = (char*) malloc(sizeof(char));
-
 	for(i=0; i<ruta->cont;i++){
-		char* name = ruta->sub_rutas[i].nombre;
-		cantMemory += strlen(name);		
-		pathStr = realloc(pathStr,cantMemory);
+		char* name = ruta->sub_directorios[i].name;
+		cantMemory += strlen(name);
+		pathStr = realloc(pathStr,cantMemory); //realloc(memoriaPrevia, u_int memoria nueva);
 		strcat(pathStr,name);		
+		printf("ruta %d \n",cantMemory);
 	}
-	
 	return pathStr;
 }
 
@@ -79,18 +89,19 @@ int main(int argc, char *argv[]){
     int seguir=1;
     PWD ruta;
 
-    SubNombre raiz;    	
-    raiz.nombre = (char*) malloc(sizeof(char)*2); /* Reservo lugar para '/' y '\0' */
-    strcpy(raiz.nombre,"/");
+    SubDirectorio raiz;    	
+    raiz.name = (char*) malloc(sizeof(char)*5); /* Reservo lugar para '/' y '\0' */
+    strcpy(raiz.name,"raiz");
+    raiz.size = strlen(raiz.name);
     
     ruta.cont = 1;
-    ruta.sub_rutas[0] = raiz;
-    char* path = getPath(&ruta);
-    pwd = (char*) malloc(sizeof(char)*strlen(path)+1);
-    strcpy(pwd,path);
+    ruta.sub_directorios[0] = raiz;
+    sd_actual = raiz;    
+    
+    //path = getPath(&ruta);
 
     while(seguir){
-        printf("%s>",pwd);
+        printf("/");
         __fpurge(stdin); //Limpia el buffer de entrada del teclado.
         memset(comando,'\0',max);  //Borra cualquier contenido previo del comando.
         scanf("%[^\n]s",comando);   //Espera hasta que el usuario ingrese algun comando.
@@ -134,62 +145,30 @@ void editor(){
 
 void listarDirectorio(){
 
-  //CARGA DEL STRUCT ES LO QUE DEBERIAMOS LLAMAR A RPC function_ls(pwd)
-  //Mensaje *m1;
-  //m1 =(Mensaje*) malloc(sizeof(Mensaje));
-  //(*m1).Mensaje_val = "Carpeta1";
-  //(*m1).Mensaje_len = 8;
-    
-    //Mensaje *msg_to_rec;
-    char buff[8] = "Carpeta1";
     Mensaje msg_test =
     {
-	    8,
-	    buff,
+	    sd_actual.size,
+	    sd_actual.name,
     };
-    printf("Cliente: Mensaje enviado\n");
-    printf("Mensaje_len = %d\n",6);
-    printf("Mensaje_val = %s\n",buff);
-
+    
+    
     Mensaje* msg_to_rec = ls_1(&msg_test,clnt);
     
-    int cant_received = msg_to_rec->Mensaje_len;
-    char* payload_received = msg_to_rec->Mensaje_val;
+    u_int i=0;  
+    char mensaje[(*msg_to_rec).Mensaje_len];
+    strcpy(mensaje,(*msg_to_rec).Mensaje_val);
+    int j=0;
 
-    printf("Cliente: Mensaje recibido\n");
-    printf("%d\n",cant_received);
-    printf("%s\n",payload_received);
-    
-  /*
-  //__________________________________________________
-    Mensaje* msg_to_rec = ls_1(&msj,clnt);
-    
-    
-		
- printf("aca2\n");
-  
-  u_int i=0;
-  
-  char mensaje[(*msg_to_rec).Mensaje_len];
-  strcpy(mensaje,(*msg_to_rec).Mensaje_val);
-  char *c = malloc(sizeof(char));
-  char *nombres = malloc(sizeof(char));
     for(i=0; i<(*msg_to_rec).Mensaje_len; i++){
-      while(mensaje[i]!=',' && i<(*msg_to_rec).Mensaje_len){
-
-	*c =(char) mensaje[i];
-	strcat(nombres,c);
-        i++;
-      }
-      strcat(nombres," ");
+	while((mensaje[i]!=',') && i<(*msg_to_rec).Mensaje_len){
+	    printf("%c",mensaje[j]);
+	    i++;
+	    j++;
+	}
+	j++;//saltea la ,
+	printf(" ");
     }
-  printf("significativo %s\n",nombres);
-  printf("\n");
-  free(msg_to_rec);
-  free(c);
-  free(nombres);
-  * */
-  
+    printf("\n");    
 }
 
 
