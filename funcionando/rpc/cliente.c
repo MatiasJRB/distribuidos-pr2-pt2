@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <dirent.h>
 #include "protocolo.h"
+#include "socketNodos.h"
 
 /*
  typedef struct {
@@ -85,6 +86,10 @@ int main(int argc, char *argv[]){
 	exit(2);
     }
     
+    // iniciar la escucha de pedidos de otros nodos
+    startListening();
+    
+    // downloadFile("192.168.0.186", "Makefile", "puto");
     
     int seguir=1;
     PWD ruta;

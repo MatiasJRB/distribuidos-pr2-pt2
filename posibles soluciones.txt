@@ -1,3 +1,9 @@
+mati-rama: funcion del cliente CD/MKDIR
+fran-salva: funcion del cliente CPY
+juanma: funcion del cliente RM
+maxi-mauro: funcion LS/GETADDRESS
+funcion editor
+
 Metodos que proveemos para la comunicacion nodo a coordinador
 
 typedef struct {
@@ -9,12 +15,12 @@ typedef struct {
 Mensaje LS(Mensaje)=1;
 Mensaje GET_ADDRESS(Mensaje)=2; devuelve la direccion IP del nodo que contiene X archivo
 Mensaje UPDATE_ADDRESS(Mensaje)=3; actualiza la direccion de X archivo
-Mensaje REPORT_CREATE(Mensaje)=4; reporta la creacion de un archivo
+Mensaje REPORT_CREATE(Mensaje)=4; reporta la creacion de un archivo/directorio
 Mensaje REPORT_DELETE(Mensaje)=5; reporta la eliminacion de un archivo
 Mensaje IS_VALID(Mensaje)=6; retorna si un directorio o archivo es valido (o sea, si existe)
 
 
-function ls
+function ls DONE
 
 1 el cliente solicita a la shell ejecutar ls con la direccion completa R  [COM5]
 2 el nodo le pide al coordinador que resuelva function_ls [COM3Y6]
@@ -75,3 +81,4 @@ funcion cpy
 8 el coordinador utiliza su tabla para poder contestar el nodo N3 que la direccion R [COM8][COM4]
 9 se fijan como transferir archivos (podes decirle a n2 que cargue el archivo en el nodo n3 o a n3 que descargue el archivo desde n2)[COM1Y2]
 10 el nodo le informa al coordinador que creo un archivo copia en R [COM3Y6] 
+
