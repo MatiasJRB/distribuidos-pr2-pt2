@@ -4,7 +4,7 @@
 #include "coordinador.h"
 #include <string.h>
 
-#define N 400
+#define N 100
 
 
 // Funcion encargada del LS
@@ -13,14 +13,31 @@
 char* funcionListar(char* Direccion)
 {	
 	struct listado list = *funcionLS(Direccion);
-	char* temp = malloc(N * sizeof(char));
-	memset(temp,'\0',1);
-	for (int i=0;i<list.cantidad;i++)
+	
+	char temp[N];
+	
+	// Revisar porque es necesario esto, pero si no lo pones no anda
+	strcpy(temp,"");
+	
+	int i;
+	struct archivo archivoaux;
+	char* nombreaux;
+	
+	for (i=0;i<list.cantidad;i++)
 	{	
-		strcat(temp, list.elementos[i].nombre);
+		archivoaux = list.elementos[i];
+		nombreaux = archivoaux.nombre;
+		strcat(temp, nombreaux);
 		strcat(temp, ",");
 	}
-	return (temp);	
+
+
+	int size = strlen(temp);
+	char *toRet;
+	toRet = malloc(sizeof(temp)*size);
+	strcpy(toRet,temp);
+	
+	return (toRet);	
 }
 
 // Funcion para retornar la IP en la que se encuentra un archivo
@@ -36,19 +53,23 @@ char* obtenerIP(char* Archivo)
 
 //~ int main()
 //~ {
-	//~ while(getc(stdin) != 'q')
-	//~ {
 	//~ char *respuesta = funcionListar("Carpeta1");
 	//~ printf("%s",respuesta);
 	//~ printf("\n");
-	//~ free(respuesta);
+	
+	//~ respuesta = funcionListar("Carpeta1");
+	//~ printf("%s",respuesta);
+	//~ printf("\n");
+	
+	//~ respuesta = funcionListar("Carpeta1");
+	//~ printf("%s",respuesta);
+	//~ printf("\n");
 	
 	//~ char* IP = obtenerIP("ArchivoA.txt");
 	//~ printf("%s",IP);
 	//~ printf("\n");
-	//~ free(IP);
-	//~ }
 	
-	//~ return 0;
+	
+	//~ return 1;
 
 //~ }
