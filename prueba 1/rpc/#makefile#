@@ -9,6 +9,6 @@ cliente : cliente.c protocolo_clnt.c protocolo_xdr.c
 	gcc -lnsl -o cliente cliente.c protocolo_clnt.c protocolo_xdr.c 
 
 
-servidor : servidor.c protocolo_svc.c protocolo_xdr.c consultas.c coordinador.c
-	gcc -lnsl -o servidor `mysql_config --cflags` servidor.c coordinador.c protocolo_svc.c protocolo_xdr.c consultas.c `mysql_config --libs`
+servidor : servidor.c protocolo_svc.c protocolo_xdr.c 
+	gcc -lnsl -o servidor `mysql_config --cflags` servidor.c  protocolo_svc.c protocolo_xdr.c consultas.c `mysql_config --libs`
 	

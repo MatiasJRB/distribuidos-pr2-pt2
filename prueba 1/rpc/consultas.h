@@ -1,3 +1,5 @@
+#ifndef CONSULTAS_H
+#define CONSULTAS_H
 struct archivo
 {
     char *nombre;            // Nombre del archivo
@@ -20,4 +22,6 @@ extern void * insertar(char *nombre, char *ip, char *direccion, char *permiso, c
 extern struct listado *funcionLS(char *direccion);
 
 extern struct archivo *buscarArchivo(char *nombre);
+
+#endif /* CONSULTAS_H */
 
