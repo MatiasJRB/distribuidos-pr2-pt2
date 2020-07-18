@@ -11,6 +11,7 @@ https://pimylifeup.com/raspberry-pi-mysql/
 
 //CREAR BD Y TABLAS
 CREATE DATABASE proyecto;
+USE proyecto;
 CREATE TABLE indexado (
     	nombre varchar(50),
     	ip varchar(50),
@@ -20,6 +21,7 @@ CREATE TABLE indexado (
 	    tipo int,
 	    ruta varchar(100)
 );
+CREATE USER 'ruso'@'localhost' IDENTIFIED BY 'rusopass';
 
 
 
