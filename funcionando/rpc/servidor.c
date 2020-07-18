@@ -21,7 +21,7 @@ Mensaje *getaddress_1_svc(Mensaje *msg, struct svc_req *req)
 int *is_valid_1_svc(Mensaje *msg, struct svc_req *req)
 {
 	static int to_return;
-	toreturn=esValido(msg->Mensaje_val);
+	to_return=1;//esValido(msg->Mensaje_val);
 	return &to_return;
 	}
 
