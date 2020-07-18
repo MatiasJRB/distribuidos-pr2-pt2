@@ -20,7 +20,7 @@
 /*Declara variables*/
 char comando[max]; //comando va a leer el comando que ingrese el usuario
 char* args[max_args];
-char* path;
+char *path[max];
 CLIENT *clnt;
 
 /*Declara funciones*/
@@ -37,34 +37,12 @@ typedef struct{
     uint size;
 }SubDirectorio;
 SubDirectorio sd_actual;
-SubDirectorio sd_padre;
+SubDirectorio raiz;    	
 
 
-/*
-*	Struct que contiene cada parte del directorio
-* 	/carpeta -> ["/", "carpeta"]
-*/
-typedef struct{
-    SubDirectorio sub_directorios[2];
-    int cont;
-}PWD;
-PWD ruta;
+void* setPath(){
 
-/* A partir de un PWD obtengo en string la ruta completa */
-
-char* getPath(PWD* ruta){
-
-	int i;
-	u_int cantMemory = 0;
-	char* pathStr = (char*) malloc(sizeof(char));
-	for(i=0; i<ruta->cont;i++){
-		char* name = ruta->sub_directorios[i].name;
-		cantMemory += strlen(name);
-		pathStr = realloc(pathStr,cantMemory); //realloc(memoriaPrevia, u_int memoria nueva);
-		strcat(pathStr,name);		
-		printf("ruta %d \n",cantMemory);
-	}
-	return pathStr;
+	
 }
 
 int main(int argc, char *argv[]){
@@ -95,20 +73,17 @@ int main(int argc, char *argv[]){
     int seguir=1;
  
 
-    SubDirectorio raiz;    	
     raiz.name = (char*) malloc(sizeof(char)*5); /* Reservo lugar para '/' y '\0' */
     strcpy(raiz.name,"raiz");
     raiz.size = strlen(raiz.name);
     
-    ruta.cont = 1;
-    ruta.sub_directorios[0] = raiz;
+ 
     sd_actual = raiz;    
-    sd_padre = raiz;
     
-    //path = getPath(&ruta);
+    strcpy((char*)path,"/");
 
     while(seguir){
-        printf("/");
+        printf("%s $",path);
         __fpurge(stdin); //Limpia el buffer de entrada del teclado.
         memset(comando,'\0',max);  //Borra cualquier contenido previo del comando.
         scanf("%[^\n]s",comando);   //Espera hasta que el usuario ingrese algun comando.
@@ -122,8 +97,6 @@ int main(int argc, char *argv[]){
                 exit(0);
             }else if(strcmp(args[0],"cd")==0){
                 ejecutarCD();
-		printf("Estoy en %s \n",sd_actual.name);
-		printf("Length actual %d \n",sd_actual.size);
             }else if(strcmp(args[0],"editor")==0){
                 editor();
             }else{
@@ -162,10 +135,10 @@ void ejecutarCD(){
     {
 	if(strcmp(args[1], "..")==0){
 	    if(strcmp(sd_actual.name,"raiz")){
-		
-		strcpy(sd_actual.name,sd_padre.name);
-		sd_actual.size = sd_padre.size;
-		printf("sd_actual en el .. es %s \n",sd_actual.name);
+		memset(path,'\0',max);
+		strcpy((char*)path,"/");
+		strcpy(sd_actual.name,"raiz");
+		sd_actual.size = strlen("raiz");
 
 		//ruta.sub_directorios[1] = NULL;
 	    }else{
@@ -189,10 +162,7 @@ void ejecutarCD(){
 	    if(valid){
 		sd_actual.size = strlen(args[1]);
 		strcpy(sd_actual.name,args[1]);
-		printf("sd_actual %s \n",sd_actual.name);
-		//manejar arreglo de sub_directorios
-		ruta.cont = ruta.cont ++;
-		ruta.sub_directorios[1] = sd_actual;
+		strcat((char*)path,sd_actual.name);
 		
 	    }else{
 		printf("El directorio ingresado no existe \n");
@@ -206,7 +176,6 @@ void editor(){
 }
 
 void listarDirectorio(){
-    printf("Estoy preguntando por esta carpeta %s\n",sd_actual.name);
 
     Mensaje msg_test =
     {
