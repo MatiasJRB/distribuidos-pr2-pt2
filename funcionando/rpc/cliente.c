@@ -160,6 +160,8 @@ void ejecutarCD(){
 	    //int valid = is_valid_1(&cd,clnt);
 	    int valid = 1;
 	    if(valid){
+		memset(path,'\0',max);
+		strcpy((char*)path,"/");
 		sd_actual.size = strlen(args[1]);
 		strcpy(sd_actual.name,args[1]);
 		strcat((char*)path,sd_actual.name);
