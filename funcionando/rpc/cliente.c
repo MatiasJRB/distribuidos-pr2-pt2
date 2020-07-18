@@ -6,6 +6,8 @@
 #include <dirent.h>
 #include "protocolo.h"
 #include "socketNodos.h"
+#include <sys/types.h>
+#include <sys/stat.h>
 
 /*
  typedef struct {
@@ -17,17 +19,20 @@
 #define max_args 2  //Numero maximo de argumentos (-1) cuando se trate de un comando externo
 #define max 100  //Numero de caracteres maximo para comando las variables de ambiente*/
 
+
 /*Declara variables*/
 char comando[max]; //comando va a leer el comando que ingrese el usuario
 char* args[max_args];
 char *path[max];
 CLIENT *clnt;
+char ip[15];
 
 /*Declara funciones*/
 void separarArgumentos();
 void listarDirectorio();
 void ejecutarCD();
 void editor();
+void ejecutarMKDIR();
 
 
 /* Structs para el manejo del current working directory */
@@ -45,8 +50,80 @@ void* setPath(){
 	
 }
 
+void ejecutarMKDIR()
+{
+    if(args[1]==NULL){
+		printf("uso: mkdir directorio \n");
+    }
+	else 
+    {
+		//Pregunta al coordinador si es valido un directorio con 0.	    
+		char contenido_mensaje[1+sd_actual.size];
+		strcpy(contenido_mensaje,"0");
+		strcat(contenido_mensaje,args[1]);
+		int size_dir= strlen(args[1]);
+
+		Mensaje mkdir =
+		{
+			size_dir,
+			contenido_mensaje,
+		};
+		if(strcmp((char*)path,"/")){ //caso en el que no estoy en root
+		    printf("No puedes crear mas niveles de carpetas \n");
+		}else{
+		    //int valid = exists_1(&mkdir,clnt);
+		    int valid = 0;
+		    if(valid)
+		    {
+			if(valid==1){
+			    printf("El directorio ingresado ya existe \n");
+			}else{
+			    printf("Error DFS: No se pudo crear \n");
+			}
+		    }
+		    else
+		    {
+			    char size_ip[2];
+			    int size = strlen(ip);
+			    sprintf(size_ip,"%d",size);
+			    char contenido_mensaje[1+sd_actual.size+strlen(ip)+2];
+			    //contenido_mensaje = "0"
+			    strcpy(contenido_mensaje,"0");
+			    //contenido_mensaje = "0nombreCSIZEIP"
+			    strcat(contenido_mensaje,args[1]);
+			    strcat(contenido_mensaje,size_ip);
+			    //contenido_mensaje = "0nombrePathSIZEIPdirIP"
+			    strcat(contenido_mensaje,(char*)ip);
+			    printf("EL contenido de mensaje es %s \n",contenido_mensaje);
+			    int size_dir= strlen(args[1]);
+			    char buffer[size_dir+6];
+			    Mensaje mkdir_report = 
+			    {
+				size_dir,
+				contenido_mensaje,
+			    };
+			    strcpy((char*)buffer,"mkdir ");
+			    strcat((char*)buffer,(char*)args[1]);
+			    system(buffer);
+			    //report_create_1(&mkdir_report,clnt);
+			    
+		    }
+		}
+		
+    }
+}
+
+void obtenerIP(){
+    system("hostname -I > nombre");
+    FILE* arch = fopen("nombre","r");
+    fscanf(arch,"%s",ip);	
+    fclose(arch);
+    remove("nombre");
+}
+
 int main(int argc, char *argv[]){
-    
+    memset(ip,'\0',15);
+    obtenerIP();
     char *srv;
 
     if(argc != 2)
@@ -99,6 +176,8 @@ int main(int argc, char *argv[]){
                 ejecutarCD();
             }else if(strcmp(args[0],"editor")==0){
                 editor();
+	    }else if(strcmp(args[0],"mkdir")==0){
+		ejecutarMKDIR();
             }else{
                 printf("No se reconoce el comando ingresado\n");
             }
