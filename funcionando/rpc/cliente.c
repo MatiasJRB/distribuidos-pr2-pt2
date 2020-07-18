@@ -8,6 +8,10 @@
 #include "socketNodos.h"
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <netdb.h> 
+#include <sys/socket.h> 
+#include <netinet/in.h> 
+#include <arpa/inet.h> 
 
 /*
  typedef struct {
@@ -16,7 +20,7 @@
  }Mensaje; 
 */
 
-#define max_args 2  //Numero maximo de argumentos (-1) cuando se trate de un comando externo
+#define max_args 3  //Numero maximo de argumentos (-1) cuando se trate de un comando externo
 #define max 100  //Numero de caracteres maximo para comando las variables de ambiente*/
 
 
@@ -33,7 +37,7 @@ void listarDirectorio();
 void ejecutarCD();
 void editor();
 void ejecutarMKDIR();
-
+void rm();
 
 /* Structs para el manejo del current working directory */
 
@@ -178,6 +182,8 @@ int main(int argc, char *argv[]){
                 editor();
 	    }else if(strcmp(args[0],"mkdir")==0){
 		ejecutarMKDIR();
+	    }else if(strcmp(args[0],"rm")==0){
+		rm();
             }else{
                 printf("No se reconoce el comando ingresado\n");
             }
@@ -285,3 +291,139 @@ void listarDirectorio(){
 }
 
 
+
+char* getMyIp()
+{
+    char myIp[256];
+    struct hostent *host_entry;
+    char *IPbuffer; 
+    gethostname(myIp,256);
+    host_entry = gethostbyname(myIp); 
+    IPbuffer = inet_ntoa(*((struct in_addr*) 
+                   host_entry->h_addr_list[0])); 
+    return IPbuffer;
+}
+
+int isValidIpAddress(char *ipAddress)
+{
+    struct sockaddr_in sa;
+    int result = inet_pton(AF_INET, ipAddress, &(sa.sin_addr));
+    return result;
+}
+
+int removeLocal(char* direccion)
+{
+    int result = remove(direccion);
+    return result;
+}
+
+int rmAux(char* type,char* file)
+{
+    if(file == NULL || type == NULL)
+	return -1;
+    
+    int tipo;
+    if(strcmp(type,"-d"))
+    {
+	//Voy a borrar un directorio
+	tipo = 0;
+    }
+    else
+    if(strcmp(type,"-f"))
+    {
+	//Voy a borrar un archivo
+	tipo = 1;
+    }
+    else
+	return -1;
+    char toSend[256];
+    strcpy(toSend,"");
+    strcat(toSend,file);
+    Mensaje msg_to_send = {
+	256,
+	toSend
+    };
+    
+    /*
+    int maxChar = 512;
+    char* cadena = malloc(maxChar * sizeof(char));
+    memset(cadena,'\0',1);
+    char tipoChar[2];
+    sprintf(tipoChar,"%d",tipo);
+    strcat(cadena,tipoChar);
+    char lengthNombre[5]; 
+    int aux = strlen(toSend);
+    sprintf(lengthNombre,"%d",aux);
+    strcat(cadena,lengthNombre);
+    strcat(cadena,toSend);
+    char lengthUbicacion[5];
+    aux = sd_actual.size;
+    sprintf(lengthUbicacion,"%d",aux);
+    strcat(cadena,lengthUbicacion);
+    strcat(cadena, sd_actual.name);
+    printf("La cadena a enviar es: %s.\n Su longitud es: %d.\n",cadena,1+strlen(cadena));
+    Mensaje msg_to_send = {
+	1+strlen(cadena),
+	cadena
+    };
+    * */
+    
+    int valid = *is_valid_1(&msg_to_send, clnt);
+    if(valid)
+    {
+	if(!tipo) //Si es una carpeta debo ver que este vacia
+	{
+	    int isEmpty = *is_empty_1(&msg_to_send, clnt);
+	    if(!isEmpty)
+		return -3;
+	}
+	Mensaje* msg_to_rec = getaddress_1(&msg_to_send, clnt);
+	char* ip = msg_to_rec->Mensaje_val;
+	if(isValidIpAddress(ip))
+	{
+	    if(strcmp(ip,getMyIp()))
+	    {
+		//No lo tengo yo
+		if(removeFile(ip,toSend))
+		{
+		    report_delete_1(&msg_to_send, clnt);
+		    return 0;
+		}
+		return -4;
+	    }
+	    else
+	    {
+		//Lo tengo yo y debo hacer un remove local
+		if(!removeLocal(toSend))
+		{
+		    report_delete_1(&msg_to_send, clnt);
+		    return 0;
+		}
+		return -4;
+	    }
+	}
+	return -4;
+    }
+    return -2;
+}
+
+
+void rm()
+{
+    int result = rmAux(args[1],args[2]);
+    switch (result)
+    {
+	case -1: 
+	    printf("Uso: rm <-d/-f> <ruta archivo/directorio>\n");
+	    break;
+	case -2:
+	    printf("El nombre de archivo/carpeta no es valido.\n");
+	    break;
+	case -3:
+	    printf("Fallo al borrar '%s': El directorio no esta vacio.\n");
+	    break;
+	case -4:
+	    printf("Ocurrio un error y no se puede eliminar.\n");
+	    break;
+    }
+}

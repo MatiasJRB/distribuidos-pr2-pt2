@@ -39,6 +39,11 @@ void uploadFile(FILE *file, char* ip, char* route)
 
 }
 
+int removeFile(char* ip, char* route)
+{
+    return 1;
+}
+
 void startListening()
 {
     //Mando al hilo a escuchar en el puerto ingresado por el cliente
