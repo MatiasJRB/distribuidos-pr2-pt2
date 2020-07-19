@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "protocolo.h"
 #include "coordinador.h"
 
@@ -13,15 +14,30 @@ Mensaje *ls_1_svc(Mensaje *msg, struct svc_req *req)
 Mensaje *getaddress_1_svc(Mensaje *msg, struct svc_req *req)
 {
 	static Mensaje to_return;
-	to_return.Mensaje_val = obtenerIP(msg->Mensaje_val);
+	char* delimiter = ",";
+	char* nombre = strtok(msg->Mensaje_val, delimiter);
+	char* ubicacion = strtok(NULL, delimiter);
+	to_return.Mensaje_val = obtenerIP(nombre, ubicacion);
 	to_return.Mensaje_len = 1 + strlen(to_return.Mensaje_val);
 	return (&to_return);
 }
 
-int *is_valid_1_svc(Mensaje *msg, struct svc_req *req)
+int *exists_1_svc(Mensaje *msg, struct svc_req *req)
 {
+	//~ printf("servidor.c::is_valid_1_svc\n\n");
+	//~ printf("msg->Mensaje_val = %s",msg->Mensaje_val);
+	//~ printf("msg->Mensaje_len = %d",msg->Mensaje_len);
+	
 	static int to_return;
-	to_return=1;//esValido(msg->Mensaje_val);
+	char* delimiter = ",";
+	char* tipo = strtok(msg->Mensaje_val, delimiter);
+	char* nombre = strtok(NULL, delimiter);
+	char* ubicacion = NULL;
+	if(*tipo == '1')
+	{
+		ubicacion = strtok(NULL, delimiter);
+	}
+	to_return = esValido(*tipo, nombre, ubicacion);
 	return &to_return;
 }
 
