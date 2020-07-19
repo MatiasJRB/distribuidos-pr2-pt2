@@ -147,15 +147,9 @@ struct archivo *buscarArchivo(char *nombre, char *direccion){
 
 // Para eliminar necesito los siguientes datos para asegurarnos que vamos a eliminar correctamente
 void * eliminar(char *nombre, char *ip, char *direccion, char *permiso){
-    printf("Entre a la db.\n");
-    printf("NOMBRE: %s.\n",nombre);
-    printf("IP: %s.\n",ip);
-    printf("Direccion: %s.\n",direccion);
-    printf("Permiso: %s.\n",permiso);
     // Inicializo el motor de mysql  
     MYSQL *con = mysql_init(NULL);
     mysql_real_connect(con, "localhost", "ruso", "rusopass", "proyecto", 0, NULL, 0);
-    printf("Entre a la db.\n");
     char query[N];
     strcpy(query, "UPDATE indexado SET permiso = 'X' WHERE nombre='");
     strcat(query, nombre);
@@ -166,8 +160,7 @@ void * eliminar(char *nombre, char *ip, char *direccion, char *permiso){
     strcat(query, "' AND permiso='");
     strcat(query, permiso); 
     strcat(query, "';");
-    
-    printf("delete query:%s \n ",query);
+
     mysql_query(con, query); //Ejecuto la query para modificar la entrada
     mysql_close(con);
  

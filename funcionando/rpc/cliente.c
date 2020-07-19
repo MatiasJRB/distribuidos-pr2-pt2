@@ -370,9 +370,9 @@ int rmAux(char* type,char* file)
     strcat(cadena,toSend);
     strcat(cadena,",");
     strcat(cadena, sd_actual.name);
-    printf("La cadena a enviar es: %s.\n Su longitud es: %d.\n",cadena,strlen(cadena));
+    //printf("La cadena a enviar es: %s.\n Su longitud es: %d.\n",cadena,strlen(cadena));
     Mensaje msg_to_send = {
-	strlen(cadena),
+	1+strlen(cadena),
 	cadena
     };
     
@@ -381,62 +381,84 @@ int rmAux(char* type,char* file)
     strcat(cadena2,toSend);
     strcat(cadena2,",");
     strcat(cadena2, sd_actual.name);
-    printf("La cadena2 a enviar es: %s.\n Su longitud es: %d.\n",cadena2,strlen(cadena2));
+    //printf("La cadena2 a enviar es: %s.\n Su longitud es: %d.\n",cadena2,strlen(cadena2));
     Mensaje msg_to_send2 = {
-	strlen(cadena2),
+	1+strlen(cadena2),
 	cadena2
     };
     
-    printf("Voy a hacer el exists.\n");
+    //printf("Voy a hacer el exists.\n");
     int valid = *exists_1(&msg_to_send, clnt);
     if(valid)
     {
-	printf("ES VALID.\n");
+	//printf("ES VALID.\n");
 	if(!tipoOperacion) //Si es una carpeta debo ver que este vacia
 	{
 	    Mensaje msg_to_send3 = {
-		strlen(toSend),
+		1+strlen(toSend),
 		toSend
 		};
 	    int isEmpty = *is_empty_1(&msg_to_send3, clnt);
 	    if(!isEmpty){
-		printf("No esta vacio.\n");
+		//printf("No esta vacio.\n");
 		return -3;
 	    }
-	    printf("Esta vacio.\n");
+	    //printf("Esta vacio.\n");
 	}
-	/*
-	Mensaje* msg_to_rec = getaddress_1(&msg_to_send2, clnt);
-	char* ip = msg_to_rec->Mensaje_val;
-	printf("Recibi una ip %s.\n",ip);
-	if(isValidIpAddress(ip))
+	else //Si es un archivo
 	{
-	    printf("La ip es valida.\n");
-	    if(strcmp(ip,getMyIp()))
+	    //Debo obtener la ip
+	    Mensaje* msg_to_rec = getaddress_1(&msg_to_send2, clnt);
+	    char* ip = msg_to_rec->Mensaje_val;
+	    //printf("Recibi una ip %s.\n",ip);
+	    //Ahora debo revisar que sea valida
+	    if(isValidIpAddress(ip))
 	    {
-		printf("no lo tengo yo.\n");
-		//No lo tengo yo
-		if(removeFile(ip,toSend))
+		//Tengo que crear el nuevo paquete con la ip
+		char* cadena3 = malloc(maxChar * sizeof(char));
+		memset(cadena3,'\0',1);
+		char tipoChar2[2];
+		sprintf(tipoChar2,"%d",tipoOperacion);
+		strcat(cadena3,tipoChar2);
+		strcat(cadena3,",");
+		strcat(cadena3,toSend);
+		strcat(cadena3,",");
+		strcat(cadena3, ip);
+		strcat(cadena3,",");
+		strcat(cadena3, sd_actual.name);
+		//printf("La cadena3 a enviar es: %s.\n Su longitud es: %d.\n",cadena3,strlen(cadena3));
+		Mensaje msg_to_send3 = {
+		    strlen(cadena3),
+		    cadena3
+		};
+		//La ip es valida
+		//Ahora debo ver si la ip es mia o no
+		if(strcmp(ip,getMyIp()))
 		{
-		
-		    report_delete_1(&msg_to_send, clnt);
-		    return 0;
+		    //printf("no lo tengo yo.\n");
+		    //No lo tengo yo
+		    if(removeFile(ip,toSend))
+		    {
+			report_delete_1(&msg_to_send3, clnt);
+			return 0;
+		    }
+		    return -4;
 		}
-		return -4;
-	    }
-	    else
-	    {
-		printf("Lo tengo yo.\n");
-		//Lo tengo yo y debo hacer un remove local
-		if(!removeLocal(toSend))
+		else
 		{
-		    report_delete_1(&msg_to_send, clnt);
-		    return 0;
+		    //printf("Lo tengo yo.\n");
+		    //Lo tengo yo y debo hacer un remove local
+		    if(!removeLocal(toSend))
+		    {
+			report_delete_1(&msg_to_send3, clnt);
+			return 0;
+		    }
+		    return -4;
 		}
-		return -4;
 	    }
 	}
-	* */
+	
+    
 	report_delete_1(&msg_to_send, clnt);
 	return 0;
     }
