@@ -5,17 +5,16 @@
 
 #define N 100
 
-
+// Funcion para verificar si un archivo/carpeta es valido
+// Recibe un tipo (0=carpeta,1=archivo), un nombre y la ubicacion del nodo actual
+// Retorna 0=falso, 1=verdadero y 2=tipoInvalido
 int esValido(char tipo, char* Nombre, char* Ubicacion)
 {
-	//int size = strlen(Entrada);
-	//char* EntradaAux = substring(Entrada, 2, size);
-
 	if (tipo == '0')
 	{
-		struct listado aux = *funcionLS(Nombre);
-		if (aux.cantidad != 0) return 1;
-		else return 0;	
+		struct archivo aux = *buscarCarpeta(Nombre);
+		if (strcmp(aux.permiso,"N")==0) return 0;
+		else return 1;	
 	}
 	else
 		if (tipo == '1')
@@ -26,7 +25,6 @@ int esValido(char tipo, char* Nombre, char* Ubicacion)
 		}
 		else
 			return 2;
-
 }
 
 
@@ -74,19 +72,57 @@ char* obtenerIP(char* Archivo, char* Ubicacion)
 	return (toRet);	
 }
 
+
+int carpetaVacia(char* Nombre)
+{
+	struct listado aux = *funcionLS(Nombre);
+	if (aux.cantidad == 0) return 1;
+	else return 0;	
+}
+
+int insert(char* Nombre,char* IP, char* Ubicacion, char tipo)
+{
+	if (tipo == '0')
+	{
+		char aux[40]="raiz/";
+		strcat(aux,Nombre);
+		insertar(Nombre,"-","raiz","R","0","0",aux);
+		return 1;
+	}
+	else
+		if (tipo == '1')
+		{
+			char aux[40]="raiz/";
+			if ( strcmp(Ubicacion,aux) !=0 ) strcat(aux,Ubicacion);
+			printf("Paso \n");
+			insertar(Nombre,IP,Ubicacion,"W","0","1",aux);
+			return 1;
+		}
+		else
+			return 0;
+}
+
 int main()
 {
-	int res = esValido('0',"Carpegta1","");
+	//insert("CarpetaDistri2","","",'0');
+	
+	/*
+	int res = carpetaVacia("Carpeta1");
 	printf("El resultado es: %i",res);
 	printf("\n");
+	*/
 	
+	/*
+	int res = esValido('0',"CarpetaDistri2","");
+	printf("El resultado es: %i",res);
+	printf("\n");
+	*/
 	
 	/*
 	char *respuesta = funcionListar("Carpeta1");
 	printf("%s",respuesta);
 	printf("\n");
 	*/
-	
 	
 	/**
 	char* IP = obtenerIP("ArchivoA.txt");

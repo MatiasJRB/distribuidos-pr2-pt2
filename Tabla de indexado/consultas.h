@@ -15,9 +15,11 @@ struct listado
     int cantidad;    
 };
 
-extern void * insertar(char *nombre, char *ip, char *direccion, char *permiso, char  *version, char  *tipo, char *ruta);
+extern void *insertar(char *nombre, char *ip, char *direccion, char *permiso, char  *version, char  *tipo, char *ruta);
 
 extern struct listado *funcionLS(char *direccion);
 
 extern struct archivo *buscarArchivo(char *nombre, char *direccion);
+
+struct archivo *buscarCarpeta(char *nombre);
 
