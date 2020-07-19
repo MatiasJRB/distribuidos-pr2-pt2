@@ -21,5 +21,7 @@ extern struct listado *funcionLS(char *direccion);
 
 extern struct archivo *buscarArchivo(char *nombre, char *direccion);
 
+void * eliminar(char *nombre, char *ip, char *direccion, char *permiso);
+
 struct archivo *buscarCarpeta(char *nombre);
 

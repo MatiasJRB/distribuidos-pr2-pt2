@@ -80,7 +80,7 @@ int carpetaVacia(char* Nombre)
 	else return 0;	
 }
 
-int insert(char* Nombre,char* IP, char* Ubicacion, char tipo)
+int insert(char tipo, char* Nombre,char* IP, char* Ubicacion)
 {
 	if (tipo == '0')
 	{
@@ -94,8 +94,24 @@ int insert(char* Nombre,char* IP, char* Ubicacion, char tipo)
 		{
 			char aux[40]="raiz/";
 			if ( strcmp(Ubicacion,aux) !=0 ) strcat(aux,Ubicacion);
-			printf("Paso \n");
 			insertar(Nombre,IP,Ubicacion,"W","0","1",aux);
+			return 1;
+		}
+		else
+			return 0;
+}
+
+int delete(char tipo, char* Nombre,char* IP, char* Ubicacion)
+{
+	if (tipo == '0')
+	{
+		eliminar(Nombre,"-","raiz","R");
+		return 1;
+	}
+	else
+		if (tipo == '1')
+		{
+			eliminar(Nombre,IP,Ubicacion,"W");
 			return 1;
 		}
 		else
@@ -104,30 +120,24 @@ int insert(char* Nombre,char* IP, char* Ubicacion, char tipo)
 
 int main()
 {
-	//insert("CarpetaDistri2","","",'0');
-	
-	/*
-	int res = carpetaVacia("Carpeta1");
+	/*int res = esValido('1',"HolaMundo.txt","Carpeta1");
 	printf("El resultado es: %i",res);
 	printf("\n");
-	*/
 	
-	/*
-	int res = esValido('0',"CarpetaDistri2","");
+	insert('1',"HolaMundo.txt","102.102.102.102","Carpeta1");
+	
+	
+	res = esValido('1',"HolaMundo.txt","Carpeta1");
 	printf("El resultado es: %i",res);
 	printf("\n");
-	*/
 	
-	/*
-	char *respuesta = funcionListar("Carpeta1");
-	printf("%s",respuesta);
-	printf("\n");
-	*/
 	
-	/**
-	char* IP = obtenerIP("ArchivoA.txt");
-	printf("%s",IP);
+	delete('1',"HolaMundo.txt","102.102.102.102","Carpeta1");
+	
+	res = esValido('1',"HolaMundo.txt","Carpeta1");
+	printf("El resultado es: %i",res);
 	printf("\n");
+	
 	*/
 	
 	return 1;
