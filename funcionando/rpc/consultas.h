@@ -21,7 +21,9 @@ extern void * insertar(char *nombre, char *ip, char *direccion, char *permiso, c
 
 extern struct listado *funcionLS(char *direccion);
 
-extern struct archivo *buscarArchivo(char *nombre);
+extern struct archivo *buscarArchivo(char *nombre, char *direccion);
+
+
 
 #endif /* CONSULTAS_H */
 

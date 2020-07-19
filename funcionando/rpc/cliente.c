@@ -339,36 +339,41 @@ int rmAux(char* type,char* file)
     char toSend[256];
     strcpy(toSend,"");
     strcat(toSend,file);
+    /*
     Mensaje msg_to_send = {
 	256,
 	toSend
     };
+    */
     
-    /*
     int maxChar = 512;
     char* cadena = malloc(maxChar * sizeof(char));
     memset(cadena,'\0',1);
     char tipoChar[2];
     sprintf(tipoChar,"%d",tipo);
     strcat(cadena,tipoChar);
-    char lengthNombre[5]; 
-    int aux = strlen(toSend);
-    sprintf(lengthNombre,"%d",aux);
-    strcat(cadena,lengthNombre);
+    strcat(cadena,",");
     strcat(cadena,toSend);
-    char lengthUbicacion[5];
-    aux = sd_actual.size;
-    sprintf(lengthUbicacion,"%d",aux);
-    strcat(cadena,lengthUbicacion);
+    strcat(cadena,",");
     strcat(cadena, sd_actual.name);
-    printf("La cadena a enviar es: %s.\n Su longitud es: %d.\n",cadena,1+strlen(cadena));
+    printf("La cadena a enviar es: %s.\n Su longitud es: %d.\n",cadena,strlen(cadena));
     Mensaje msg_to_send = {
-	1+strlen(cadena),
+	strlen(cadena),
 	cadena
     };
-    * */
     
-    int valid = *is_valid_1(&msg_to_send, clnt);
+    char* cadena2 = malloc(maxChar * sizeof(char));
+    memset(cadena2,'\0',1);
+    strcat(cadena2,toSend);
+    strcat(cadena2,",");
+    strcat(cadena2, sd_actual.name);
+    printf("La cadena2 a enviar es: %s.\n Su longitud es: %d.\n",cadena2,strlen(cadena2));
+    Mensaje msg_to_send2 = {
+	strlen(cadena2),
+	cadena2
+    };
+    
+    int valid = *exists_1(&msg_to_send, clnt);
     if(valid)
     {
 	if(!tipo) //Si es una carpeta debo ver que este vacia
@@ -377,7 +382,7 @@ int rmAux(char* type,char* file)
 	    if(!isEmpty)
 		return -3;
 	}
-	Mensaje* msg_to_rec = getaddress_1(&msg_to_send, clnt);
+	Mensaje* msg_to_rec = getaddress_1(&msg_to_send2, clnt);
 	char* ip = msg_to_rec->Mensaje_val;
 	if(isValidIpAddress(ip))
 	{

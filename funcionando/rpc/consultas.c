@@ -6,6 +6,8 @@
 #include <string.h>
 #include "consultas.h"
 
+#define N 500
+
 void * insertar(char *nombre, char *ip, char *direccion, char *permiso, char  *version, char  *tipo, char *ruta){
     
     // Inicializo el motor de mysql  
@@ -31,7 +33,7 @@ void * insertar(char *nombre, char *ip, char *direccion, char *permiso, char  *v
     strcat(query, "');");
 
     if (tipo = "1"){ //Agrego un archivo , por lo tanto tengo que cambiar las versiones de los demas y pasarlos a lectura y luego recien ejecuto la query.
-        char queryupdate[200];
+        char queryupdate[500];
         strcpy(queryupdate, "UPDATE indexado SET permiso = 'R',version = version + 1 WHERE nombre = '");
         strcat(queryupdate, nombre);
         strcat(queryupdate, "';");
@@ -54,13 +56,13 @@ struct listado *funcionLS(char *direccion){
     struct listado *resultado = (struct listado *)malloc(sizeof (struct archivo)*40);
     resultado->cantidad = 0;
 
-    char query[100];
+    char query[500];
     strcpy(query, "SELECT * ");
     strcat(query, "FROM indexado ");
     strcat(query, "WHERE ");
     strcat(query, "direccion = '");
     strcat(query, direccion);
-    strcat(query, "';");
+    strcat(query, "' AND permiso!='X';"); //si permiso es X, es porque esta borrado
     
 	mysql_query(con, query);
     // Obtengo el resultado de esa consulta
@@ -94,7 +96,10 @@ struct listado *funcionLS(char *direccion){
 
 }
 
-struct archivo *buscarArchivo(char *nombre){
+// Modificacion para que busque un archivo o carpeta, con nombre y direccion porque puede tener el mismo nombre en diferente archivo.
+// Recorda que si estoy buscando una carpeta la direccion es - (fijate lso ejemplo en la tabla)
+// vos de ante mano sabes si tenes que buscar una carpeta o un archivo
+struct archivo *buscarArchivo(char *nombre, char *direccion){
     // Inicializo el motor de mysql  
     MYSQL *con = mysql_init(NULL);
     mysql_real_connect(con, "localhost", "ruso", "rusopass", "proyecto", 0, NULL, 0);
@@ -108,95 +113,59 @@ struct archivo *buscarArchivo(char *nombre){
     resultado->permiso = (char*)malloc (1*sizeof(char));
     resultado->ruta = (char*)malloc (100*sizeof(char));
        
-    char query[100];
+    char query[500];
     strcpy(query, "SELECT * ");
     strcat(query, "FROM indexado ");
     strcat(query, "WHERE ");
     strcat(query, "nombre = '");
     strcat(query, nombre);
-    strcat(query, "' AND version = 0;");
-
+    strcat(query, "' AND direccion = '");
+    strcat(query, direccion);
+    strcat(query, "' AND version = 0 AND permiso!='X';");
 	mysql_query(con, query);
     // Obtengo el resultado de esa consulta
     res = mysql_use_result(con);
-   
+    int cantidad=0;
+        while ((row = mysql_fetch_row(res)) != NULL) /* recorrer la variable res con todos los registros obtenidos para su uso */
+        {   
+            cantidad = cantidad + 1;
+            strcpy(resultado->nombre, row[0]);
+            strcpy(resultado->ip, row[1]);
+            strcpy(resultado->direccion, row[2]);
+            strcpy(resultado->permiso, row[3]);
+            resultado->version = atoi(row[4]);
+            resultado->tipo = atoi(row[5]);
+            strcpy(resultado->ruta, row[6]);
+        } 
+    if (cantidad == 0){ // si es 0 significa que nunca encontro un archivo.
+        strcpy(resultado->permiso, "N"); //Si el resultado es null, te pongo como nombre el NULL
+    }
 
-    while ((row = mysql_fetch_row(res)) != NULL) /* recorrer la variable res con todos los registros obtenidos para su uso */
-    {   
-        strcpy(resultado->nombre, row[0]);
-        strcpy(resultado->ip, row[1]);
-        strcpy(resultado->direccion, row[2]);
-        strcpy(resultado->permiso, row[3]);
-        resultado->version = atoi(row[4]);
-        resultado->tipo = atoi(row[5]);
-        strcpy(resultado->ruta, row[6]);
-    } 
     mysql_close(con);
     return resultado;
 }
 
-/*
-// Funciones las cuales utilizaran ustedes Max y Mauro
-int main(int argc, char **argv)
-{  
-    printf("METODO DE BUSQUEDA \n");
-    printf("Nombre \t Ip \t direccion \t permiso \t version \t tipo \t ruta \n");
-        char * nombreArchivo = "ArchivoA.txt";
-        struct archivo mostrar;
-        mostrar = *buscarArchivo(nombreArchivo);    
-        printf("%s \t %s \t %s \t %s \t %d \t %d \t %s \n", mostrar.nombre, mostrar.ip, mostrar.direccion, mostrar.permiso, mostrar.version, mostrar.tipo, mostrar.ruta);
-    printf("__________________________________________________ \n");
-
-
-    printf("METODO DE LS \n");
-    printf("Nombre \t Ip \t direccion \t permiso \t version \t tipo \t ruta \n");
-        char * nombreDirectorio = "Carpeta1";
-        struct listado mostrarlistado;
-        mostrarlistado = *funcionLS(nombreDirectorio); 
-
-        int limite = mostrarlistado.cantidad;
-        int i=0;
-
-        while (i<limite){
-            printf("%s \t %s \t %s \t %s \t %d \t %d \t %s \n", mostrarlistado.elementos[i].nombre, mostrarlistado.elementos[i].ip, mostrarlistado.elementos[i].direccion, mostrarlistado.elementos[i].permiso,mostrarlistado.elementos[i].version, mostrarlistado.elementos[i].tipo, mostrarlistado.elementos[i].ruta);
-            i = i+1; 
-        }
-    printf("__________________________________________________\n");
-
-
-    printf("METODO DE INSERTAR \n");
-        // Inserto un nuevo archivo con la modificacion que actualiza los valores de los anteriores con el mismo nombre.
-        char *nombre = "ArchivoA.txt";            // Nombre del archivo
-        char *ip = "192.168.1.99";                // ip del archivo
-        char *direccion = "Carpeta1";         // direccion del padre del archivo
-        char *permiso = "W";           // w o r, segun escritura o lectura
-        char  *version = "0";            // numero de version con numero 0, es la mas actual
-        char  *tipo = "1";               // 0 si es archivo, 1 si es carpeta
-        char *ruta = "raiz/Carpeta1/ArchivoA.txt";
-    printf("Comienzo a insertar un archivo, y actualizo versiones \n");
-    insertar(nombre, ip, direccion, permiso, version, tipo,ruta);
+// Para eliminar necesito los siguientes datos para asegurarnos que vamos a eliminar correctamente
+void * eliminar(char *nombre, char *ip, char *direccion, char *permiso){
     
-    // Inserto un nuevo archivo que no tiene versiones anteriores
-        nombre = "ArchivoH.txt";            // Nombre del archivo
-        ip = "192.168.1.99";                // ip del archivo
-        direccion = "Carpeta1";         // direccion del padre del archivo
-        permiso = "W";           // w o r, segun escritura o lectura
-        version = "0";            // numero de version con numero 0, es la mas actual
-        tipo = "1";               // 0 si es archivo, 1 si es carpeta
-        ruta = "raiz/Carpeta1/ArchivoH.txt";
-    printf("Comienzo a insertar un archivo \n");
-    insertar(nombre, ip, direccion, permiso, version, tipo,ruta);
-    // Inserto una carpeta
-        nombre = "Carpeta4";            // Nombre del archivo
-        ip = "-";                // ip del archivo
-        direccion = "raiz";         // direccion del padre del archivo
-        permiso = "R";           // w o r, segun escritura o lectura
-        version = "0";            // numero de version con numero 0, es la mas actual
-        tipo = "0";               // 0 si es archivo, 1 si es carpeta
-        ruta = "raiz/Carpeta4";
-        printf("Comienzo a insertar una carpeta \n");
-    insertar(nombre, ip, direccion, permiso, version, tipo,ruta);
+    // Inicializo el motor de mysql  
+    MYSQL *con = mysql_init(NULL);
+    mysql_real_connect(con, "localhost", "ruso", "rusopass", "proyecto", 0, NULL, 0);
+    
+    char query[500];
+    strcpy(query, "UPDATE indexado SET permiso = 'X' WHERE nombre='");
+    strcat(query, nombre);
+    strcat(query, "' AND ip='");
+    strcat(query, ip);
+    strcat(query, "' AND direccion='");
+    strcat(query, direccion);
+    strcat(query, "' AND permiso='");
+    strcat(query, permiso); 
+    strcat(query, "';");
+  
 
-    printf("__________________________________________________ \n");
+    mysql_query(con, query); //Ejecuto la query para modificar la entrada
+    mysql_close(con);
+ 
+    
 }
-* */
