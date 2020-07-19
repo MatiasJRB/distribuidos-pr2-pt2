@@ -40,12 +40,72 @@ getaddress_1(Mensaje *argp, CLIENT *clnt)
 }
 
 int *
-is_valid_1(Mensaje *argp, CLIENT *clnt)
+exists_1(Mensaje *argp, CLIENT *clnt)
 {
 	static int clnt_res;
 
 	memset((char *)&clnt_res, 0, sizeof(clnt_res));
-	if (clnt_call (clnt, IS_VALID,
+	if (clnt_call (clnt, EXISTS,
+		(xdrproc_t) xdr_Mensaje, (caddr_t) argp,
+		(xdrproc_t) xdr_int, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}
+
+Mensaje *
+update_address_1(Mensaje *argp, CLIENT *clnt)
+{
+	static Mensaje clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, UPDATE_ADDRESS,
+		(xdrproc_t) xdr_Mensaje, (caddr_t) argp,
+		(xdrproc_t) xdr_Mensaje, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}
+
+Mensaje *
+report_create_1(Mensaje *argp, CLIENT *clnt)
+{
+	static Mensaje clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, REPORT_CREATE,
+		(xdrproc_t) xdr_Mensaje, (caddr_t) argp,
+		(xdrproc_t) xdr_Mensaje, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}
+
+Mensaje *
+report_delete_1(Mensaje *argp, CLIENT *clnt)
+{
+	static Mensaje clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, REPORT_DELETE,
+		(xdrproc_t) xdr_Mensaje, (caddr_t) argp,
+		(xdrproc_t) xdr_Mensaje, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}
+
+int *
+is_empty_1(Mensaje *argp, CLIENT *clnt)
+{
+	static int clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, IS_EMPTY,
 		(xdrproc_t) xdr_Mensaje, (caddr_t) argp,
 		(xdrproc_t) xdr_int, (caddr_t) &clnt_res,
 		TIMEOUT) != RPC_SUCCESS) {

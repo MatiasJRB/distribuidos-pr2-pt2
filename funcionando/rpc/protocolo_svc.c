@@ -22,7 +22,11 @@ proy2dfs_1(struct svc_req *rqstp, register SVCXPRT *transp)
 	union {
 		Mensaje ls_1_arg;
 		Mensaje getaddress_1_arg;
-		Mensaje is_valid_1_arg;
+		Mensaje exists_1_arg;
+		Mensaje update_address_1_arg;
+		Mensaje report_create_1_arg;
+		Mensaje report_delete_1_arg;
+		Mensaje is_empty_1_arg;
 	} argument;
 	char *result;
 	xdrproc_t _xdr_argument, _xdr_result;
@@ -45,10 +49,34 @@ proy2dfs_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		local = (char *(*)(char *, struct svc_req *)) getaddress_1_svc;
 		break;
 
-	case IS_VALID:
+	case EXISTS:
 		_xdr_argument = (xdrproc_t) xdr_Mensaje;
 		_xdr_result = (xdrproc_t) xdr_int;
-		local = (char *(*)(char *, struct svc_req *)) is_valid_1_svc;
+		local = (char *(*)(char *, struct svc_req *)) exists_1_svc;
+		break;
+
+	case UPDATE_ADDRESS:
+		_xdr_argument = (xdrproc_t) xdr_Mensaje;
+		_xdr_result = (xdrproc_t) xdr_Mensaje;
+		local = (char *(*)(char *, struct svc_req *)) update_address_1_svc;
+		break;
+
+	case REPORT_CREATE:
+		_xdr_argument = (xdrproc_t) xdr_Mensaje;
+		_xdr_result = (xdrproc_t) xdr_Mensaje;
+		local = (char *(*)(char *, struct svc_req *)) report_create_1_svc;
+		break;
+
+	case REPORT_DELETE:
+		_xdr_argument = (xdrproc_t) xdr_Mensaje;
+		_xdr_result = (xdrproc_t) xdr_Mensaje;
+		local = (char *(*)(char *, struct svc_req *)) report_delete_1_svc;
+		break;
+
+	case IS_EMPTY:
+		_xdr_argument = (xdrproc_t) xdr_Mensaje;
+		_xdr_result = (xdrproc_t) xdr_int;
+		local = (char *(*)(char *, struct svc_req *)) is_empty_1_svc;
 		break;
 
 	default:

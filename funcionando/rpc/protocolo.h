@@ -29,9 +29,21 @@ extern  Mensaje * ls_1_svc(Mensaje *, struct svc_req *);
 #define GETADDRESS 2
 extern  Mensaje * getaddress_1(Mensaje *, CLIENT *);
 extern  Mensaje * getaddress_1_svc(Mensaje *, struct svc_req *);
-#define IS_VALID 3
-extern  int * is_valid_1(Mensaje *, CLIENT *);
-extern  int * is_valid_1_svc(Mensaje *, struct svc_req *);
+#define EXISTS 3
+extern  int * exists_1(Mensaje *, CLIENT *);
+extern  int * exists_1_svc(Mensaje *, struct svc_req *);
+#define UPDATE_ADDRESS 4
+extern  Mensaje * update_address_1(Mensaje *, CLIENT *);
+extern  Mensaje * update_address_1_svc(Mensaje *, struct svc_req *);
+#define REPORT_CREATE 5
+extern  Mensaje * report_create_1(Mensaje *, CLIENT *);
+extern  Mensaje * report_create_1_svc(Mensaje *, struct svc_req *);
+#define REPORT_DELETE 6
+extern  Mensaje * report_delete_1(Mensaje *, CLIENT *);
+extern  Mensaje * report_delete_1_svc(Mensaje *, struct svc_req *);
+#define IS_EMPTY 7
+extern  int * is_empty_1(Mensaje *, CLIENT *);
+extern  int * is_empty_1_svc(Mensaje *, struct svc_req *);
 extern int proy2dfs_1_freeresult (SVCXPRT *, xdrproc_t, caddr_t);
 
 #else /* K&R C */
@@ -41,9 +53,21 @@ extern  Mensaje * ls_1_svc();
 #define GETADDRESS 2
 extern  Mensaje * getaddress_1();
 extern  Mensaje * getaddress_1_svc();
-#define IS_VALID 3
-extern  int * is_valid_1();
-extern  int * is_valid_1_svc();
+#define EXISTS 3
+extern  int * exists_1();
+extern  int * exists_1_svc();
+#define UPDATE_ADDRESS 4
+extern  Mensaje * update_address_1();
+extern  Mensaje * update_address_1_svc();
+#define REPORT_CREATE 5
+extern  Mensaje * report_create_1();
+extern  Mensaje * report_create_1_svc();
+#define REPORT_DELETE 6
+extern  Mensaje * report_delete_1();
+extern  Mensaje * report_delete_1_svc();
+#define IS_EMPTY 7
+extern  int * is_empty_1();
+extern  int * is_empty_1_svc();
 extern int proy2dfs_1_freeresult ();
 #endif /* K&R C */
 

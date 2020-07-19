@@ -62,21 +62,26 @@ void ejecutarMKDIR()
 	else 
     {
 		//Pregunta al coordinador si es valido un directorio con 0.	    
-		char contenido_mensaje[1+sd_actual.size];
-		strcpy(contenido_mensaje,"0");
-		strcat(contenido_mensaje,args[1]);
-		int size_dir= strlen(args[1]);
 
+
+		int maxChar = 512;
+		char* cadena = malloc(maxChar * sizeof(char));
+		memset(cadena,'\0',1);
+		char tipoChar[2];
+		sprintf(tipoChar,"%d",0);
+		strcat(cadena,tipoChar);
+		strcat(cadena,",");
+		strcat(cadena,args[1]);
 		Mensaje mkdir =
 		{
-			size_dir,
-			contenido_mensaje,
+			strlen(cadena),
+			cadena
 		};
 		if(strcmp((char*)path,"/")){ //caso en el que no estoy en root
 		    printf("No puedes crear mas niveles de carpetas \n");
 		}else{
-		    //int valid = exists_1(&mkdir,clnt);
-		    int valid = 0;
+		    int valid = *exists_1(&mkdir,clnt);
+		    //int valid = 0;
 		    if(valid)
 		    {
 			if(valid==1){
@@ -91,25 +96,34 @@ void ejecutarMKDIR()
 			    int size = strlen(ip);
 			    sprintf(size_ip,"%d",size);
 			    char contenido_mensaje[1+sd_actual.size+strlen(ip)+2];
-			    //contenido_mensaje = "0"
 			    strcpy(contenido_mensaje,"0");
-			    //contenido_mensaje = "0nombreCSIZEIP"
 			    strcat(contenido_mensaje,args[1]);
 			    strcat(contenido_mensaje,size_ip);
-			    //contenido_mensaje = "0nombrePathSIZEIPdirIP"
 			    strcat(contenido_mensaje,(char*)ip);
-			    printf("EL contenido de mensaje es %s \n",contenido_mensaje);
+			    int maxChar = 512;
+			    char* cadena = malloc(maxChar * sizeof(char));
+			    memset(cadena,'\0',1);
+			    char tipoChar[2];
+			    sprintf(tipoChar,"%d",0);
+			    strcat(cadena,tipoChar);
+			    strcat(cadena,",");
+			    strcat(cadena,args[1]);
+			    strcat(cadena,",");
+			    strcat(cadena,size);
+			    strcat(cadena,",");
+			    strcat(cadena,size_ip);
+			    Mensaje mkdir_report =
+			    {
+				    strlen(cadena),
+				    cadena
+			    };
+			    printf("EL contenido de mensaje es %s \n",cadena);
 			    int size_dir= strlen(args[1]);
 			    char buffer[size_dir+6];
-			    Mensaje mkdir_report = 
-			    {
-				size_dir,
-				contenido_mensaje,
-			    };
 			    strcpy((char*)buffer,"mkdir ");
 			    strcat((char*)buffer,(char*)args[1]);
 			    system(buffer);
-			    //report_create_1(&mkdir_report,clnt);
+			    report_create_1(&mkdir_report,clnt);
 			    
 		    }
 		}
@@ -231,19 +245,21 @@ void ejecutarCD(){
 	    }
 	}else{
 	    //Pregunta al coordinador si es valido un directorio con 0.
-	    
-	    char contenido_mensaje[1+sd_actual.size];
-	    strcpy(contenido_mensaje,"0");
-	    strcat(contenido_mensaje,sd_actual.name);
-
-
-	     Mensaje cd =
+	
+	    int maxChar = 512;
+	    char* cadena = malloc(maxChar * sizeof(char));
+	    memset(cadena,'\0',1);
+	    char tipoChar[2];
+	    sprintf(tipoChar,"%d",0);
+	    strcat(cadena,tipoChar);
+	    strcat(cadena,",");
+	    strcat(cadena,args[1]);
+	    Mensaje cd =
 	    {
-		    sd_actual.size,
-		    contenido_mensaje,
+		    strlen(cadena),
+		    cadena
 	    };
-	    //int valid = is_valid_1(&cd,clnt);
-	    int valid = 1;
+	    int valid = *exists_1(&cd,clnt);
 	    if(valid){
 		memset(path,'\0',max);
 		strcpy((char*)path,"/");
