@@ -69,15 +69,15 @@ update_address_1(Mensaje *argp, CLIENT *clnt)
 	return (&clnt_res);
 }
 
-Mensaje *
+int *
 report_create_1(Mensaje *argp, CLIENT *clnt)
 {
-	static Mensaje clnt_res;
+	static int clnt_res;
 
 	memset((char *)&clnt_res, 0, sizeof(clnt_res));
 	if (clnt_call (clnt, REPORT_CREATE,
 		(xdrproc_t) xdr_Mensaje, (caddr_t) argp,
-		(xdrproc_t) xdr_Mensaje, (caddr_t) &clnt_res,
+		(xdrproc_t) xdr_int, (caddr_t) &clnt_res,
 		TIMEOUT) != RPC_SUCCESS) {
 		return (NULL);
 	}

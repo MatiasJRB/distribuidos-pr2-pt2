@@ -36,8 +36,8 @@ extern  int * exists_1_svc(Mensaje *, struct svc_req *);
 extern  Mensaje * update_address_1(Mensaje *, CLIENT *);
 extern  Mensaje * update_address_1_svc(Mensaje *, struct svc_req *);
 #define REPORT_CREATE 5
-extern  Mensaje * report_create_1(Mensaje *, CLIENT *);
-extern  Mensaje * report_create_1_svc(Mensaje *, struct svc_req *);
+extern  int * report_create_1(Mensaje *, CLIENT *);
+extern  int * report_create_1_svc(Mensaje *, struct svc_req *);
 #define REPORT_DELETE 6
 extern  Mensaje * report_delete_1(Mensaje *, CLIENT *);
 extern  Mensaje * report_delete_1_svc(Mensaje *, struct svc_req *);
@@ -60,8 +60,8 @@ extern  int * exists_1_svc();
 extern  Mensaje * update_address_1();
 extern  Mensaje * update_address_1_svc();
 #define REPORT_CREATE 5
-extern  Mensaje * report_create_1();
-extern  Mensaje * report_create_1_svc();
+extern  int * report_create_1();
+extern  int * report_create_1_svc();
 #define REPORT_DELETE 6
 extern  Mensaje * report_delete_1();
 extern  Mensaje * report_delete_1_svc();

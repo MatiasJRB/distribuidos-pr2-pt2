@@ -47,7 +47,7 @@ Mensaje *update_address_1_svc(Mensaje *msg, struct svc_req *req)
 	return(&to_return);
 }
 
-Mensaje *report_create_1_svc(Mensaje *msg, struct svc_req *req)
+int *report_create_1_svc(Mensaje *msg, struct svc_req *req)
 {
 	static int to_return;
 	
@@ -60,7 +60,7 @@ Mensaje *report_create_1_svc(Mensaje *msg, struct svc_req *req)
 	{
 		ubicacion = strtok(NULL, delimiter);
 	}
-	to_return = insert(nombre, ip, ubicacion, *tipo);
+	to_return = insert(nombre, IP, ubicacion, *tipo);
 	
 	return &to_return;
 }

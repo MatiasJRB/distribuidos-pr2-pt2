@@ -118,8 +118,8 @@ int delete(char tipo, char* Nombre,char* IP, char* Ubicacion)
 			return 0;
 }
 
-int main()
-{
+//int main()
+//{
 	/*int res = esValido('1',"HolaMundo.txt","Carpeta1");
 	printf("El resultado es: %i",res);
 	printf("\n");
@@ -140,6 +140,6 @@ int main()
 	
 	*/
 	
-	return 1;
+//	return 1;
 
-}
+//}

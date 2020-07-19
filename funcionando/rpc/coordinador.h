@@ -14,5 +14,13 @@ char* funcionListar(char* Direccion);
 // Recibe el nombre de un archivo y la ubicacion actual del nodo
 // Retorna un string con el IP del nodo que tiene el archivo
 char* obtenerIP(char* Archivo, char* Ubicacion);
+
+// Inserta un archivo o carpeta en el sistema
+// Recibe el nombre del elemento a insertar, su IP y ubicacion (en caso de ser archivo) y el tipo
+int insert(char* Nombre,char* IP, char* Ubicacion, char tipo);
+
+// Elimina un archivo o carpeta del sistema
+// Recibe el tipo (1=archivo,0=carpeta) el nombre y, en caso de ser archivo, la IP y carpeta en la que se encuentra
+int delete(char tipo, char* Nombre,char* IP, char* Ubicacion);
 int carpetaVacia(char* Nombre);
 #endif /* COORDINADOR_H */

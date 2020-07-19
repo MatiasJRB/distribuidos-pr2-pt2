@@ -109,8 +109,6 @@ void ejecutarMKDIR()
 			    strcat(cadena,",");
 			    strcat(cadena,args[1]);
 			    strcat(cadena,",");
-			    strcat(cadena,size);
-			    strcat(cadena,",");
 			    strcat(cadena,size_ip);
 			    Mensaje mkdir_report =
 			    {
