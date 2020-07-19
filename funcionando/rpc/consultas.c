@@ -9,7 +9,7 @@
 #define N 500
 
 void * insertar(char *nombre, char *ip, char *direccion, char *permiso, char  *version, char  *tipo, char *ruta){
-    
+    printf("Ya entre al insertar db.\n");
     // Inicializo el motor de mysql  
     MYSQL *con = mysql_init(NULL);
     mysql_real_connect(con, "localhost", "ruso", "rusopass", "proyecto", 0, NULL, 0);
@@ -39,6 +39,7 @@ void * insertar(char *nombre, char *ip, char *direccion, char *permiso, char  *v
         mysql_query(con, queryupdate); //Ejecuto la query para updatear los registros
     }
 
+    printf("QUERY: %s.\n",query);
     mysql_query(con, query); //Ejecuto la query para agregar el registro
     mysql_close(con);
     //printf("\n Termine de ejecutar el metodo de insertar \n");
@@ -146,11 +147,15 @@ struct archivo *buscarArchivo(char *nombre, char *direccion){
 
 // Para eliminar necesito los siguientes datos para asegurarnos que vamos a eliminar correctamente
 void * eliminar(char *nombre, char *ip, char *direccion, char *permiso){
-    
+    printf("Entre a la db.\n");
+    printf("NOMBRE: %s.\n",nombre);
+    printf("IP: %s.\n",ip);
+    printf("Direccion: %s.\n",direccion);
+    printf("Permiso: %s.\n",permiso);
     // Inicializo el motor de mysql  
     MYSQL *con = mysql_init(NULL);
     mysql_real_connect(con, "localhost", "ruso", "rusopass", "proyecto", 0, NULL, 0);
-    
+    printf("Entre a la db.\n");
     char query[N];
     strcpy(query, "UPDATE indexado SET permiso = 'X' WHERE nombre='");
     strcat(query, nombre);
@@ -161,8 +166,8 @@ void * eliminar(char *nombre, char *ip, char *direccion, char *permiso){
     strcat(query, "' AND permiso='");
     strcat(query, permiso); 
     strcat(query, "';");
-  
-
+    
+    printf("delete query:%s \n ",query);
     mysql_query(con, query); //Ejecuto la query para modificar la entrada
     mysql_close(con);
  

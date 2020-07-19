@@ -69,7 +69,7 @@ proy2dfs_1(struct svc_req *rqstp, register SVCXPRT *transp)
 
 	case REPORT_DELETE:
 		_xdr_argument = (xdrproc_t) xdr_Mensaje;
-		_xdr_result = (xdrproc_t) xdr_Mensaje;
+		_xdr_result = (xdrproc_t) xdr_int;
 		local = (char *(*)(char *, struct svc_req *)) report_delete_1_svc;
 		break;
 

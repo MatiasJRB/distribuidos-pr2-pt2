@@ -50,7 +50,7 @@ Mensaje *update_address_1_svc(Mensaje *msg, struct svc_req *req)
 int *report_create_1_svc(Mensaje *msg, struct svc_req *req)
 {
 	static int to_return;
-	
+	printf("Mensaje_val = %s.\n",msg->Mensaje_val);
 	char* delimiter = ",";
 	char* tipo = strtok(msg->Mensaje_val, delimiter);
 	char* nombre = strtok(NULL, delimiter);
@@ -60,14 +60,18 @@ int *report_create_1_svc(Mensaje *msg, struct svc_req *req)
 	{
 		ubicacion = strtok(NULL, delimiter);
 	}
+	printf("TIPO: %s\n",tipo);
+	printf("NOMBRE: %s\n",nombre);
+	printf("UBICACION: %s\n",ubicacion);
+	printf("IP: %s\n",IP);
 	to_return = insert(nombre, IP, ubicacion, *tipo);
 	
 	return &to_return;
 }
 
-Mensaje *report_delete_1_svc(Mensaje *msg, struct svc_req *req)
+int *report_delete_1_svc(Mensaje *msg, struct svc_req *req)
 {
-	printf("Reporto el delete de %s.\n",msg->Mensaje_val);
+	/*printf("Reporto el delete de %s.\n",msg->Mensaje_val);
 	char str[64];
 	strcpy(str,"");
 	char* aux = "Terminado prro";
@@ -76,6 +80,25 @@ Mensaje *report_delete_1_svc(Mensaje *msg, struct svc_req *req)
 	
 	to_return.Mensaje_len =	64;
 	to_return.Mensaje_val =	str;
+	*/
+	
+	static int to_return;
+	printf("Mensaje_size = %d.\n",msg->Mensaje_len);
+	printf("Mensaje_val = %s.\n",msg->Mensaje_val);
+	char* delimiter = ",";
+	char* tipo = strtok(msg->Mensaje_val, delimiter);
+	char* nombre = strtok(NULL, delimiter);
+	char* ubicacion = NULL;
+	//char* IP = strtok(NULL, delimiter);
+	if(*tipo == '1')
+	{
+		ubicacion = strtok(NULL, delimiter);
+	}
+	printf("TIPO: %s\n",tipo);
+	printf("NOMBRE: %s\n",nombre);
+	printf("UBICACION: %s\n",ubicacion);
+	//printf("IP: %s\n",IP);
+	to_return = delete(nombre, "-", ubicacion, *tipo);
 	
 	return (&to_return);
 }

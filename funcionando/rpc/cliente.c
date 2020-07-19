@@ -109,7 +109,7 @@ void ejecutarMKDIR()
 			    strcat(cadena,",");
 			    strcat(cadena,args[1]);
 			    strcat(cadena,",");
-			    strcat(cadena,size_ip);
+			    strcat(cadena,ip);
 			    Mensaje mkdir_report =
 			    {
 				    strlen(cadena),
@@ -370,7 +370,7 @@ int rmAux(char* type,char* file)
     strcat(cadena,toSend);
     strcat(cadena,",");
     strcat(cadena, sd_actual.name);
-    //printf("La cadena a enviar es: %s.\n Su longitud es: %d.\n",cadena,strlen(cadena));
+    printf("La cadena a enviar es: %s.\n Su longitud es: %d.\n",cadena,strlen(cadena));
     Mensaje msg_to_send = {
 	strlen(cadena),
 	cadena
@@ -381,15 +381,17 @@ int rmAux(char* type,char* file)
     strcat(cadena2,toSend);
     strcat(cadena2,",");
     strcat(cadena2, sd_actual.name);
-    //printf("La cadena2 a enviar es: %s.\n Su longitud es: %d.\n",cadena2,strlen(cadena2));
+    printf("La cadena2 a enviar es: %s.\n Su longitud es: %d.\n",cadena2,strlen(cadena2));
     Mensaje msg_to_send2 = {
 	strlen(cadena2),
 	cadena2
     };
     
+    printf("Voy a hacer el exists.\n");
     int valid = *exists_1(&msg_to_send, clnt);
     if(valid)
     {
+	printf("ES VALID.\n");
 	if(!tipoOperacion) //Si es una carpeta debo ver que este vacia
 	{
 	    Mensaje msg_to_send3 = {
@@ -401,17 +403,22 @@ int rmAux(char* type,char* file)
 		printf("No esta vacio.\n");
 		return -3;
 	    }
+	    printf("Esta vacio.\n");
 	}
+	/*
 	Mensaje* msg_to_rec = getaddress_1(&msg_to_send2, clnt);
 	char* ip = msg_to_rec->Mensaje_val;
-	//printf("Recibi una ip %s.\n",ip);
+	printf("Recibi una ip %s.\n",ip);
 	if(isValidIpAddress(ip))
 	{
+	    printf("La ip es valida.\n");
 	    if(strcmp(ip,getMyIp()))
 	    {
+		printf("no lo tengo yo.\n");
 		//No lo tengo yo
 		if(removeFile(ip,toSend))
 		{
+		
 		    report_delete_1(&msg_to_send, clnt);
 		    return 0;
 		}
@@ -419,6 +426,7 @@ int rmAux(char* type,char* file)
 	    }
 	    else
 	    {
+		printf("Lo tengo yo.\n");
 		//Lo tengo yo y debo hacer un remove local
 		if(!removeLocal(toSend))
 		{
@@ -428,7 +436,9 @@ int rmAux(char* type,char* file)
 		return -4;
 	    }
 	}
-	return -4;
+	* */
+	report_delete_1(&msg_to_send, clnt);
+	return 0;
     }
     return -2;
 }

@@ -80,10 +80,11 @@ int carpetaVacia(char* Nombre)
 	else return 0;	
 }
 
-int insert(char tipo, char* Nombre,char* IP, char* Ubicacion)
-{
+int insert( char* Nombre,char* IP, char* Ubicacion, char tipo)
+{	printf("INGRESE AL INSERT DEL COORDINADOR.\n");
 	if (tipo == '0')
 	{
+		printf("TIPO 0.\n");
 		char aux[40]="raiz/";
 		strcat(aux,Nombre);
 		insertar(Nombre,"-","raiz","R","0","0",aux);
@@ -92,6 +93,7 @@ int insert(char tipo, char* Nombre,char* IP, char* Ubicacion)
 	else
 		if (tipo == '1')
 		{
+			printf("TIPO 1.\n");
 			char aux[40]="raiz/";
 			if ( strcmp(Ubicacion,aux) !=0 ) strcat(aux,Ubicacion);
 			insertar(Nombre,IP,Ubicacion,"W","0","1",aux);
@@ -101,16 +103,19 @@ int insert(char tipo, char* Nombre,char* IP, char* Ubicacion)
 			return 0;
 }
 
-int delete(char tipo, char* Nombre,char* IP, char* Ubicacion)
+int delete( char* Nombre,char* IP, char* Ubicacion,char tipo)
 {
+	printf("Llegue al delete.\n");
 	if (tipo == '0')
 	{
+		printf("Tipo 0.\n");
 		eliminar(Nombre,"-","raiz","R");
 		return 1;
 	}
 	else
 		if (tipo == '1')
 		{
+			printf("Tipo 1.\n");
 			eliminar(Nombre,IP,Ubicacion,"W");
 			return 1;
 		}

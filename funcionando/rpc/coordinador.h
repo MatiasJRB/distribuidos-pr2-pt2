@@ -21,6 +21,6 @@ int insert(char* Nombre,char* IP, char* Ubicacion, char tipo);
 
 // Elimina un archivo o carpeta del sistema
 // Recibe el tipo (1=archivo,0=carpeta) el nombre y, en caso de ser archivo, la IP y carpeta en la que se encuentra
-int delete(char tipo, char* Nombre,char* IP, char* Ubicacion);
+int delete(char* Nombre,char* IP, char* Ubicacion,char tipo);
 int carpetaVacia(char* Nombre);
 #endif /* COORDINADOR_H */
