@@ -32,7 +32,7 @@ typedef struct erow
 {
 	int idx;
 	int size;
-	int rsize; //render size
+	int rsize;
 	char *chars;
 	char *render;
 } erow;
@@ -40,7 +40,7 @@ typedef struct erow
 struct editorConfig
 {
 	int cx, cy; // cursor position, current line
-	int rx;
+	int rx; //scroll
 	int rowoff; // X offset
 	int coloff; // Y offset
 	int screenrows; // X screen size
@@ -86,7 +86,6 @@ void enableRawMode()
 	if (tcgetattr(STDIN_FILENO, &E.orig_termios) == -1)
 		die("tcgetattr");
 	atexit(disableRawMode);
-	// use it to register our disableRawMode() function to be called automatically when the program exits
 	struct termios raw = E.orig_termios;
 	raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
 	raw.c_oflag &= ~(OPOST);
@@ -94,7 +93,6 @@ void enableRawMode()
 	raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
 	raw.c_cc[VMIN] = 0;
 	raw.c_cc[VTIME] = 1;
-
 	if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1)
 		die("tcsetattr");
 }
@@ -109,7 +107,7 @@ int editorReadKey()
 			die("read");
 	}
 
-	if (c == '\x1b') //ESCAPE o CTRL + Q
+	if (c == '\x1b')
 	{
 		char seq[3];
 		if (read(STDIN_FILENO, &seq[0], 1) != 1)
@@ -125,14 +123,12 @@ int editorReadKey()
 					return '\x1b';
 				if (seq[2] == '~')
 				{
-					// pageup and pagedown <esc>[5~ and <esc>[6~
 					switch (seq[1])
 					{
 					case '1':
 						return HOME_KEY;
 					case '3':
 						return DEL_KEY; 
-						//<esc>[3~
 					case '4':
 						return END_KEY;
 					case '5':
@@ -587,8 +583,7 @@ void editorDrawRows(struct abuf *ab)
 			if (E.numrows == 0 && y == E.screenrows / 3) //WELCOME PAGE
 			{
 				char welcome[80];
-				int welcomelen = snprintf(welcome, sizeof(welcome),
-										  "Pito editor");
+				int welcomelen = snprintf(welcome, sizeof(welcome),"Editor de Texto");
 				if (welcomelen > E.screencols)
 					welcomelen = E.screencols;
 
@@ -596,19 +591,17 @@ void editorDrawRows(struct abuf *ab)
 				int padding = (E.screencols - welcomelen) / 2;
 				if (padding)
 				{
-					abAppend(ab, "~", 1);
+					abAppend(ab, "", 1);
 					padding--;
 				}
 				while (padding--)
 				{
 					abAppend(ab, " ", 1);
 				}
-
 				abAppend(ab, welcome, welcomelen);
 			}
 			else
 			{
-				//write(STDOUT_FILENO, "~", 1);
 				abAppend(ab, "", 1);
 			}
 		}
@@ -618,8 +611,6 @@ void editorDrawRows(struct abuf *ab)
 		}
 
 		abAppend(ab, "\x1b[K", 3);
-		// K means `erase in line`
-		//write(STDOUT_FILENO, "\r\n", 2);
 		abAppend(ab, "\r\n", 2);
 	}
 }
@@ -669,11 +660,7 @@ void editorRefreshScreen()
 
 	struct abuf ab = ABUF_INIT;
 
-	//write(STDOUT_FILENO, "\x1b[2J", 4);
-	//write(STDOUT_FILENO, "\x1b[H", 3);
 	abAppend(&ab, "\x1b[?25l", 6);
-	//abAppend(&ab, "\x1b[2J", 4);
-	// remove the clear entire screen escape sequence
 	abAppend(&ab, "\x1b[H", 3);
 
 	editorDrawRows(&ab);
@@ -684,13 +671,9 @@ void editorRefreshScreen()
 	snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 1, 
 	(E.rx - E.coloff) + 1);
 	abAppend(&ab, buf, strlen(buf));
-
-	//write(STDOUT_FILENO, "\x1b[H", 3);
-	//abAppend(&ab, "\x1b[H", 3);
 	abAppend(&ab, "\x1b[?25h", 6);
 
 	write(STDOUT_FILENO, ab.b, ab.len);
-	//write the buffer's contents out to standard output
 	abFree(&ab);
 }
 
@@ -912,13 +895,11 @@ void initEditor()
 	if (getWindowSize(&E.screenrows, &E.screencols) == -1)
 		die("getWindowSize");
 	E.screenrows -= 2;
-	//2 lines for status bar
 }
 
 int main(int argc, char *argv[])
 {
 	enableRawMode();
-	//enable raw mode, type `reset` to exit the raw mode to canonical mode
 	initEditor();
 	if (argc >= 2)
 	{
@@ -926,7 +907,7 @@ int main(int argc, char *argv[])
 	}
 
 	editorSetStatusMessage(
-		"HELP: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F = find");
+		"AYUDA: Ctrl-S = Guardar | Ctrl-Q = Salir");
 
 	while (1)
 	{
