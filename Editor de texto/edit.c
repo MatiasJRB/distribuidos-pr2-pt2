@@ -32,7 +32,7 @@ typedef struct erow
 {
 	int idx;
 	int size;
-	int rsize;
+	int rsize; //render size
 	char *chars;
 	char *render;
 } erow;
@@ -69,7 +69,6 @@ void die(const char *s)
 	write(STDOUT_FILENO, "\x1b[2J", 4);
 	write(STDOUT_FILENO, "\x1b[H", 3);
 
-	perror(s);
 	exit(1);
 }
 
@@ -93,6 +92,7 @@ void enableRawMode()
 	raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
 	raw.c_cc[VMIN] = 0;
 	raw.c_cc[VTIME] = 1;
+
 	if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1)
 		die("tcsetattr");
 }
@@ -128,7 +128,7 @@ int editorReadKey()
 					case '1':
 						return HOME_KEY;
 					case '3':
-						return DEL_KEY; 
+						return DEL_KEY;
 					case '4':
 						return END_KEY;
 					case '5':
@@ -203,22 +203,6 @@ int getCursorPosition(int *rows, int *cols)
 		return -1;
 
 	return 0;
-}
-
-int getWindowSize1(int *rows, int *cols)
-{
-	struct winsize ws;
-
-	if (ioctl(STDIN_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0)
-	{
-		return -1;
-	}
-	else
-	{
-		*cols = ws.ws_col;
-		*rows = ws.ws_row;
-		return 0;
-	}
 }
 
 int getWindowSize(int *rows, int *cols)
@@ -344,10 +328,8 @@ void editorRowInsertChar(erow *row, int at, int c)
 {
 	if (at < 0 || at > row->size)
 		at = row->size; 
-		// at is the index we want to insert into
 	row->chars = realloc(row->chars, row->size + 2);
 	memmove(&row->chars[at + 1], &row->chars[at], row->size - at + 1);
-	// memmove to make room for the new charater
 	row->size++;
 	row->chars[at] = c;
 	editorUpdateRow(row);
@@ -355,7 +337,7 @@ void editorRowInsertChar(erow *row, int at, int c)
 }
 
 void editorRowAppendString(erow *row, char *s, size_t len)
-{ //append a string to the end of row
+{
 	row->chars = realloc(row->chars, row->size + len + 1);
 	memcpy(&row->chars[row->size], s, len);
 	row->size += len;
@@ -419,7 +401,6 @@ void editorDelChar()
 		E.cx--;
 	}
 	else
-	// means E.cx == 0
 	{
 		E.cx = E.row[E.cy - 1].size;
 		editorRowAppendString(&E.row[E.cy - 1], row->chars, row->size);
@@ -432,7 +413,6 @@ void editorDelChar()
 
 char *editorRowsToString(int *buflen)
 {
-	//converts a row into a single string
 	int totlen = 0;
 	int j;
 	for (j = 0; j < E.numrows; j++)
@@ -456,8 +436,8 @@ void editorOpen(char *filename)
 {
 	free(E.filename);
 	E.filename = strdup(filename);
-	//strdup: makes a copy of the given string
-
+	
+	editorSetStatusMessage(filename);
 
 	FILE *fp = fopen(filename, "r");
 	if (!fp)
@@ -483,10 +463,45 @@ void editorSave()
 {
 	if (E.filename == NULL)
 	{
-		E.filename = editorPrompt("Save as: %s (ESC to cancel)", NULL);
+		E.filename = editorPrompt("Guardar como: %s (ESC to cancel)", NULL);
 		if (E.filename == NULL)
 		{
-			editorSetStatusMessage("Save aborted");
+			editorSetStatusMessage("Guardado cancelado");
+			return;
+		}
+	}
+	int len;
+	char *buf = editorRowsToString(&len);
+
+	int fd = open(E.filename, O_RDWR | O_CREAT, 0644);
+	if (fd != -1)
+	{
+		if (ftruncate(fd, len) != -1)
+		{
+			if (write(fd, buf, len) == len)
+			{
+				close(fd);
+				free(buf);
+				E.dirty = 0;
+				editorSetStatusMessage("%d bytes en disco", len);
+				return;
+			}
+		}
+		close(fd);
+	}
+
+	free(buf);
+	editorSetStatusMessage("Error al guardar, error I/O: %s", strerror(errno));
+}
+
+void editorSaveBeforeExit()
+{
+	if (E.filename == NULL)
+	{
+		E.filename = editorPrompt("Archivo modificado. Guardar como: %s (ESC = cancelar | CTRL-Q = salir)", NULL);
+		if (E.filename == NULL)
+		{
+			editorSetStatusMessage("Guardado cancelado");
 			return;
 		}
 	}
@@ -495,35 +510,30 @@ void editorSave()
 	char *buf = editorRowsToString(&len);
 
 	int fd = open(E.filename, O_RDWR | O_CREAT, 0644);
-	//reading and writing , 0644: permissions
 	if (fd != -1)
 	{
 		if (ftruncate(fd, len) != -1)
-		//sets the file��s size to the specified length
 		{
 			if (write(fd, buf, len) == len)
 			{
 				close(fd);
 				free(buf);
 				E.dirty = 0;
-				editorSetStatusMessage("%d bytes written to disk", len);
+				die("exit");
 				return;
 			}
 		}
 		close(fd);
 	}
-
 	free(buf);
-	editorSetStatusMessage("Can't save! I/O error: %s", strerror(errno));
+	editorSetStatusMessage("Error al guardar, error I/O: %s", strerror(errno));
 }
-
 
 struct abuf
 {
 	char *b;
 	int len;
 };
-
 #define ABUF_INIT \
 	{             \
 		NULL, 0   \
@@ -532,7 +542,6 @@ struct abuf
 void abAppend(struct abuf *ab, const char *s, int len)
 {
 	char *new = realloc(ab->b, ab->len + len);
-
 	if (new == NULL)
 		return;
 	memcpy(&new[ab->len], s, len);
@@ -580,14 +589,13 @@ void editorDrawRows(struct abuf *ab)
 		int filerow = y + E.rowoff;
 		if (filerow >= E.numrows) // LINEAS FUERA DEL ARCHIVO
 		{
-			if (E.numrows == 0 && y == E.screenrows / 3) //WELCOME PAGE
+			if (E.numrows == 0 && y == E.screenrows / 3) //WELCOME PAGE si no se abrio un archivo
 			{
 				char welcome[80];
-				int welcomelen = snprintf(welcome, sizeof(welcome),"Editor de Texto");
+				int welcomelen = snprintf(welcome, sizeof(welcome),"Bienvenido al editor de texto");
 				if (welcomelen > E.screencols)
 					welcomelen = E.screencols;
 
-				// center the welcome info
 				int padding = (E.screencols - welcomelen) / 2;
 				if (padding)
 				{
@@ -598,6 +606,7 @@ void editorDrawRows(struct abuf *ab)
 				{
 					abAppend(ab, " ", 1);
 				}
+
 				abAppend(ab, welcome, welcomelen);
 			}
 			else
@@ -607,9 +616,33 @@ void editorDrawRows(struct abuf *ab)
 		}
 		else  // LINEAS DENTRO DEL ARCHIVO
 		{
+			int len = E.row[filerow].rsize - E.coloff;
 			
+			// SCREEN BOUNDS
+			if (len < 0)
+				len = 0;
+			if (len > E.screencols)
+				len = E.screencols;
+				
+			char *c = &E.row[filerow].render[E.coloff];
+			int j;
+			for (j = 0; j < len; j++) // DE 0 A LONGITUD DE FILEROW (?
+			{
+				if (iscntrl(c[j]))
+				{
+					char sym = (c[j] <= 26) ? '@' + c[j] : '?';
+					abAppend(ab, "\x1b[7m", 4);
+					abAppend(ab, &sym, 1);
+					abAppend(ab, "\x1b[m", 3);
+				}
+				else
+				{
+					abAppend(ab, "\x1b[39m", 5);
+					abAppend(ab, &c[j], 1);
+				}
+			}
+			abAppend(ab, "\x1b[39m", 5);
 		}
-
 		abAppend(ab, "\x1b[K", 3);
 		abAppend(ab, "\r\n", 2);
 	}
@@ -620,10 +653,10 @@ void editorDrawStatusBar(struct abuf *ab)
 	abAppend(ab, "\x1b[7m", 4);
 	char status[80], rstatus[80];
 
-	int len = snprintf(status, sizeof(status), "%.20s - %d lines %s",
-					   E.filename ? E.filename : "[No Name]", E.numrows,
-					   E.dirty ? "(modified)" : "");
-	int rlen = 20;
+	int len = snprintf(status, sizeof(status), "%.20s - %d lineas %s",
+					   E.filename ? E.filename : "[Archivo nuevo]", E.numrows,
+					   E.dirty ? "(modificado)" : "");
+	int rlen = snprintf(rstatus, sizeof(rstatus), "%d/%d", E.cy + 1, E.numrows);
 	if (len > E.screencols)
 		len = E.screencols;
 	abAppend(ab, status, len);
@@ -671,6 +704,7 @@ void editorRefreshScreen()
 	snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 1, 
 	(E.rx - E.coloff) + 1);
 	abAppend(&ab, buf, strlen(buf));
+
 	abAppend(&ab, "\x1b[?25h", 6);
 
 	write(STDOUT_FILENO, ab.b, ab.len);
@@ -706,6 +740,10 @@ char *editorPrompt(char *prompt, void (*callback)(char *, int))
 		{
 			if (buflen != 0)
 				buf[--buflen] = '\0';
+		}
+		else if (c == CTRL_KEY('q'))
+		{
+			die("Salida con exito");
 		}
 		else if (c == '\x1b')
 		{
@@ -793,24 +831,19 @@ void editorMoveCursor(int key)
 
 void editorProcessKeypress()
 {
-	static int quit_times = 3;
 
 	int c = editorReadKey();
 
 	switch (c)
 	{
 	case '\r':
-		//Enter key
 		editorInsertNewline();
 		break;
 
 	case CTRL_KEY('q'):
-		if (E.dirty && quit_times > 0)
+		if (E.dirty)
 		{
-			editorSetStatusMessage("WARNING!!! File has unsaved changes. "
-								   "Press Ctrl-Q %d more times to quit.",
-								   quit_times);
-			quit_times--;
+			editorSaveBeforeExit();
 			return;
 		}
 		write(STDOUT_FILENO, "\x1b[2J", 4);
@@ -874,8 +907,6 @@ void editorProcessKeypress()
 		editorInsertChar(c);
 		break;
 	}
-
-	quit_times = 3;
 }
 
 void initEditor()
@@ -901,19 +932,21 @@ int main(int argc, char *argv[])
 {
 	enableRawMode();
 	initEditor();
-	if (argc >= 2)
+	if (argc >= 2) // Si me pasan un archivo, abro el archivo
 	{
+		char* archivo= argv[1];
+		char* ubicacion = null; // CONSULTA
+		//Buscar el archivo
+		//if(esValido(1, archivo, char* Ubicacion)){
+			// lo busco
+		//}
 		editorOpen(argv[1]);
 	}
-
-	editorSetStatusMessage(
-		"AYUDA: Ctrl-S = Guardar | Ctrl-Q = Salir");
-
+	editorSetStatusMessage("Ctrl-S = Guardar | Ctrl-Q = Cerrar");
 	while (1)
 	{
 		editorRefreshScreen();
 		editorProcessKeypress();
 	}
-
 	return 0;
 }
