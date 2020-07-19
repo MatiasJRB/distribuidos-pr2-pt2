@@ -15,7 +15,7 @@ void * insertar(char *nombre, char *ip, char *direccion, char *permiso, char  *v
     mysql_real_connect(con, "localhost", "ruso", "rusopass", "proyecto", 0, NULL, 0);
     //Si lo que tengo que agregar es un archivo tengo que hacer un cambio de version en los demas.
     
-    char query[200];
+    char query[N];
     strcpy(query, "INSERT INTO indexado (nombre, ip, direccion, permiso, version, tipo, ruta)VALUES ('");
     strcat(query, nombre);
     strcat(query, "','");
@@ -31,9 +31,8 @@ void * insertar(char *nombre, char *ip, char *direccion, char *permiso, char  *v
     strcat(query, ",'");
     strcat(query, ruta);
     strcat(query, "');");
-
     if (tipo = "1"){ //Agrego un archivo , por lo tanto tengo que cambiar las versiones de los demas y pasarlos a lectura y luego recien ejecuto la query.
-        char queryupdate[500];
+        char queryupdate[N];
         strcpy(queryupdate, "UPDATE indexado SET permiso = 'R',version = version + 1 WHERE nombre = '");
         strcat(queryupdate, nombre);
         strcat(queryupdate, "';");
@@ -42,7 +41,7 @@ void * insertar(char *nombre, char *ip, char *direccion, char *permiso, char  *v
 
     mysql_query(con, query); //Ejecuto la query para agregar el registro
     mysql_close(con);
-    printf("\n Termine de ejecutar el metodo de insertar \n");
+    //printf("\n Termine de ejecutar el metodo de insertar \n");
     
 }
 
@@ -56,7 +55,7 @@ struct listado *funcionLS(char *direccion){
     struct listado *resultado = (struct listado *)malloc(sizeof (struct archivo)*40);
     resultado->cantidad = 0;
 
-    char query[500];
+    char query[N];
     strcpy(query, "SELECT * ");
     strcat(query, "FROM indexado ");
     strcat(query, "WHERE ");
@@ -113,7 +112,7 @@ struct archivo *buscarArchivo(char *nombre, char *direccion){
     resultado->permiso = (char*)malloc (1*sizeof(char));
     resultado->ruta = (char*)malloc (100*sizeof(char));
        
-    char query[500];
+    char query[N];
     strcpy(query, "SELECT * ");
     strcat(query, "FROM indexado ");
     strcat(query, "WHERE ");
@@ -152,7 +151,7 @@ void * eliminar(char *nombre, char *ip, char *direccion, char *permiso){
     MYSQL *con = mysql_init(NULL);
     mysql_real_connect(con, "localhost", "ruso", "rusopass", "proyecto", 0, NULL, 0);
     
-    char query[500];
+    char query[N];
     strcpy(query, "UPDATE indexado SET permiso = 'X' WHERE nombre='");
     strcat(query, nombre);
     strcat(query, "' AND ip='");
@@ -168,4 +167,50 @@ void * eliminar(char *nombre, char *ip, char *direccion, char *permiso){
     mysql_close(con);
  
     
+}
+struct archivo *buscarCarpeta(char *nombre){
+    // Inicializo el motor de mysql  
+    MYSQL *con = mysql_init(NULL);
+    mysql_real_connect(con, "localhost", "ruso", "rusopass", "proyecto", 0, NULL, 0);
+    MYSQL_RES *res;
+    MYSQL_ROW row;
+    
+    struct archivo *resultado = (struct archivo *)malloc(sizeof (struct archivo));
+    resultado->nombre = (char*)malloc (50*sizeof(char));
+    resultado->ip    = (char*)malloc (50*sizeof(char));
+    resultado->direccion = (char*)malloc (50*sizeof(char));
+    resultado->permiso = (char*)malloc (1*sizeof(char));
+    resultado->ruta = (char*)malloc (100*sizeof(char));
+       
+    char query[300];
+    strcpy(query, "SELECT * ");
+    strcat(query, "FROM indexado ");
+    strcat(query, "WHERE ");
+    strcat(query, "nombre = '");
+    strcat(query, nombre);
+    strcat(query, "' AND tipo = 0 AND permiso!='X';");
+
+	mysql_query(con, query);
+    // Obtengo el resultado de esa consulta
+    res = mysql_use_result(con);
+    int cantidad=0;
+
+        while ((row = mysql_fetch_row(res)) != NULL) /* recorrer la variable res con todos los registros obtenidos para su uso */
+        {   
+            cantidad = cantidad + 1;
+            strcpy(resultado->nombre, row[0]);
+            strcpy(resultado->ip, row[1]);
+            strcpy(resultado->direccion, row[2]);
+            strcpy(resultado->permiso, row[3]);
+            resultado->version = atoi(row[4]);
+            resultado->tipo = atoi(row[5]);
+            strcpy(resultado->ruta, row[6]);
+        } 
+    
+    if (cantidad == 0){ // si es 0 significa que nunca encontro un archivo.
+        strcpy(resultado->permiso, "N"); //Si el resultado es null, te pongo como nombre el NULL
+    }
+
+    mysql_close(con);
+    return resultado;
 }

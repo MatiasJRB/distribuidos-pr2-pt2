@@ -5,17 +5,16 @@
 
 #define N 100
 
-
+// Funcion para verificar si un archivo/carpeta es valido
+// Recibe un tipo (0=carpeta,1=archivo), un nombre y la ubicacion del nodo actual
+// Retorna 0=falso, 1=verdadero y 2=tipoInvalido
 int esValido(char tipo, char* Nombre, char* Ubicacion)
 {
-	//int size = strlen(Entrada);
-	//char* EntradaAux = substring(Entrada, 2, size);
-
 	if (tipo == '0')
 	{
-		struct listado aux = *funcionLS(Nombre);
-		if (aux.cantidad != 0) return 1;
-		else return 0;	
+		struct archivo aux = *buscarCarpeta(Nombre);
+		if (strcmp(aux.permiso,"N")==0) return 0;
+		else return 1;	
 	}
 	else
 		if (tipo == '1')
@@ -26,7 +25,6 @@ int esValido(char tipo, char* Nombre, char* Ubicacion)
 		}
 		else
 			return 2;
-
 }
 
 
@@ -74,24 +72,72 @@ char* obtenerIP(char* Archivo, char* Ubicacion)
 	return (toRet);	
 }
 
+
+int carpetaVacia(char* Nombre)
+{
+	struct listado aux = *funcionLS(Nombre);
+	if (aux.cantidad == 0) return 1;
+	else return 0;	
+}
+
+int insert(char tipo, char* Nombre,char* IP, char* Ubicacion)
+{
+	if (tipo == '0')
+	{
+		char aux[40]="raiz/";
+		strcat(aux,Nombre);
+		insertar(Nombre,"-","raiz","R","0","0",aux);
+		return 1;
+	}
+	else
+		if (tipo == '1')
+		{
+			char aux[40]="raiz/";
+			if ( strcmp(Ubicacion,aux) !=0 ) strcat(aux,Ubicacion);
+			insertar(Nombre,IP,Ubicacion,"W","0","1",aux);
+			return 1;
+		}
+		else
+			return 0;
+}
+
+int delete(char tipo, char* Nombre,char* IP, char* Ubicacion)
+{
+	if (tipo == '0')
+	{
+		eliminar(Nombre,"-","raiz","R");
+		return 1;
+	}
+	else
+		if (tipo == '1')
+		{
+			eliminar(Nombre,IP,Ubicacion,"W");
+			return 1;
+		}
+		else
+			return 0;
+}
+
 int main()
 {
-	int res = esValido('0',"Carpegta1","");
+	/*int res = esValido('1',"HolaMundo.txt","Carpeta1");
+	printf("El resultado es: %i",res);
+	printf("\n");
+	
+	insert('1',"HolaMundo.txt","102.102.102.102","Carpeta1");
+	
+	
+	res = esValido('1',"HolaMundo.txt","Carpeta1");
 	printf("El resultado es: %i",res);
 	printf("\n");
 	
 	
-	/*
-	char *respuesta = funcionListar("Carpeta1");
-	printf("%s",respuesta);
-	printf("\n");
-	*/
+	delete('1',"HolaMundo.txt","102.102.102.102","Carpeta1");
 	
-	
-	/**
-	char* IP = obtenerIP("ArchivoA.txt");
-	printf("%s",IP);
+	res = esValido('1',"HolaMundo.txt","Carpeta1");
+	printf("El resultado es: %i",res);
 	printf("\n");
+	
 	*/
 	
 	return 1;
