@@ -934,17 +934,19 @@ int main(int argc, char *argv[])
 	initEditor();
 	if (argc >= 2) // Si me pasan un archivo, abro el archivo
 	{
+		char* archivo= argv[1];
+		char* ubicacion = null; // CONSULTA
 		//Buscar el archivo
+		//if(esValido(1, archivo, char* Ubicacion)){
+			// lo busco
+		//}
 		editorOpen(argv[1]);
 	}
-
 	editorSetStatusMessage("Ctrl-S = Guardar | Ctrl-Q = Cerrar");
-
 	while (1)
 	{
 		editorRefreshScreen();
 		editorProcessKeypress();
 	}
-
 	return 0;
 }
