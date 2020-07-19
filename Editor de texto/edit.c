@@ -40,7 +40,7 @@ typedef struct erow
 struct editorConfig
 {
 	int cx, cy; // cursor position, current line
-	int rx;
+	int rx; //scroll
 	int rowoff; // X offset
 	int coloff; // Y offset
 	int screenrows; // X screen size
@@ -85,7 +85,6 @@ void enableRawMode()
 	if (tcgetattr(STDIN_FILENO, &E.orig_termios) == -1)
 		die("tcgetattr");
 	atexit(disableRawMode);
-	// use it to register our disableRawMode() function to be called automatically when the program exits
 	struct termios raw = E.orig_termios;
 	raw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
 	raw.c_oflag &= ~(OPOST);
@@ -124,14 +123,12 @@ int editorReadKey()
 					return '\x1b';
 				if (seq[2] == '~')
 				{
-					// pageup and pagedown <esc>[5~ and <esc>[6~
 					switch (seq[1])
 					{
 					case '1':
 						return HOME_KEY;
 					case '3':
-						return DEL_KEY; 
-						//<esc>[3~
+						return DEL_KEY;
 					case '4':
 						return END_KEY;
 					case '5':
@@ -331,10 +328,8 @@ void editorRowInsertChar(erow *row, int at, int c)
 {
 	if (at < 0 || at > row->size)
 		at = row->size; 
-		// at is the index we want to insert into
 	row->chars = realloc(row->chars, row->size + 2);
 	memmove(&row->chars[at + 1], &row->chars[at], row->size - at + 1);
-	// memmove to make room for the new charater
 	row->size++;
 	row->chars[at] = c;
 	editorUpdateRow(row);
@@ -406,7 +401,6 @@ void editorDelChar()
 		E.cx--;
 	}
 	else
-	// means E.cx == 0
 	{
 		E.cx = E.row[E.cy - 1].size;
 		editorRowAppendString(&E.row[E.cy - 1], row->chars, row->size);
@@ -476,7 +470,6 @@ void editorSave()
 			return;
 		}
 	}
-
 	int len;
 	char *buf = editorRowsToString(&len);
 
@@ -532,7 +525,6 @@ void editorSaveBeforeExit()
 		}
 		close(fd);
 	}
-
 	free(buf);
 	editorSetStatusMessage("Error al guardar, error I/O: %s", strerror(errno));
 }
@@ -542,7 +534,6 @@ struct abuf
 	char *b;
 	int len;
 };
-
 #define ABUF_INIT \
 	{             \
 		NULL, 0   \
@@ -551,7 +542,6 @@ struct abuf
 void abAppend(struct abuf *ab, const char *s, int len)
 {
 	char *new = realloc(ab->b, ab->len + len);
-
 	if (new == NULL)
 		return;
 	memcpy(&new[ab->len], s, len);
@@ -606,7 +596,6 @@ void editorDrawRows(struct abuf *ab)
 				if (welcomelen > E.screencols)
 					welcomelen = E.screencols;
 
-				// center the welcome info
 				int padding = (E.screencols - welcomelen) / 2;
 				if (padding)
 				{
