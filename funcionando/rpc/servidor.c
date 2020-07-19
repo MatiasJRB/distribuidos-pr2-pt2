@@ -55,7 +55,7 @@ Mensaje *report_delete_1_svc(Mensaje *msg, struct svc_req *req)
 int *is_empty_1_svc(Mensaje *msg, struct svc_req *req)
 {
 	static int to_return;
-	to_return=1;
+	to_return = carpetaVacia(msg->Mensaje_val);
 	return &to_return;
 }
 

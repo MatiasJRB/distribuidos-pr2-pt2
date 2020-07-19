@@ -51,6 +51,14 @@ char* obtenerIP(char* Archivo)
 	return (toRet);	
 }
 
+int carpetaVacia(char* Nombre)
+{
+	struct listado aux = *funcionLS(Nombre);
+	if (aux.cantidad == 0) return 1;
+	else return 0;	
+}
+
+
 //~ int main()
 //~ {
 	//~ char *respuesta = funcionListar("Carpeta1");
