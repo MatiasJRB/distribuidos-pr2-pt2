@@ -322,17 +322,17 @@ int rmAux(char* type,char* file)
     if(file == NULL || type == NULL)
 	return -1;
     
-    int tipo;
-    if(strcmp(type,"-d"))
+    int tipoOperacion = 0;
+    if(!strcmp(type,"-d"))
     {
 	//Voy a borrar un directorio
-	tipo = 0;
+	tipoOperacion = 0;
     }
     else
-    if(strcmp(type,"-f"))
+    if(!strcmp(type,"-f"))
     {
 	//Voy a borrar un archivo
-	tipo = 1;
+	tipoOperacion = 1;
     }
     else
 	return -1;
@@ -350,13 +350,13 @@ int rmAux(char* type,char* file)
     char* cadena = malloc(maxChar * sizeof(char));
     memset(cadena,'\0',1);
     char tipoChar[2];
-    sprintf(tipoChar,"%d",tipo);
+    sprintf(tipoChar,"%d",tipoOperacion);
     strcat(cadena,tipoChar);
     strcat(cadena,",");
     strcat(cadena,toSend);
     strcat(cadena,",");
     strcat(cadena, sd_actual.name);
-    printf("La cadena a enviar es: %s.\n Su longitud es: %d.\n",cadena,strlen(cadena));
+    //printf("La cadena a enviar es: %s.\n Su longitud es: %d.\n",cadena,strlen(cadena));
     Mensaje msg_to_send = {
 	strlen(cadena),
 	cadena
@@ -367,7 +367,7 @@ int rmAux(char* type,char* file)
     strcat(cadena2,toSend);
     strcat(cadena2,",");
     strcat(cadena2, sd_actual.name);
-    printf("La cadena2 a enviar es: %s.\n Su longitud es: %d.\n",cadena2,strlen(cadena2));
+    //printf("La cadena2 a enviar es: %s.\n Su longitud es: %d.\n",cadena2,strlen(cadena2));
     Mensaje msg_to_send2 = {
 	strlen(cadena2),
 	cadena2
@@ -376,14 +376,21 @@ int rmAux(char* type,char* file)
     int valid = *exists_1(&msg_to_send, clnt);
     if(valid)
     {
-	if(!tipo) //Si es una carpeta debo ver que este vacia
+	if(!tipoOperacion) //Si es una carpeta debo ver que este vacia
 	{
-	    int isEmpty = *is_empty_1(&msg_to_send, clnt);
-	    if(!isEmpty)
+	    Mensaje msg_to_send3 = {
+		strlen(toSend),
+		toSend
+		};
+	    int isEmpty = *is_empty_1(&msg_to_send3, clnt);
+	    if(!isEmpty){
+		printf("No esta vacio.\n");
 		return -3;
+	    }
 	}
 	Mensaje* msg_to_rec = getaddress_1(&msg_to_send2, clnt);
 	char* ip = msg_to_rec->Mensaje_val;
+	//printf("Recibi una ip %s.\n",ip);
 	if(isValidIpAddress(ip))
 	{
 	    if(strcmp(ip,getMyIp()))
