@@ -40,6 +40,8 @@ void ejecutarCD();
 void editor();
 void ejecutarMKDIR();
 void rm();
+void cp();
+int cpAux(char*,char*);
 
 /* Structs para el manejo del current working directory */
 
@@ -163,7 +165,7 @@ int main(int argc, char *argv[]){
     // iniciar la escucha de pedidos de otros nodos
     
     int seguir=1;
- 
+	startListening(clnt);
 
     raiz.name = (char*) malloc(sizeof(char)*5); /* Reservo lugar para '/' y '\0' */
     strcpy(raiz.name,"raiz");
@@ -619,8 +621,8 @@ int cpAux(char* origen,char* destino)
 			// le mandamos [nombre_archivo],[directorio origen]
 			Mensaje* msg_to_rec = getaddress_1(&msg_to_send3, clnt);
 
-			// char* ip = msg_to_rec->Mensaje_val;
-			strcpy(ip, "localhost");
+			char* ip = msg_to_rec->Mensaje_val;
+			// strcpy(ip, "localhost");
 			printf("ip msg: %s \n", ip);
 			printf("rutaO msg: %s\n", rutaOrigen);
 			printf("rutaD msg: %s\n", rutaDestino);
