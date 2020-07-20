@@ -19,6 +19,7 @@ char* getaddress(CLIENT* clnt, char* nombre, char* ubicacion)
 {
     int size = 2 + strlen(nombre) + strlen(ubicacion);
     char buf[size];
+    buf[0] = '\0';
     strcat(buf,nombre);
     strcat(buf,",");
     strcat(buf,ubicacion);
@@ -40,6 +41,7 @@ int exists(CLIENT* clnt, char tipo, char* nombre, char* ubicacion)
     }
     char buf[size];
     buf[0] = tipo;
+    buf[1] = '\0';
     strcat(buf,",");
     strcat(buf,nombre);
     if(ubicacion != NULL)
@@ -65,6 +67,7 @@ int report_create(CLIENT* clnt, char tipo, char* nombre, char* ip, char* ubicaci
     }
     char buf[size];
     buf[0] = tipo;
+    buf[1] = '\0';
     strcat(buf,",");
     strcat(buf,nombre);
     strcat(buf,",");
