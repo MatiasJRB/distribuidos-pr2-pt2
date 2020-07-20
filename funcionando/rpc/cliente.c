@@ -156,16 +156,11 @@ int main(int argc, char *argv[]){
 
     if(clnt == (CLIENT*)NULL)
     {
-	clnt_pcreateerror(srv);
-	exit(2);
+		clnt_pcreateerror(srv);
+		exit(2);
     }
     
     // iniciar la escucha de pedidos de otros nodos
-	//if (!strcmp(argv[2], "1"))
-	if(argc >2 && argv[2] != '1');
-		startListening(clnt);
-    
-    // downloadFile("192.168.0.186", "Makefile", "puto");
     
     int seguir=1;
  
