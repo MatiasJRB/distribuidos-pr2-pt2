@@ -13,6 +13,7 @@
 #include <sys/socket.h> 
 #include <netinet/in.h> 
 #include <arpa/inet.h> 
+#include "comunicacion.h"
 
 /*
  typedef struct {
@@ -160,7 +161,8 @@ int main(int argc, char *argv[]){
     }
     
     // iniciar la escucha de pedidos de otros nodos
-	if (!strcmp(argv[2], "1"))
+	//if (!strcmp(argv[2], "1"))
+	if(argc >2 && argv[2] != '1');
 		startListening(clnt);
     
     // downloadFile("192.168.0.186", "Makefile", "puto");
@@ -247,20 +249,22 @@ void ejecutarCD(){
 	}else{
 	    //Pregunta al coordinador si es valido un directorio con 0.
 	
-	    int maxChar = 512;
-	    char* cadena = malloc(maxChar * sizeof(char));
-	    memset(cadena,'\0',1);
-	    char tipoChar[2];
-	    sprintf(tipoChar,"%d",0);
-	    strcat(cadena,tipoChar);
-	    strcat(cadena,",");
-	    strcat(cadena,args[1]);
-	    Mensaje cd =
-	    {
-		    strlen(cadena),
-		    cadena
-	    };
-	    int valid = *exists_1(&cd,clnt);
+	    //~ int maxChar = 512;
+	    //~ char* cadena = malloc(maxChar * sizeof(char));
+	    //~ memset(cadena,'\0',1);
+	    //~ char tipoChar[2];
+	    //~ sprintf(tipoChar,"%d",0);
+	    //~ strcat(cadena,tipoChar);
+	    //~ strcat(cadena,",");
+	    //~ strcat(cadena,args[1]);
+	    //~ Mensaje cd =
+	    //~ {
+		    //~ strlen(cadena),
+		    //~ cadena
+	    //~ };
+	    //~ int valid = *exists_1(&cd,clnt);
+	    
+	    int valid = exists(clnt, '0', args[1], NULL);
 	    if(valid){
 		memset(path,'\0',max);
 		strcpy((char*)path,"/");
@@ -549,47 +553,51 @@ int cpAux(char* origen,char* destino)
    
  //   printf("ruta completa %s\n", rutaDestino);
 
-    char toSend[256];
-    strcpy(toSend,"");
-    char* cadena = malloc(maxChar * sizeof(char));
-    memset(cadena,'\0',1);
-    char tipoChar[1];
-    sprintf(tipoChar,"%d",1); 
-    strcat(cadena,tipoChar);   
-    strcat(cadena,",");       
-    strcat(cadena,origen);
-    strcat(cadena,",");
-    strcat(cadena, sd_actual.name);
-    printf("La cadena a enviar es: %s.\n Su longitud es: %d.\n",cadena,strlen(cadena));
-    Mensaje msg_to_send = {
-		strlen(cadena),
-		cadena	
-    };
+    //~ char toSend[256];
+    //~ strcpy(toSend,"");
+    //~ char* cadena = malloc(maxChar * sizeof(char));
+    //~ memset(cadena,'\0',1);
+    //~ char tipoChar[1];
+    //~ sprintf(tipoChar,"%d",1); 
+    //~ strcat(cadena,tipoChar);   
+    //~ strcat(cadena,",");       
+    //~ strcat(cadena,origen);
+    //~ strcat(cadena,",");
+    //~ strcat(cadena, sd_actual.name);
+    //~ printf("La cadena a enviar es: %s.\n Su longitud es: %d.\n",cadena,strlen(cadena));
+    //~ Mensaje msg_to_send = {
+		//~ 1+strlen(cadena),
+		//~ cadena	
+    //~ };
     //Control Archivo de entrada
 
 	// TODO: este falla por alguna razón...
 	// le mandamos 1,[nombre_archivo],[directorio origen]
-    int validEntrada = *exists_1(&msg_to_send, clnt);
-	validEntrada = 1;
+    //~ int validEntrada = *exists_1(&msg_to_send, clnt);
+    int validEntrada = exists(clnt, '1', origen, sd_actual.name);
+	//validEntrada = 1;
+	printf("validEntrada::%d\n\n",validEntrada);
 
     if(validEntrada)
     {
 	    //Control Carpeta de salida - (CarpetaX sin /)
-	    char* cadena2 = malloc(maxChar * sizeof(char));
-	    memset(cadena2,'\0',1);
-	    char tipoChar[1];
-	    sprintf(tipoChar,"%d",0); 
-	    strcat(cadena2,tipoChar);   
-	    strcat(cadena2,",");       
-	    strcat(cadena2,destino);
-	 // printf("La cadena a enviar es: %s.\n Su longitud es: %d.\n",cadena2,strlen(cadena2));
-	    Mensaje msg_to_send = {
-			strlen(cadena2),
-			cadena2
-	    };
+	    //~ char* cadena2 = malloc(maxChar * sizeof(char));
+	    //~ memset(cadena2,'\0',1);
+	    //~ char tipoChar[1];
+	    //~ sprintf(tipoChar,"%d",0); 
+	    //~ strcat(cadena2,tipoChar);   
+	    //~ strcat(cadena2,",");            
+	    //~ strcat(cadena2,destino);
+		//~ printf("La cadena a enviar es: %s.\n Su longitud es: %d.\n",cadena2,strlen(cadena2));
+	    //~ Mensaje msg_to_send = {
+			//~ 1+strlen(cadena2),
+			//~ cadena2
+	    //~ };
 	
 	    //printf("Voy a hacer el exists.\n");
-	    int validSalida = *exists_1(&msg_to_send, clnt);
+	    int validSalida = exists(clnt, '0', destino, NULL);
+	    //int validSalida = *exists_1(&msg_to_send, clnt);
+	    
 	    if(validSalida){
 	    	printf("Salida Bien \n");
 	    	char* cadena3 = malloc(maxChar * sizeof(char));

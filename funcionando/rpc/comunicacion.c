@@ -35,25 +35,46 @@ char* getaddress(CLIENT* clnt, char* nombre, char* ubicacion)
 int exists(CLIENT* clnt, char tipo, char* nombre, char* ubicacion)
 {
     int size = 3 + strlen(nombre);
-    if(ubicacion != NULL)
+    //es un archivo
+    //if(tipo == '1')
+    if(tipo == TIPOARCHIVO)
     {
-        size = size + 1 + strlen(ubicacion);
+		
+		size = size + 1 + strlen(ubicacion);
+		//Si es una carpeta y viene con /, se la sacamos
+		if(*ubicacion == '/')
+		{
+			ubicacion = ubicacion + sizeof(char);
+			size--;
+		}
+
     }
+    else
+    {	
+		//Si es una carpeta y viene con /, se la sacamos
+		if(*nombre == '/')
+		{
+			nombre = nombre + sizeof(char);
+			size--;
+		}
+	}
     char buf[size];
     buf[0] = tipo;
     buf[1] = '\0';
     strcat(buf,",");
     strcat(buf,nombre);
-    if(ubicacion != NULL)
+    if(tipo == TIPOARCHIVO)
     {   
         strcat(buf,",");
         strcat(buf,ubicacion);
     }
+    
     Mensaje to_send =
     {
         1 + strlen(buf),
         buf,
     };
+    printf("%s\n\n",to_send.Mensaje_val);
     int to_return = *exists_1(&to_send,clnt);
     return to_return;
 }

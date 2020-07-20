@@ -2,6 +2,8 @@
 #define COMUNICACION_H_
 
 #include "protocolo.h"
+#define TIPOARCHIVO '1'
+#define TIPOCARPETA '0'
 
 	// devuelve un listado de los archivos y carpetas
 	// que se encuentran en el directorio
