@@ -38,4 +38,7 @@
 	// indica si un directorio esta vacio
 	int is_empty(CLIENT* clnt, char* nombre);
 
+	// actualiza la ip de un archivo
+	int report_update(CLIENT* clnt, char* nombre, char* ip, char* ubicacion);
+
 #endif

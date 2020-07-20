@@ -7,7 +7,7 @@ program PROY2DFS
 		Mensaje LS(Mensaje)=1;
 		Mensaje GETADDRESS(Mensaje)=2;
 		int EXISTS(Mensaje)=3;
-		Mensaje UPDATE_ADDRESS(Mensaje)=4;
+		int REPORT_UPDATE(Mensaje)=4;
 		int REPORT_CREATE(Mensaje)=5;
 		int REPORT_DELETE(Mensaje)=6;
 		int IS_EMPTY(Mensaje)=7;

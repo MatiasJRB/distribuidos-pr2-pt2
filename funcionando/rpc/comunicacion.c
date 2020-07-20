@@ -4,8 +4,19 @@
 #include "protocolo.h"
 #include "comunicacion.h"
 
+char* sacar_barra(char* src)
+{
+	char* to_return = src;
+	if(*src == '/')
+	{
+		to_return = src + sizeof(char);
+	}
+	return to_return;
+}
+
 char* ls(CLIENT* clnt, char* dir)
 {
+	dir = sacar_barra(dir);
     Mensaje to_send =
     {
         1 + strlen(dir),
@@ -17,7 +28,11 @@ char* ls(CLIENT* clnt, char* dir)
 
 char* getaddress(CLIENT* clnt, char* nombre, char* ubicacion)
 {
-    int size = 2 + strlen(nombre) + strlen(ubicacion);
+    //necesitamos por lo menos 3 bytes
+    //dos para comas y uno para el terminador nulo
+    int size = 3;
+    ubicacion = sacar_barra(ubicacion);
+	size = size + strlen(nombre) + strlen(ubicacion);
     char buf[size];
     buf[0] = '\0';
     strcat(buf,nombre);
@@ -34,30 +49,20 @@ char* getaddress(CLIENT* clnt, char* nombre, char* ubicacion)
 
 int exists(CLIENT* clnt, char tipo, char* nombre, char* ubicacion)
 {
-    int size = 3 + strlen(nombre);
+    //necesitamos por lo menos 3 bytes
+    //uno para el tipo, uno para una coma y uno para el terminador nulo
+    int size = 3;
     //es un archivo
-    //if(tipo == '1')
     if(tipo == TIPOARCHIVO)
     {
-		
+        ubicacion = sacar_barra(ubicacion);
 		size = size + 1 + strlen(ubicacion);
-		//Si es una carpeta y viene con /, se la sacamos
-		if(*ubicacion == '/')
-		{
-			ubicacion = ubicacion + sizeof(char);
-			size--;
-		}
-
     }
-    else
-    {	
-		//Si es una carpeta y viene con /, se la sacamos
-		if(*nombre == '/')
-		{
-			nombre = nombre + sizeof(char);
-			size--;
-		}
+    if(tipo == TIPOCARPETA)
+    {
+		nombre = sacar_barra(nombre);
 	}
+	size = size + strlen(nombre);
     char buf[size];
     buf[0] = tipo;
     buf[1] = '\0';
@@ -68,37 +73,43 @@ int exists(CLIENT* clnt, char tipo, char* nombre, char* ubicacion)
         strcat(buf,",");
         strcat(buf,ubicacion);
     }
-    
     Mensaje to_send =
     {
         1 + strlen(buf),
         buf,
     };
-    printf("%s\n\n",to_send.Mensaje_val);
     int to_return = *exists_1(&to_send,clnt);
     return to_return;
 }
 
 int report_create(CLIENT* clnt, char tipo, char* nombre, char* ip, char* ubicacion)
 {
-    int size = 4 + strlen(nombre) + strlen(ip);
-    if(ubicacion != NULL)
+    //necesitamos por lo menos 4 bytes
+    int size = 4;
+    //es un archivo
+    if(tipo == TIPOARCHIVO)
     {
-        size = size + 1 + strlen(ubicacion);
+        ubicacion = sacar_barra(ubicacion);
+		size = size + 1 + strlen(ubicacion);
     }
+    if(tipo == TIPOCARPETA)
+    {
+		nombre = sacar_barra(nombre);
+	}
+	size = size + strlen(nombre);
     char buf[size];
     buf[0] = tipo;
     buf[1] = '\0';
     strcat(buf,",");
     strcat(buf,nombre);
-    strcat(buf,",");
+	strcat(buf,",");
     strcat(buf,ip);
-    if(ubicacion != NULL)
-    {
+    if(tipo == TIPOARCHIVO)
+    {   
         strcat(buf,",");
-        strcat(buf,ubicacion);   
+        strcat(buf,ubicacion);
     }
-    Mensaje to_send = 
+    Mensaje to_send =
     {
         1 + strlen(buf),
         buf,
@@ -109,24 +120,32 @@ int report_create(CLIENT* clnt, char tipo, char* nombre, char* ip, char* ubicaci
 
 int report_delete(CLIENT* clnt, char tipo, char* nombre, char* ip, char* ubicacion)
 {
-    int size = 4 + strlen(nombre) + strlen(ip);
-    if(ubicacion != NULL)
+    //necesitamos por lo menos 4 bytes
+    int size = 4;
+    //es un archivo
+    if(tipo == TIPOARCHIVO)
     {
-        size = size + 1 + strlen(ubicacion);
+        ubicacion = sacar_barra(ubicacion);
+		size = size + 1 + strlen(ubicacion);
     }
+    if(tipo == TIPOCARPETA)
+    {
+		nombre = sacar_barra(nombre);
+	}
+	size = size + strlen(nombre);
     char buf[size];
     buf[0] = tipo;
     buf[1] = '\0';
     strcat(buf,",");
     strcat(buf,nombre);
-    strcat(buf,",");
-    strcat(buf,ip);
-    if(ubicacion != NULL)
-    {
+	strcat(buf,",");
+    strcat(buf,nombre);
+    if(tipo == TIPOARCHIVO)
+    {   
         strcat(buf,",");
-        strcat(buf,ubicacion);   
+        strcat(buf,ubicacion);
     }
-    Mensaje to_send = 
+    Mensaje to_send =
     {
         1 + strlen(buf),
         buf,
@@ -137,6 +156,7 @@ int report_delete(CLIENT* clnt, char tipo, char* nombre, char* ip, char* ubicaci
 
 int is_empty(CLIENT* clnt, char* nombre)
 {
+	nombre = sacar_barra(nombre);
 	Mensaje to_send =
     {
         1 + strlen(nombre),
@@ -146,4 +166,25 @@ int is_empty(CLIENT* clnt, char* nombre)
     return rcv;
 }
 
+int report_update(CLIENT* clnt, char* nombre, char* ip, char* ubicacion)
+{
+    //necesitamos por lo menos 3 bytes
+    int size = 3;  
+    ubicacion = sacar_barra(ubicacion);
+    size = size + strlen(nombre) + strlen(ip) + strlen(ubicacion);
+    char buf[size];
+    buf[0] = '\0';
+    strcat(buf,nombre);  
+    strcat(buf,",");
+    strcat(buf,ip);
+    strcat(buf,",");
+    strcat(buf,ubicacion);
+    Mensaje to_send =
+    {
+        1 + strlen(buf),
+        buf,
+    };
+    int to_return = *report_update_1(&to_send,clnt);
+    return to_return;
+}
 
