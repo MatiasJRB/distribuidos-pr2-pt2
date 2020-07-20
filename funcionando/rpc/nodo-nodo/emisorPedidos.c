@@ -38,6 +38,7 @@ int emisorPedidosNodo(char* ip, char* route, char* destino,int opcion)
 	
 	if ((he=gethostbyname(ip)) == NULL) 
 	{
+		printf("ip recibida: %s------------------------------\n", ip);
 		perror("Error función gethostbyname()\n");
 		return ERROR;
 	}

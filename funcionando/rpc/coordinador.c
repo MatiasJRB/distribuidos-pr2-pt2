@@ -95,7 +95,11 @@ int insert(char tipo, char* Nombre,char* IP, char* Ubicacion)
 		{
 			//printf("TIPO 1.\n");
 			char aux[40]="raiz/";
-			if ( strcmp(Ubicacion,aux) !=0 ) strcat(aux,Ubicacion);
+			if ( strcmp(Ubicacion,aux) !=0 ) {
+				strcat(aux,Ubicacion);
+				strcat(aux,"/");
+				strcat(aux,Nombre);
+			}
 			insertar(Nombre,IP,Ubicacion,"W","0","1",aux);
 			return 1;
 		}
