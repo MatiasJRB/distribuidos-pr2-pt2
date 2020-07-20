@@ -1,4 +1,4 @@
-all: rpcgen enviarRecibir.o receptorPedidos.o emisorPedidos.o socketNodos.o cliente servidor
+all: rpcgen enviarRecibir.o receptorPedidos.o emisorPedidos.o socketNodos.o editor cliente servidor
 .PHONY: all 
 
 rpcgen: protocolo.x
@@ -12,6 +12,9 @@ servidor : servidor.c protocolo_svc.c protocolo_xdr.c consultas.c coordinador.c
 	
 socketNodos.o: nodo-nodo/socketNodos.c
 	gcc nodo-nodo/socketNodos.c -c -Wall -Wpedantic -Wextra
+
+editor: editor.c protocolo_clnt.c protocolo_xdr.c socketNodos.o receptorPedidos.o emisorPedidos.o enviarRecibir.o
+	gcc -lnsl -o editor editor.c comunicacion.c  protocolo_clnt.c protocolo_xdr.c socketNodos.o receptorPedidos.o emisorPedidos.o enviarRecibir.o -lpthread
 
 receptorPedidos.o: nodo-nodo/receptorPedidos.c
 	gcc nodo-nodo/receptorPedidos.c -c -Wall -Wpedantic -Wextra
