@@ -80,7 +80,7 @@ int carpetaVacia(char* Nombre)
 	else return 0;	
 }
 
-int insert( char* Nombre,char* IP, char* Ubicacion, char tipo)
+int insert(char tipo, char* Nombre,char* IP, char* Ubicacion)
 {	//printf("INGRESE AL INSERT DEL COORDINADOR.\n");
 	if (tipo == '0')
 	{
@@ -103,7 +103,7 @@ int insert( char* Nombre,char* IP, char* Ubicacion, char tipo)
 			return 0;
 }
 
-int delete( char* Nombre,char* IP, char* Ubicacion,char tipo)
+int delete(char tipo, char* Nombre,char* IP, char* Ubicacion)
 {
 	//printf("Llegue al delete.\n");
 	if (tipo == '0')

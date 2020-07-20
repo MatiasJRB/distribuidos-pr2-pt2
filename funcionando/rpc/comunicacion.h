@@ -1,12 +1,13 @@
 #ifndef COMUNICACION_H_
 #define COMUNICACION_H_
 
-	char* ls(char* dir);
-	char* getaddress(char* archivo, char* ubicacion);
-	int exists(char tipo, char* nombre; char* ubicacion);
-	int report_create(char tipo, char* nombre, char* ip, char* ubicacion);
-	int report_delete(char tipo, char* nombre, char* ip, char* ubicacion);
-	int is_empty(char* nombre);
+#include "protocolo.h"
 
+	char* ls(CLIENT* clnt, char* dir);
+	char* getaddress(CLIENT* clnt, char* nombre, char* ubicacion);
+	int exists(CLIENT* clnt, char tipo, char* nombre, char* ubicacion);
+	int report_create(CLIENT* clnt, char tipo, char* nombre, char* ip, char* ubicacion);
+	int report_delete(CLIENT* clnt, char tipo, char* nombre, char* ip, char* ubicacion);
+	int is_empty(CLIENT* clnt, char* nombre);
 
 #endif

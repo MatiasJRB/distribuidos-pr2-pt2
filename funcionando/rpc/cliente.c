@@ -12,6 +12,7 @@
 #include <sys/socket.h> 
 #include <netinet/in.h> 
 #include <arpa/inet.h> 
+#include "comunicacion.h"
 
 /*
  typedef struct {
@@ -277,31 +278,49 @@ void editor(){
 }
 
 void listarDirectorio(){
-
-    Mensaje msg_test =
-    {
-	   sd_actual.size,
-	   sd_actual.name,
-    };
-    
-    
-    Mensaje* msg_to_rec = ls_1(&msg_test,clnt);
-    
-    u_int i=0;  
-    char mensaje[(*msg_to_rec).Mensaje_len];
-    strcpy(mensaje,(*msg_to_rec).Mensaje_val);
-    int j=0;
-
-    for(i=0; i<(*msg_to_rec).Mensaje_len; i++){
-	while((mensaje[i]!=',') && i<(*msg_to_rec).Mensaje_len){
-	    printf("%c",mensaje[j]);
-	    i++;
-	    j++;
-	}
-	j++;//saltea la ,
-	printf(" ");
+	
+	
+	char* listado = ls(clnt, sd_actual.name);
+	u_int i = 0;
+	int j = 0;
+	for(i=0; i<strlen(listado); i++)
+	{
+		while((listado[i]!=',') && i<strlen(listado))
+		{
+			printf("%c",listado[j]);
+			i++;
+			j++;
+		}
+		j++;//saltea la ,
+		printf(" ");
     }
-    printf("\n");    
+    printf("\n"); 
+	
+
+    //~ Mensaje msg_test =
+    //~ {
+	   //~ sd_actual.size,
+	   //~ sd_actual.name,
+    //~ };
+    
+    
+    //~ Mensaje* msg_to_rec = ls_1(&msg_test,clnt);
+    
+    //~ u_int i=0;  
+    //~ char mensaje[(*msg_to_rec).Mensaje_len];
+    //~ strcpy(mensaje,(*msg_to_rec).Mensaje_val);
+    //~ int j=0;
+
+    //~ for(i=0; i<(*msg_to_rec).Mensaje_len; i++){
+	//~ while((mensaje[i]!=',') && i<(*msg_to_rec).Mensaje_len){
+	    //~ printf("%c",mensaje[j]);
+	    //~ i++;
+	    //~ j++;
+	//~ }
+	//~ j++;//saltea la ,
+	//~ printf(" ");
+    //~ }
+    //~ printf("\n");    
 }
 
 

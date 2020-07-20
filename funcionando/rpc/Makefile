@@ -6,7 +6,7 @@ protocolo.h protocolo_clnt.c protocolo_svc.c protocolo_xdr.c: protocolo.x
 
 
 cliente : cliente.c protocolo_clnt.c protocolo_xdr.c socketNodos.o receptorPedidos.o emisorPedidos.o enviarRecibir.o
-	gcc -lnsl -o cliente cliente.c protocolo_clnt.c protocolo_xdr.c socketNodos.o receptorPedidos.o emisorPedidos.o enviarRecibir.o -lpthread
+	gcc -lnsl -o cliente cliente.c comunicacion.c protocolo_clnt.c protocolo_xdr.c socketNodos.o receptorPedidos.o emisorPedidos.o enviarRecibir.o -lpthread
 
 servidor : servidor.c protocolo_svc.c protocolo_xdr.c consultas.c coordinador.c
 	gcc -lnsl -o servidor `mysql_config --cflags` servidor.c coordinador.c protocolo_svc.c protocolo_xdr.c consultas.c `mysql_config --libs`

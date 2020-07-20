@@ -64,7 +64,7 @@ int *report_create_1_svc(Mensaje *msg, struct svc_req *req)
 	//printf("NOMBRE: %s\n",nombre);
 	//printf("UBICACION: %s\n",ubicacion);
 	//printf("IP: %s\n",IP);
-	to_return = insert(nombre, IP, ubicacion, *tipo);
+	to_return = insert(*tipo, nombre, IP, ubicacion);
 	
 	return &to_return;
 }
@@ -98,7 +98,7 @@ int *report_delete_1_svc(Mensaje *msg, struct svc_req *req)
 	//printf("NOMBRE: %s\n",nombre);
 	//printf("UBICACION: %s\n",ubicacion);
 	//printf("IP: %s\n",IP);
-	to_return = delete(nombre, IP, ubicacion, *tipo);
+	to_return = delete(*tipo, nombre, IP, ubicacion);
 	
 	return (&to_return);
 }
