@@ -184,7 +184,7 @@ int report_update(CLIENT* clnt, char* nombre, char* ip, char* ubicacion)
         1 + strlen(buf),
         buf,
     };
-    int to_return = *report_create_1(&to_send,clnt);
+    int to_return = *report_update_1(&to_send,clnt);
     return to_return;
 }
 
