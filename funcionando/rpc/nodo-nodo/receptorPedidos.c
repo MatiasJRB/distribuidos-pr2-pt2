@@ -151,9 +151,7 @@ void * receptorPedidosNodo(void * arg)
 						*/
 						FILE * archivoNuevo;
 						FILE * archivoOrigen;
-						mkdir(destino, 0777); //creo la carpeta destino
-						
-						
+
 						nombreArchivo="";
 						char * ruta_aux;
 						ruta_aux = strdup(ruta);
@@ -164,8 +162,24 @@ void * receptorPedidosNodo(void * arg)
 						    pasador= strtok(NULL,"/");
 						    
 						}
-						strcat(destino,"/");
+						printf("strlen destino: %i\n", strlen(destino));
+
+						if (strlen(destino)) {
+							mkdir(destino, 0777); //creo la carpeta destino
+							strcat(destino,"/");
+						}
+
 						strcat(destino,nombreArchivo);
+
+						printf("destino: %s\nruta: %s\n", destino, ruta);
+						if (!strcmp(destino,ruta)) {
+							printf("son el mismo archivo ...\n");
+							enviar_paquete.identificador=ERROR;
+							enviar(newfd,&enviar_paquete,sizeof(struct PAQUETE_SOCKET));
+							exit(ERROR);
+						}
+
+						printf("archivo a crear en %s\n", destino);
 						
 						archivoOrigen = fopen(ruta,"r");
 						if(archivoOrigen == NULL)
