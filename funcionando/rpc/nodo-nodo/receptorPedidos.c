@@ -11,34 +11,20 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <pthread.h>
-#include <string.h> 
+
+#include <sys/stat.h>
+
 
 #include "receptorPedidos.h"
 #include "enviarRecibir.h"
-
-#define PUERTO 15000 // puerto en el que cada nodo va a escuchar
-
-#define MAXDATASIZE 512
-#define DOWNLOAD 1
-#define UPLOAD 2
-#define UPDATE 3
-#define ERROR 4
-#define ACK 5
-
-typedef struct PAQUETE_SOCKET
-{
-	int identificador; //Identificador del tipo de operacion que se este realizando
-	int tamanio_data; //Indicará el tamaño del archivo en bytes
-    int ultimo_paquete;
-    char data[MAXDATASIZE]; //Indicará la ruta del archivo (id=1) o el archivo en sì (si el id=2)
-} PAQUETE_SOCKET;
+#include "constantes.h"
+#include "../protocolo.h"
 
 static PAQUETE_SOCKET enviar_paquete, recibir_paquete;
 
-
-
-void * receptorPedidosNodo()
+void * receptorPedidosNodo(void * arg)
 {
+	CLIENT * clnt = arg;
 	int sockfd; // el servidor escuchara por sockfd
 	int newfd; // las transferencias de datos se realizara mediante newfd
 	
@@ -71,13 +57,13 @@ void * receptorPedidosNodo()
 	if (bind(sockfd, (struct sockaddr *)&servidorInfo, sizeof(struct sockaddr)) == -1)
 	{
 		perror("Error en función bind()\n");
-		exit(EXIT_FAILURE);
+		exit(errno);
 	}
 	// Habilita el socket para recibir conexiones, con una cola de x conexiones en espera como máximo
 	if (listen(sockfd, 10) == -1)
 	{
 		perror("Error en funcion listen()\n");
-		exit(EXIT_FAILURE);
+		exit(errno);
 	}
 	while(1) 
 	{ 
@@ -88,11 +74,15 @@ void * receptorPedidosNodo()
 		if ((newfd = accept(sockfd, (struct sockaddr *)&clienteInfo, (socklen_t *) &sin_size)) == -1)
 		{
 			perror("Error en función accept()\n");
-            exit(EXIT_FAILURE);
+			exit(errno);
 		}
 		printf("Pedido desde el nodo con IP: %s\n", inet_ntoa(clienteInfo.sin_addr));
 		printf("Conexion desde puerto: %d \n", ntohs(clienteInfo.sin_port));
+		char* ruta;
+		char* destino;
 
+		char* nombreArchivo;
+		char* pasador;
 		if (!fork()) 
 		{ 
 			// Comienza el proceso hijo, enviamos los datos mediante newfd
@@ -115,7 +105,7 @@ void * receptorPedidosNodo()
                         enviar_paquete.ultimo_paquete = 0;
                         while(!enviar_paquete.ultimo_paquete){
                             leidos = fread(enviar_paquete.data, sizeof(char), MAXDATASIZE, archivo);
-                            enviar_paquete.identificador=UPLOAD;
+                            enviar_paquete.identificador=DOWNLOAD;
                             enviar_paquete.tamanio_data = leidos;
                             enviar_paquete.ultimo_paquete = feof(archivo);
                             enviar(newfd, &enviar_paquete,sizeof(struct PAQUETE_SOCKET)); 
@@ -129,14 +119,92 @@ void * receptorPedidosNodo()
                         fclose(archivo);
                         printf("\nArchivo enviado\n");
                         break;
+				case COPY:
+						ruta = strtok(recibir_paquete.data," ");
+						destino= strtok(NULL," ");
+						long unsigned int i=0;
+						for(i=1;i<strlen(ruta);i++)
+						{
+						  ruta[i-1]=ruta[i];
+						}
+						ruta[i-1]='\0';
+						
+						for(i=1;i<strlen(destino);i++)
+						{
+						  destino[i-1]=destino[i];
+						}
+						destino[i-1]='\0';
 
-				case UPLOAD:
+						if(clnt == (CLIENT*)NULL)
+						{
+							clnt_pcreateerror("localhost");
+							printf("error cliente copy");
+							exit(2);
+						}
+						/*	
+						Mensaje msg ;
+						msg.Mensaje_val=destino;
+						msg.Mensaje_len=strlen(destino);
+
+						int * to_return =is_valid_1(&msg,clnt);
+						printf("%i",*to_return);
+						*/
+						FILE * archivoNuevo;
+						FILE * archivoOrigen;
+						mkdir(destino, 0777); //creo la carpeta destino
+						
+						
+						nombreArchivo="";
+						char * ruta_aux;
+						ruta_aux = strdup(ruta);
+						pasador= strtok(ruta_aux,"/");
+						while(pasador!=NULL)
+						{
+						    nombreArchivo=pasador;
+						    pasador= strtok(NULL,"/");
+						    
+						}
+						strcat(destino,"/");
+						strcat(destino,nombreArchivo);
+						
+						archivoOrigen = fopen(ruta,"r");
+						if(archivoOrigen == NULL)
+						{
+							enviar_paquete.identificador=ERROR;
+							enviar(newfd,&enviar_paquete,sizeof(struct PAQUETE_SOCKET));
+							exit(ERROR);
+						}
+
+						archivoNuevo = fopen(destino,"w+");
+						if(archivoNuevo == NULL)
+						{
+							fclose(archivoOrigen);
+							enviar_paquete.identificador=ERROR;
+							enviar(newfd,&enviar_paquete,sizeof(struct PAQUETE_SOCKET));
+							exit(ERROR);
+						}
+
+						char ch;
+						while ((ch = fgetc(archivoOrigen)) != EOF)
+						{
+							fputc(ch, archivoNuevo);
+						}
+
+						fclose(archivoOrigen);
+						fclose(archivoNuevo);
+						
+						enviar_paquete.identificador=ACK;
+						enviar(newfd,&enviar_paquete,sizeof(struct PAQUETE_SOCKET));
+
+
+						break;
+				/*case UPLOAD:
 						printf("Envio de Archivo\n");
 						break;
 
 				case UPDATE:
 						printf("Actualizacion de Archivo\n");
-						break;
+						break;*/
 
 				default:	
                         printf("No existe la operación.\n");
@@ -148,4 +216,5 @@ void * receptorPedidosNodo()
 		} 
 		close(newfd);
 	}
+	return NULL;
 }

@@ -16,38 +16,33 @@
 #include "socketNodos.h"
 #include "receptorPedidos.h"
 #include "emisorPedidos.h"
-
-#define PUERTO 15000 // puerto en el que cada nodo va a escuchar
-
-#define MAXDATASIZE 512
-#define DOWNLOAD 1
-#define UPLOAD 2
-#define UPDATE 3
-#define ERROR 4
+#include "constantes.h"
+// #include "protocolo.h"
 
 //Hilo que atenderá los pedidos de otros nodos
 pthread_t thread_a;
 
 int downloadFile(char* ip, char* route, char* destino)
 {
-    emisorPedidosNodo(ip, route, destino, DOWNLOAD);
-    return 1;
+   return emisorPedidosNodo(ip, route, destino, DOWNLOAD);
+   
 }
 
-void uploadFile(FILE *file, char* ip, char* route)
+int copyFile(char* ip, char* route, char* destino)
 {
-
+     return emisorPedidosNodo(ip,route,destino,COPY);
 }
 
-int removeFile(char* ip, char* route)
+int removeFile(char * ip, char * route)
 {
-    return 1;
+	printf("%s %s\n", ip, route);
+	return 1;
 }
 
-void startListening()
+void startListening(void *clnt)
 {
     //Mando al hilo a escuchar en el puerto ingresado por el cliente
-	pthread_create(&thread_a,NULL,receptorPedidosNodo,NULL);
+	pthread_create(&thread_a,NULL,receptorPedidosNodo,clnt);
 
 }
 void stopListening()

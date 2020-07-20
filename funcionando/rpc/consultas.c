@@ -1,6 +1,6 @@
-#include <mariadb/my_global.h>
-#include <mariadb/mysql.h>
-//#include <mysql/mysql.h>
+// #include <mariadb/my_global.h>
+// #include <mariadb/mysql.h>
+#include <mysql/mysql.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <dirent.h>
 #include "protocolo.h"
-#include "socketNodos.h"
+#include "nodo-nodo/socketNodos.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <netdb.h> 
@@ -143,7 +143,7 @@ int main(int argc, char *argv[]){
     obtenerIP();
     char *srv;
 
-    if(argc != 2)
+    if(argc < 2)
     {
 	    printf("El argumento deben ser <ip>\n");
 	    exit(1);
@@ -155,14 +155,16 @@ int main(int argc, char *argv[]){
 
     if(clnt == (CLIENT*)NULL)
     {
-	clnt_pcreateerror(srv);
-	exit(2);
+		clnt_pcreateerror(srv);
+		exit(2);
     }
     
     // iniciar la escucha de pedidos de otros nodos
-    startListening();
+	if (!strcmp(argv[2], "1"))
+		startListening(clnt);
+	else
+		copyFile("localhost","/pepe/Makefile","/hola");
     
-    // downloadFile("192.168.0.186", "Makefile", "puto");
     
     int seguir=1;
  
