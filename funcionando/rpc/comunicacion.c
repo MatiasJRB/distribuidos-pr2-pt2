@@ -102,6 +102,8 @@ int report_create(CLIENT* clnt, char tipo, char* nombre, char* ip, char* ubicaci
     buf[1] = '\0';
     strcat(buf,",");
     strcat(buf,nombre);
+	strcat(buf,",");
+    strcat(buf,ip);
     if(tipo == TIPOARCHIVO)
     {   
         strcat(buf,",");
@@ -136,6 +138,8 @@ int report_delete(CLIENT* clnt, char tipo, char* nombre, char* ip, char* ubicaci
     buf[1] = '\0';
     strcat(buf,",");
     strcat(buf,nombre);
+	strcat(buf,",");
+    strcat(buf,nombre);
     if(tipo == TIPOARCHIVO)
     {   
         strcat(buf,",");
@@ -160,5 +164,27 @@ int is_empty(CLIENT* clnt, char* nombre)
     };
     int rcv = *is_empty_1(&to_send, clnt);
     return rcv;
+}
+
+int report_update(CLIENT* clnt, char* nombre, char* ip, char* ubicacion)
+{
+    //necesitamos por lo menos 3 bytes
+    int size = 3;  
+    ubicacion = sacar_barra(ubicacion);
+    size = size + strlen(nombre) + strlen(ip) + strlen(ubicacion);
+    char buf[size];
+    buf[0] = '\0';
+    strcat(buf,nombre);  
+    strcat(buf,",");
+    strcat(buf,ip);
+    strcat(buf,",");
+    strcat(buf,ubicacion);
+    Mensaje to_send =
+    {
+        1 + strlen(buf),
+        buf,
+    };
+    int to_return = *report_create_1(&to_send,clnt);
+    return to_return;
 }
 
