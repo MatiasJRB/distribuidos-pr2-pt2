@@ -127,6 +127,24 @@ int delete(char tipo, char* Nombre,char* IP, char* Ubicacion)
 			return 0;
 }
 
+int modificarIP(char* NuevaIP, char* Archivo, char* Carpeta)
+{
+	struct archivo aux = *buscarArchivo(Archivo,Carpeta);
+
+	updateip(Archivo,NuevaIP,aux.direccion,aux.permiso,"0","1",aux.ruta);
+	return 1;
+}
+
+
+
+int isFile(char* Nombre, char* Ubicacion)
+{
+	struct archivo aux = *buscarArchivo(Nombre,Ubicacion);
+
+	if (strcmp(aux.permiso,"N") ==0) return 0;
+	else return 1;
+}
+
 //int main()
 //{
 	/*int res = esValido('1',"HolaMundo.txt","Carpeta1");

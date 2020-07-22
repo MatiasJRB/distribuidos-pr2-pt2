@@ -212,3 +212,27 @@ struct archivo *buscarCarpeta(char *nombre){
     mysql_close(con);
     return resultado;
 }
+
+void *updateip(char *nombre, char *ipnueva, char *direccion, char *permiso, char *version, char  *tipo, char *ruta)
+
+{
+    // Inicializo el motor de mysql  
+
+    MYSQL *con = mysql_init(NULL);
+    mysql_real_connect(con, "localhost", "ruso", "rusopass", "proyecto", 0, NULL, 0);
+
+    char query[500];
+    strcpy(query, "UPDATE indexado SET ip= '");
+    strcat(query, ipnueva);
+    strcat(query, "' WHERE ruta= '");
+    strcat(query, ruta);
+    strcat(query, "' AND nombre = '");
+    strcat(query, nombre); 
+    strcat(query, "' AND direccion = '");
+    strcat(query, direccion); 
+    strcat(query, "';");
+
+    mysql_query(con, query); //Ejecuto la query para modificar la entrada
+    mysql_close(con);
+
+}

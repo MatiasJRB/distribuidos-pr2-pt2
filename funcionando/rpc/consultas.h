@@ -25,3 +25,4 @@ void * eliminar(char *nombre, char *ip, char *direccion, char *permiso);
 
 struct archivo *buscarCarpeta(char *nombre);
 
+void *updateip(char *nombre, char *ipnueva, char *direccion, char *permiso, char *version, char  *tipo, char *ruta);

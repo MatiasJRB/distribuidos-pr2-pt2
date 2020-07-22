@@ -23,4 +23,11 @@ int insert(char tipo, char* Nombre,char* IP, char* Ubicacion);
 // Recibe el tipo (1=archivo,0=carpeta) el nombre y, en caso de ser archivo, la IP y carpeta en la que se encuentra
 int delete(char tipo, char* Nombre,char* IP, char* Ubicacion);
 int carpetaVacia(char* Nombre);
+
+// Modifica la IP de un archivo
+// Recibe el nombre del archivo, la nueva ip y la carpeta donde se encuentra
+int modificarIP(char* NuevaIP, char* Archivo, char* Carpeta);
+
+// Verifica si un determinado nombre es un archivo o no
+int isFile(char* Nombre, char* Ubicacion);
 #endif /* COORDINADOR_H */
