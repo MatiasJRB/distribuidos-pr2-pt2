@@ -48,4 +48,6 @@
     // es un archivo o una carpeta
     int is_file(CLIENT* clnt, char* nombre, char* ubicacion);
 
+
+	int report_update_directory(CLIENT* clnt, char* nombre, char* ubicacion);
 #endif

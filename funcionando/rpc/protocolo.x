@@ -12,6 +12,7 @@ program PROY2DFS
 		int REPORT_DELETE(Mensaje)=6;
 		int IS_EMPTY(Mensaje)=7;
 		int IS_FILE(Mensaje)=8;
+		int REPORT_UPDATE_DIRECTORY(Mensaje)=9;
 	}=1;
 	
 }=0x20001003;
