@@ -50,7 +50,7 @@ int *report_update_1_svc(Mensaje *msg, struct svc_req *req)
     char* nombre = strtok(msg->Mensaje_val, delimiter);
     char* ip = strtok(NULL, delimiter);
     char* carpeta = strtok(NULL, delimiter);
-    to_return = modificarIP(char* ip, char* nombre, char* carpeta);
+    to_return = modificarIP(ip, nombre, carpeta);
 	return(&to_return);
 }
 
