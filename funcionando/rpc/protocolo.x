@@ -11,6 +11,7 @@ program PROY2DFS
 		int REPORT_CREATE(Mensaje)=5;
 		int REPORT_DELETE(Mensaje)=6;
 		int IS_EMPTY(Mensaje)=7;
+		int IS_FILE(Mensaje)=8;
 	}=1;
 	
 }=0x20001003;

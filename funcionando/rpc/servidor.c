@@ -46,6 +46,11 @@ int *report_update_1_svc(Mensaje *msg, struct svc_req *req)
 	static int to_return;
 	//sin implementar
 	//tengo que llamar a una funcion de coordinador.h
+    char* delimiter = ",";
+    char* nombre = strtok(msg->Mensaje_val, delimiter);
+    char* ip = strtok(NULL, delimiter);
+    char* carpeta = strtok(NULL, delimiter);
+    to_return = modificarIP(char* ip, char* nombre, char* carpeta);
 	return(&to_return);
 }
 
@@ -110,5 +115,16 @@ int *is_empty_1_svc(Mensaje *msg, struct svc_req *req)
 	static int to_return;
 	to_return = carpetaVacia(msg->Mensaje_val);
 	return &to_return;
+}
+
+int *is_file_1_svc(Mensaje *msg, struct svc_req *req)
+{
+        static int to_return;
+        char* delimiter = ",";
+        char* nombre = strtok(msg->Mensaje_val, delimiter);
+        char* carpeta = strtok(NULL, delimiter);
+        to_return = isFile(nombre, carpeta);
+        
+        return (&to_return);
 }
 

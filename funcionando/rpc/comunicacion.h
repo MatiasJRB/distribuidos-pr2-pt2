@@ -39,6 +39,13 @@
 	int is_empty(CLIENT* clnt, char* nombre);
 
 	// actualiza la ip de un archivo
+    // nombre es el nombre del archivo
+    // ip es la nueva ip que tendra el archivo
+    // ubicacion es la carpeta dentro del fs
 	int report_update(CLIENT* clnt, char* nombre, char* ip, char* ubicacion);
+    
+    // devuelve si el elemento de nombre y ubicacion pasados por parametro
+    // es un archivo o una carpeta
+    int is_file(CLIENT* clnt, char* nombre, char* ubicacion);
 
 #endif
