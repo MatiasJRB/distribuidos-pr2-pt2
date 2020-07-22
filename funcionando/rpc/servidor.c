@@ -24,9 +24,9 @@ Mensaje *getaddress_1_svc(Mensaje *msg, struct svc_req *req)
 
 int *exists_1_svc(Mensaje *msg, struct svc_req *req)
 {
-	//printf("servidor.c::is_valid_1_svc\n\n");
-	//printf("msg->Mensaje_val = %s.\n",msg->Mensaje_val);
-	//printf("msg->Mensaje_len = %d.\n",msg->Mensaje_len);
+	printf("servidor.c::is_valid_1_svc\n\n");
+	printf("msg->Mensaje_val = %s.\n",msg->Mensaje_val);
+	printf("msg->Mensaje_len = %d.\n",msg->Mensaje_len);
 	
 	static int to_return;
 	char* delimiter = ",";
@@ -74,6 +74,17 @@ int *report_create_1_svc(Mensaje *msg, struct svc_req *req)
 	to_return = insert(*tipo, nombre, IP, ubicacion);
 	
 	return &to_return;
+}
+
+int *report_update_directory_1_svc(Mensaje *msg, struct svc_req *req)
+{
+	static int to_return;
+	char* delimiter = ",";
+    char* nombre = strtok(msg->Mensaje_val, delimiter);
+    char* carpeta = strtok(NULL, delimiter);
+    //to_return = updatearDirectorio(nombre,directorio);
+    to_return = 1;
+	return(&to_return);
 }
 
 int *report_delete_1_svc(Mensaje *msg, struct svc_req *req)

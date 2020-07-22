@@ -17,6 +17,8 @@
 #define CTRL_KEY(k) ((k)&0x1f)
 #define TAB_STOP 8
 
+CLIENT* clnt;
+char* ip;
 enum editorKey
 {
 	BACKSPACE = 127,
@@ -470,7 +472,7 @@ void editorOpen(char *filename)
 
 void updateCoordinador(){
 	
-	report_update(clnt,ip,E.nombre,E.ubicacion);
+	report_update(clnt,ip,E.filename,E.ubicacion);
 }
 
 void editorSave()
@@ -987,7 +989,7 @@ int main(int argc, char *argv[])
 		
 		char* srv = "localhost";
 
-		CLIENT* clnt = clnt_create(srv, PROY2DFS, PROY2DFSVERS,"tcp");
+		clnt = clnt_create(srv, PROY2DFS, PROY2DFSVERS,"tcp");
 
 		if(clnt == (CLIENT*)NULL)
 		{
@@ -997,7 +999,7 @@ int main(int argc, char *argv[])
 		
 		if(exists(clnt,1,nombre,ubicacion)) { //Pregunta al coordinador si es valido un archivo.
 			
-			char* ip = getaddress(clnt,nombre,ubicacion);
+			ip = getaddress(clnt,nombre,ubicacion);
 			
 			char ruta [strlen(nombre)+strlen(ubicacion)+1];
 			sprintf(ruta,"%s/%s",ubicacion,nombre);

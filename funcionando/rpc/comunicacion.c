@@ -118,6 +118,25 @@ int report_create(CLIENT* clnt, char tipo, char* nombre, char* ip, char* ubicaci
     return to_return;
 }
 
+int report_update_directory(CLIENT* clnt,char* nombre,char* ubicacion)
+{
+        // el mensaje que tengo que crear es nombre,ubicacion\0
+        int size=strlen(nombre)+strlen(ubicacion)+1;//el 1 es la ,
+        char buf[size];
+        strcpy(buf,"");
+        memset(buf,'\0',1);
+        strcat(buf,nombre);
+        strcat(buf,",");
+        strcat(buf,ubicacion);
+        Mensaje to_send =
+        {
+            1 + strlen(buf),
+            buf,
+        };
+        int to_return = *report_update_directory_1(&to_send,clnt);
+        return to_return;
+}
+
 int report_delete(CLIENT* clnt, char tipo, char* nombre, char* ip, char* ubicacion)
 {
     //necesitamos por lo menos 4 bytes
