@@ -41,9 +41,9 @@ int *exists_1_svc(Mensaje *msg, struct svc_req *req)
 	return &to_return;
 }
 
-Mensaje *report_update_1_svc(Mensaje *msg, struct svc_req *req)
+int *report_update_1_svc(Mensaje *msg, struct svc_req *req)
 {
-	static Mensaje to_return;
+	static int to_return;
 	//sin implementar
 	//tengo que llamar a una funcion de coordinador.h
 	return(&to_return);
