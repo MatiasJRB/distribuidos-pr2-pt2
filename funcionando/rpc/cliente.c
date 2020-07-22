@@ -40,7 +40,6 @@ void ejecutarCD();
 void editor();
 void ejecutarMKDIR();
 void rm();
-void mv();
 
 /* Structs para el manejo del current working directory */
 
@@ -202,11 +201,7 @@ int main(int argc, char *argv[]){
 				rm();
 			}else if(strcmp(args[0],"cp")==0){
 				cp();
-            }
-	    else if(strcmp(args[0],"mv")==0){
-		mv();
-	    }
-	    else{
+            }else{
                 printf("No se reconoce el comando ingresado\n");
             }
         }
@@ -705,66 +700,4 @@ int cpAux(char* origen,char* destino)
 		printf("Mal \n");
 	}
     return 0;
-}
-
-void mv()
-{
-    if(args[1]==NULL){
-	printf("uso: mv archivo o mv archivo directorio \n");
-    }else 
-    {
-	/*
-	 * si el archivo y el directorio existen procedo
-	 * */	
-	char* archivo = malloc(50*sizeof(char));
-	strcpy(archivo,args[1]);
-	char* destino = malloc(100*sizeof(char));
-	strcpy(destino,"raiz");
-	int archivo_valido=exists(clnt, '1', archivo, sd_actual.name);
-	int directorio_existe=1;	
-	int directorio_valido=1;
-	if (args[2]!= NULL)
-	{
-	    strcpy(destino,args[2]);
-	    directorio_existe=exists(clnt, '0', destino, NULL);
-	    directorio_valido=0;
-	    int i = 0;
-	    char *pch=strchr(destino,'/');
-	    if (pch==NULL)
-	    {
-		directorio_valido=1;
-	    }
-	}	
-	if (archivo_valido==1)
-	{
-	    if (directorio_valido)
-	    {
-		if (directorio_existe==1)
-		{
-		    //no tengo que crear el directorio
-		    /*
-		     * como el directorio existe solo tengo que actualizarle el padre
-		     * */
-		    int res_update_directory= report_update_directory(clnt,archivo,destino);
-		    printf("El resultado es: %d .\n",res_update_directory);
-		}
-		else
-		{
-		    printf("Debo crear la carpeta.\n");
-		    // como el directorio no eixste lo creo y despues actualizo el directorio del archivo
-		    int res_create= report_create(clnt,'0',destino,"",NULL);
-		    int res_update_directory= report_update_directory(clnt,archivo,destino);
-		}
-	    }
-	    else
-	    {
-		printf("Solo puedes crear un nivel de carpeta en el root. Uso: mv archivo raiz/directorio \n");
-	    }	    
-	}
-	else
-	{
-	    printf("¡El archivo no es válido!\n");
-	}
-	 
-    }
 }
