@@ -148,6 +148,22 @@ int isFile(char* Nombre, char* Ubicacion)
 
 }
 
+int modificarDirectorio(char* Nombre, char* CarpetaVieja, char* CarpetaNueva)
+{
+	char dir[40]="raiz/";
+
+	if (strcmp(CarpetaNueva,"raiz") != 0) strcat(dir,CarpetaNueva);
+
+	strcat(dir,"/");
+	strcat(dir,Nombre);
+
+	struct archivo aux = *buscarArchivo(Nombre,CarpetaVieja);
+	updatePosicion(Nombre,aux.ip,CarpetaNueva,aux.permiso,"0","1",dir);
+
+	return 1;
+}
+
+
 int main()
 {
 	

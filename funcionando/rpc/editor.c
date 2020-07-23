@@ -17,8 +17,6 @@
 #define CTRL_KEY(k) ((k)&0x1f)
 #define TAB_STOP 8
 
-CLIENT* clnt;
-char* ip;
 enum editorKey
 {
 	BACKSPACE = 127,
@@ -54,7 +52,9 @@ struct editorConfig
 	erow *row;
 	int dirty;
 	char *filename;
+	int nuevo;
 	char* ubicacion;
+	CLIENT* clnt;
 	char statusmsg[80];
 	time_t statusmsg_time;
 	struct termios orig_termios;
@@ -472,7 +472,14 @@ void editorOpen(char *filename)
 
 void updateCoordinador(){
 	
-	report_update(clnt,ip,E.filename,E.ubicacion);
+	char* ip="localhost";
+	
+	if(!E.nuevo){
+		//report_update(E.clnt,E.filename,ip,E.ubicacion);
+	}else{
+		report_create(E.clnt,TIPOARCHIVO,E.filename,ip,E.ubicacion);
+	}
+	
 }
 
 void editorSave()
@@ -502,8 +509,7 @@ void editorSave()
 				E.dirty = 0;
 				
 				//Update de sistema distribuido
-				
-				
+				updateCoordinador();
 				
 				editorSetStatusMessage("%d bytes en disco", len);
 				return;
@@ -559,11 +565,7 @@ void editorSaveBeforeExit()
 				E.dirty = 0;
 				
 				//Update de sistema distribuido
-				
-				
-				
-				
-				
+				updateCoordinador();
 				
 				die("exit");
 				return;
@@ -970,6 +972,7 @@ void initEditor()
 	E.row = NULL;
 	E.dirty = 0;
 	E.filename = NULL;
+	E.nuevo= 0;
 	E.statusmsg[0] = '\0';
 	E.statusmsg_time = 0;
 
@@ -989,7 +992,7 @@ int main(int argc, char *argv[])
 		
 		char* srv = "localhost";
 
-		clnt = clnt_create(srv, PROY2DFS, PROY2DFSVERS,"tcp");
+		CLIENT* clnt = clnt_create(srv, PROY2DFS, PROY2DFSVERS,"tcp");
 
 		if(clnt == (CLIENT*)NULL)
 		{
@@ -997,25 +1000,48 @@ int main(int argc, char *argv[])
 			exit(2);
 		}
 		
-		if(exists(clnt,1,nombre,ubicacion)) { //Pregunta al coordinador si es valido un archivo.
+		
+		
+		E.clnt = clnt;
+		
+		
+		//RUTA COMPLETA
+		char cwd[PATH_MAX];
+		if (getcwd(cwd, sizeof(cwd)) == NULL) {
+			exit(4); //Codigo de error de esta verga
+		}
+		
+		char ruta [strlen(nombre)+strlen(ubicacion)+1];
+		sprintf(ruta,"%s/%s",ubicacion,nombre);
+		
+		
+		// Esto lo hacemos porque estamos en localhost y le pedimos a la misma carpeta...
+		char rutaDestino [strlen(nombre)+strlen(ubicacion)+1];
+		sprintf(rutaDestino,"%s/%s","Carpeta2",nombre);
+		
+		char carpetaNueva [200];
+		sprintf(carpetaNueva,"/%s/%s",cwd,"Carpeta2");
+		
+		char archivoNuevo [200];
+		sprintf(archivoNuevo,"%s/%s",carpetaNueva,nombre);
+		
+		
+		mkdir(carpetaNueva, 0777);
+		
+		if(exists(clnt,TIPOARCHIVO,nombre,ubicacion)) { //Pregunta al coordinador si es valido un archivo.
 			
-			ip = getaddress(clnt,nombre,ubicacion);
+			char* ip = getaddress(clnt,nombre,ubicacion);
 			
-			char ruta [strlen(nombre)+strlen(ubicacion)+1];
-			sprintf(ruta,"%s/%s",ubicacion,nombre);
-			char destino [strlen(nombre)+5];
-			sprintf(destino,"temp_%s",nombre);
-			
-			int descarga = downloadFile("localhost",ruta,destino); //en localhost iria la ip
+			int descarga = downloadFile("localhost",ruta,archivoNuevo); //en localhost iria la ip
 			
 			if(descarga == 0){
-				
-				editorOpen(destino); //abro el archivo
+				editorOpen(archivoNuevo); //abro el archivo
 			}else{
 				exit(1); //codigo de error de descarga del archivo
 			}
 		}else{
-			editorOpen(nombre); //creo el archivo que no existe en el sistema distribuido
+			E.nuevo=1;
+			editorOpen(archivoNuevo); //creo el archivo que no existe en el sistema distribuido
 		}
 	}
 	editorSetStatusMessage("Ctrl-S = Guardar | Ctrl-Q = Cerrar");
