@@ -96,7 +96,7 @@ int report_create(CLIENT* clnt, char tipo, char* nombre, char* ip, char* ubicaci
     {
 		nombre = sacar_barra(nombre);
 	}
-	size = size + strlen(nombre);
+    size = size + strlen(nombre) + strlen(ip);
     char buf[size];
     buf[0] = tipo;
     buf[1] = '\0';
