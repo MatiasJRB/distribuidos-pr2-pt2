@@ -84,8 +84,8 @@ int exists(CLIENT* clnt, char tipo, char* nombre, char* ubicacion)
 
 int report_create(CLIENT* clnt, char tipo, char* nombre, char* ip, char* ubicacion)
 {
-    //necesitamos por lo menos 4 bytes
-    int size = 4;
+    //necesitamos por lo menos 5 bytes
+    int size = 5;
     //es un archivo
     if(tipo == TIPOARCHIVO)
     {
@@ -140,7 +140,7 @@ int report_update_directory(CLIENT* clnt,char* nombre,char* ubicacion)
 int report_delete(CLIENT* clnt, char tipo, char* nombre, char* ip, char* ubicacion)
 {
     //necesitamos por lo menos 4 bytes
-    int size = 4;
+    int size = 5;
     //es un archivo
     if(tipo == TIPOARCHIVO)
     {
