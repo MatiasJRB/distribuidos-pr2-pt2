@@ -238,3 +238,25 @@ void *updateip(char *nombre, char *ipnueva, char *direccion, char *permiso, char
     mysql_query(con, query); //Ejecuto la query para modificar la entrada
     mysql_close(con);
 }
+
+void * updatePosicion(char *nombre, char *ip, char *direccionNueva, char *permiso, char *version, char  *tipo, char *rutaNueva){
+    
+    // Inicializo el motor de mysql  
+    MYSQL *con = mysql_init(NULL);
+    mysql_real_connect(con, "localhost", "ruso", "rusopass", "proyecto", 0, NULL, 0);
+    
+    char query[500];
+    strcpy(query, "UPDATE indexado SET direccion = '");
+    strcat(query, direccionNueva);
+    strcat(query, "', ruta = '");
+    strcat(query, rutaNueva);
+    strcat(query, "' WHERE ip = '");
+    strcat(query, ip);
+    strcat(query, "' AND nombre = '");
+    strcat(query, nombre); 
+    strcat(query, "';");
+  
+    mysql_query(con, query); //Ejecuto la query para modificar la entrada
+    mysql_close(con);
+  
+}

@@ -27,3 +27,4 @@ int modificarIP(char* NuevaIP, char* Archivo, char* Carpeta);
 
 // Verifica si un determinado nombre es un archivo o no
 int isFile(char* Nombre, char* Ubicacion);
+
