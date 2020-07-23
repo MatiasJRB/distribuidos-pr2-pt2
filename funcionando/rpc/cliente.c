@@ -41,6 +41,8 @@ void editor();
 void ejecutarMKDIR();
 void rm();
 void mv();
+void cp();
+int  cpAux(char*,char*);
 
 /* Structs para el manejo del current working directory */
 
@@ -157,8 +159,8 @@ int main(int argc, char *argv[]){
 
     if(clnt == (CLIENT*)NULL)
     {
-	clnt_pcreateerror(srv);
-	exit(2);
+		clnt_pcreateerror(srv);
+		exit(2);
     }
     
     // iniciar la escucha de pedidos de otros nodos
@@ -167,9 +169,9 @@ int main(int argc, char *argv[]){
 		startListening(clnt);
     
     // downloadFile("192.168.0.186", "Makefile", "puto");
-    
+        
     int seguir=1;
- 
+	
 
     raiz.name = (char*) malloc(sizeof(char)*5); /* Reservo lugar para '/' y '\0' */
     strcpy(raiz.name,"raiz");
@@ -203,10 +205,10 @@ int main(int argc, char *argv[]){
 			}else if(strcmp(args[0],"cp")==0){
 				cp();
             }
-	    else if(strcmp(args[0],"mv")==0){
-		mv();
-	    }
-	    else{
+			else if(strcmp(args[0],"mv")==0){
+				mv();
+	    	}
+	    	else{
                 printf("No se reconoce el comando ingresado\n");
             }
         }
@@ -535,30 +537,36 @@ void cp()
 			printf("Uso: rm <-d/-f> <ruta archivo/directorio>\n");
 			break;
 		case -2:
-			printf("El nombre de archivo/carpeta no es valido.\n");
+			printf("Error: Archivo de entrada incorrecto.\n");
 			break;
 		case -3:
-			printf("Fallo al borrar '%s': El directorio no esta vacio.\n");
+			printf("Error: Directorio de salida incorrecto.\n");
 			break;
 		case -4:
-			printf("Ocurrio un error y no se puede eliminar.\n");
+			printf("Error: En la comunicacion con el nodo origen.\n");
+			break;
+		case -5:
+			printf("Directorio debe ser absoluto (/Directoriorio).\n");
+			break;
+		case -6:
+			printf("Error: Archivo ya existe en destino.\n");
 			break;
     }
 }
 
 int cpAux(char* origen,char* destino)
-{
+{	
+
     if(origen == NULL || destino == NULL){
-		printf("Error de parametros");
 		return -1;
 	}
     
     //Verificacion de si el archivo origen existe
 
-    //Creo la ruta de origen
+    //Creo la ruta completa del archivo origen para enviarle al copyFile
 	int maxChar = 512;
 	char* rutaOrigen = malloc(maxChar * sizeof(char));
-    memset(rutaOrigen,'\0',1);
+	memset(rutaOrigen,'\0',1);
 	if (strcmp(sd_actual.name, "raiz")) {
 		strcat(rutaOrigen,"/");
 		strcat(rutaOrigen, sd_actual.name);
@@ -566,205 +574,113 @@ int cpAux(char* origen,char* destino)
     strcat(rutaOrigen,"/");
     strcat(rutaOrigen,origen);
 
-    //Creo la ruta de Destino
-    char* rutaDestino = malloc(maxChar * sizeof(char));
-    memset(rutaDestino,'\0',1);
-    //Me fijo si es la raiz
-    int rutaCompara = strcmp(destino,"/");
-
-    if (rutaCompara != 0){
-	    strcat(rutaDestino,"/");
-	    strcat(rutaDestino,destino);
-    }
-    else{
-    	//Es la raiz
-    	strcat(rutaDestino,destino);
-    }
-   
- //   printf("ruta completa %s\n", rutaDestino);
-
-    //~ char toSend[256];
-    //~ strcpy(toSend,"");
-    //~ char* cadena = malloc(maxChar * sizeof(char));
-    //~ memset(cadena,'\0',1);
-    //~ char tipoChar[1];
-    //~ sprintf(tipoChar,"%d",1); 
-    //~ strcat(cadena,tipoChar);   
-    //~ strcat(cadena,",");       
-    //~ strcat(cadena,origen);
-    //~ strcat(cadena,",");
-    //~ strcat(cadena, sd_actual.name);
-    //~ printf("La cadena a enviar es: %s.\n Su longitud es: %d.\n",cadena,strlen(cadena));
-    //~ Mensaje msg_to_send = {
-		//~ 1+strlen(cadena),
-		//~ cadena	
-    //~ };
-    //Control Archivo de entrada
-
-	// TODO: este falla por alguna razón...
-	// le mandamos 1,[nombre_archivo],[directorio origen]
-    //~ int validEntrada = *exists_1(&msg_to_send, clnt);
-    int validEntrada = exists(clnt, '1', origen, sd_actual.name);
-	//validEntrada = 1;
-	printf("validEntrada::%d\n\n",validEntrada);
-
-    if(validEntrada)
+    //Control de archivo de entrada
+	int validArchivoOrigen = 0;
+    validArchivoOrigen = exists(clnt, TIPOARCHIVO, origen, sd_actual.name);
+	if(validArchivoOrigen)
     {
-	    //Control Carpeta de salida - (CarpetaX sin /)
-	    //~ char* cadena2 = malloc(maxChar * sizeof(char));
-	    //~ memset(cadena2,'\0',1);
-	    //~ char tipoChar[1];
-	    //~ sprintf(tipoChar,"%d",0); 
-	    //~ strcat(cadena2,tipoChar);   
-	    //~ strcat(cadena2,",");            
-	    //~ strcat(cadena2,destino);
-		//~ printf("La cadena a enviar es: %s.\n Su longitud es: %d.\n",cadena2,strlen(cadena2));
-	    //~ Mensaje msg_to_send = {
-			//~ 1+strlen(cadena2),
-			//~ cadena2
-	    //~ };
-	
-	    //printf("Voy a hacer el exists.\n");
-	    int validSalida = exists(clnt, '0', destino, NULL);
-	    //int validSalida = *exists_1(&msg_to_send, clnt);
+	    //Control de directorio de salida - (CarpetaX sin /)
+	    if (destino[0] != '/')
+	    {
+	    	//Directorio debe ser absoluto (/Directoriorio)
+	    	return -5;
+	    }
+
+	    //controlo que exista un directorio de destino
+	    //Me fijo si es la raiz
+	    //TODO: setear destino = raiz
+	    int rutaCompara = strcmp(destino,"/");
+	    int rutaCompara2 = strcmp(destino,"raiz");
+	    int validCarpetaDestino = 0;
+	    int validArchivoDestino = 0;
+	    int esRaiz = 0;
+	    if (rutaCompara == 0 || rutaCompara2 == 0)
+	    {
+	    	validCarpetaDestino = 1;
+	    	validArchivoDestino = exists(clnt, TIPOARCHIVO, origen, "raiz");
+			esRaiz=1;
+	    }
+	    else{
+	    	validCarpetaDestino = exists(clnt, TIPOCARPETA, destino, NULL);
+	    	validArchivoDestino = exists(clnt, TIPOARCHIVO, origen, destino);
+	    }
 	    
-	    if(validSalida){
-	    	printf("Salida Bien \n");
-	    	char* cadena3 = malloc(maxChar * sizeof(char));
-		    memset(cadena3,'\0',1);
-		    char tipoChar[1];
-		   // sprintf(tipoChar,"%d",1); 
-	    	//strcat(cadena3,tipoChar); 
-		    //strcat(cadena3,toSend);
-		  //  strcat(cadena3,",");       
-	    	strcat(cadena3,origen);
-		    strcat(cadena3,",");
-		    strcat(cadena3, sd_actual.name);
-		    printf("La cadena3 a enviar es: %s.\n Su longitud es: %d.\n",cadena3,strlen(cadena3));
-		    Mensaje msg_to_send3 = {
-				1+strlen(cadena3),
-				cadena3
-		    };
+	    if(validCarpetaDestino){
+	    	
+	    	//Control si existe el archivo en el destino(cp no reemplaza)
+	    	if (validArchivoDestino != 0)
+	    	{
+	    		//Error: Archivo ya existe en destino
+	    		return -6;
+	    	}
 
-		    
-			//Debo obtener la ip
+	    	//En este punto ya se pasaron todos los controles sobre el archivo origen y destino
+	    	//Obtengo IP del nodo que tiene el archivo origen
 
+			if (esRaiz){
+				char * ip = getaddress(clnt, origen, "raiz");
+			}
+			else {
+				char * ip = getaddress(clnt, origen, destino);
 
-			// TODO: este falla por alguna razón...
-			// le mandamos [nombre_archivo],[directorio origen]
-			Mensaje* msg_to_rec = getaddress_1(&msg_to_send3, clnt);
+			}
+			
+			//Si no es la raiz, le saco la barra a la direccion destino
+		    if (esRaiz == 0)
+		    {
+				int i;
+				for(i=1;i<strlen(destino);i++)
+				{
+					destino[i-1]=destino[i];
+				}
+					destino[i-1]='\0';
+			}
 
-			// char* ip = msg_to_rec->Mensaje_val;
-			strcpy(ip, "localhost");
+			printf("Mensaje para copyFile %s \n", ip);
 			printf("ip msg: %s \n", ip);
 			printf("rutaO msg: %s\n", rutaOrigen);
-			printf("rutaD msg: %s\n", rutaDestino);
-			int resCopy = copyFile(ip, rutaOrigen, rutaDestino);
-			if (resCopy == ACK)
+			printf("rutaD msg: %s\n", destino);
+
+			//TODO: DESCOMENTAR LUEGO PARA REALIZAR LA COPIA FISICA
+			//int resCopy = copyFile(ip, rutaOrigen, destino);
+			int resCopy =1;
+			//if (resCopy == ACK)
+			if (resCopy == 1)
+			{	
+			    int result = 0;
+			    if (esRaiz){
+					printf("resport create: el destino es la raiz, no se crea el archivo \n");
+				    //result = report_create(clnt, TIPOARCHIVO, origen, ip, NULL);
+			    }
+			    else {
+			        result = report_create(clnt, TIPOARCHIVO, origen, ip, destino);
+					printf("cp correcto");
+			    }
+                            
+			    /*
+					Manejo de errores del report create, no especifica que retorna
+
+					if (result != 0 ) // TODO: HUBO error
+					{
+						printf("Error: En report_create \n");
+						return -10;
+					}
+                */
+			}
+			else
 			{
-				//int maxChar = 512;
-			    char* cadena4 = malloc(maxChar * sizeof(char));
-			    memset(cadena4,'\0',1);
-			    char tipoChar[2];
-			    sprintf(tipoChar,"%d",1);
-			    strcat(cadena4,tipoChar);
-			    strcat(cadena4,",");
-			    strcat(cadena4,origen);
-			    strcat(cadena4,",");
-			    strcat(cadena4,ip);
-			    strcat(cadena4,",");
-			    strcat(cadena4,destino);
-				printf("origen: %s\n", origen);
-				printf("rutaDestino: %s\n", rutaDestino);
-				printf("destino %s\n", destino);
-				printf("cadena4: %s\n", cadena4);
-				// sprintf(cadena4, "%s,%s,%s,%s", tipoChar, origen, rutadesino, ip);
-			    Mensaje mkdir_report =
-			    {
-				    strlen(cadena4),
-				    cadena4
-			    };
-			    printf("EL contenido de mensaje es %s \n",cadena4);
-			    int size_dir= strlen(args[1]);
-			    char buffer[size_dir+6];
-			    strcpy((char*)buffer,"mkdir ");
-			    strcat((char*)buffer,(char*)args[1]);
-			    // system(buffer);
-			    report_create_1(&mkdir_report,clnt);
-				    
+				//Error: En la comunicacion con el nodo origen
+				return -4;
 			}
 	    }
-
 	    else{
-	    	printf("Salida Mal \n");
+	    	//Error: Directorio de salida incorrecto
+	    	return -3;
 	    }
-    	
-	    
     }
 	else{
-		printf("Mal \n");
+		//Error: Nombre de archivo origen incorrecto
+		return -2;
 	}
     return 0;
-}
-
-void mv()
-{
-    if(args[1]==NULL){
-	printf("uso: mv archivo o mv archivo directorio \n");
-    }else 
-    {
-	/*
-	 * si el archivo y el directorio existen procedo
-	 * */	
-	char* archivo = malloc(50*sizeof(char));
-	strcpy(archivo,args[1]);
-	char* destino = malloc(100*sizeof(char));
-	strcpy(destino,"raiz");
-	int archivo_valido=exists(clnt, '1', archivo, sd_actual.name);
-	int directorio_existe=1;	
-	int directorio_valido=1;
-	if (args[2]!= NULL)
-	{
-	    strcpy(destino,args[2]);
-	    directorio_existe=exists(clnt, '0', destino, NULL);
-	    directorio_valido=0;
-	    int i = 0;
-	    char *pch=strchr(destino,'/');
-	    if (pch==NULL)
-	    {
-		directorio_valido=1;
-	    }
-	}	
-	if (archivo_valido==1)
-	{
-	    if (directorio_valido)
-	    {
-		if (directorio_existe==1)
-		{
-		    //no tengo que crear el directorio
-		    /*
-		     * como el directorio existe solo tengo que actualizarle el padre
-		     * */
-		    int res_update_directory= report_update_directory(clnt,archivo,destino);
-		    printf("El resultado es: %d .\n",res_update_directory);
-		}
-		else
-		{
-		    printf("Debo crear la carpeta.\n");
-		    // como el directorio no eixste lo creo y despues actualizo el directorio del archivo
-		    int res_create= report_create(clnt,'0',destino,"",NULL);
-		    int res_update_directory= report_update_directory(clnt,archivo,destino);
-		}
-	    }
-	    else
-	    {
-		printf("Solo puedes crear un nivel de carpeta en el root. Uso: mv archivo raiz/directorio \n");
-	    }	    
-	}
-	else
-	{
-	    printf("¡El archivo no es válido!\n");
-	}
-	 
-    }
 }
