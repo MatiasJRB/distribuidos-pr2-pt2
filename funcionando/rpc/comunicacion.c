@@ -121,7 +121,8 @@ int report_create(CLIENT* clnt, char tipo, char* nombre, char* ip, char* ubicaci
 int report_update_directory(CLIENT* clnt,char* nombre, char* ubicacionActual, char* ubicacionDestino)
 {
         // el mensaje que tengo que crear es nombre,ubicacion\0
-        int size=strlen(nombre)+strlen(ubicacionActual)+strlen(ubicacionDestino)+1;//el 1 es la ,
+        ubicacionDestino = sacar_barra(ubicacionDestino);
+        int size=strlen(nombre)+strlen(ubicacionActual)+strlen(ubicacionDestino)+3;//el 1 es la ,
         char buf[size];
         strcpy(buf,"");
         memset(buf,'\0',1);
