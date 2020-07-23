@@ -156,9 +156,11 @@ int modificarDirectorio(char* Nombre, char* CarpetaVieja, char* CarpetaNueva)
 {
 	char dir[40]="raiz/";
 
-	if (strcmp(CarpetaNueva,"raiz") != 0) strcat(dir,CarpetaNueva);
-
-	strcat(dir,"/");
+	if (strcmp(CarpetaNueva,"raiz") != 0)
+	{
+		strcat(dir,CarpetaNueva);
+		strcat(dir,"/");
+	}
 	strcat(dir,Nombre);
 
 	struct archivo aux = *buscarArchivo(Nombre,CarpetaVieja);
