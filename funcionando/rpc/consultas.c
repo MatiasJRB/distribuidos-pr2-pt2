@@ -53,7 +53,7 @@ struct listado *funcionLS(char *direccion){
     MYSQL_RES *res;
     MYSQL_ROW row;
 
-    struct listado *resultado = (struct listado *)malloc(sizeof (struct archivo)*40);
+    struct listado *resultado = (struct listado *)malloc(sizeof (struct archivo)*1024);
     resultado->cantidad = 0;
 
     char query[N];
@@ -91,6 +91,7 @@ struct listado *funcionLS(char *direccion){
         resultado->elementos[i] = *actual;
         i=i+1;
     } 
+    //printf("Llegue aca sin problemas\n");
     mysql_close(con);
     return resultado;
 
@@ -257,4 +258,41 @@ void * updatePosicion(char *nombre, char *ip, char *direccionNueva, char *permis
     mysql_query(con, query); //Ejecuto la query para modificar la entrada
     mysql_close(con);
   
+}
+
+char* getFilesByIp(char* ip)
+{
+    // Inicializo el motor de mysql  
+    MYSQL *con = mysql_init(NULL);
+    mysql_real_connect(con, "localhost", "ruso", "rusopass", "proyecto", 0, NULL, 0);
+    MYSQL_RES *res;
+    MYSQL_ROW row;
+    char query[500];
+    strcpy(query, "SELECT direccion, nombre from indexado where ip = '");
+    strcat(query, ip);
+    strcat(query, "' and permiso != 'X';");
+    
+    printf("Query: %s.\n",query);
+    
+    mysql_query(con, query); //Ejecuto la query para modificar la entrada
+    
+    // Obtengo el resultado de esa consulta
+    res = mysql_use_result(con);
+    int cantidad=0;
+    char* resultado = malloc(2048*sizeof(char));
+    strcpy(resultado,"");
+    while ((row = mysql_fetch_row(res)) != NULL) /* recorrer la variable res con todos los registros obtenidos para su uso */
+    {   
+        cantidad = cantidad + 1;
+        strcat(resultado, row[0]);//Pongo la carpeta
+        strcat(resultado,",");
+        strcat(resultado, row[1]);//Pongo el nombre
+        strcat(resultado,",");
+    } 
+    mysql_close(con);
+    if(cantidad>0){
+        //printf("El resultado es: %s\n",resultado);
+        return resultado;
+    }
+    return "";
 }

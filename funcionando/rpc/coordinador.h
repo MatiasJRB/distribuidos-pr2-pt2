@@ -34,4 +34,6 @@ int isFile(char* Nombre, char* Ubicacion);
 // Muevo un archivo de un directorio a otro
 // Recibo el nombre del archivo, el directorio actual del archivo y el directorio destino
 int modificarDirectorio(char* Nombre, char* CarpetaVieja, char* CarpetaNueva);
+
+char* obtenerArchivoConIp(char* ip);
 #endif /* COORDINADOR_H */

@@ -50,6 +50,9 @@ extern  int * is_file_1_svc(Mensaje *, struct svc_req *);
 #define REPORT_UPDATE_DIRECTORY 9
 extern  int * report_update_directory_1(Mensaje *, CLIENT *);
 extern  int * report_update_directory_1_svc(Mensaje *, struct svc_req *);
+#define GET_FILES_IP 10
+extern  Mensaje * get_files_ip_1(Mensaje *, CLIENT *);
+extern  Mensaje * get_files_ip_1_svc(Mensaje *, struct svc_req *);
 extern int proy2dfs_1_freeresult (SVCXPRT *, xdrproc_t, caddr_t);
 
 #else /* K&R C */
@@ -80,6 +83,9 @@ extern  int * is_file_1_svc();
 #define REPORT_UPDATE_DIRECTORY 9
 extern  int * report_update_directory_1();
 extern  int * report_update_directory_1_svc();
+#define GET_FILES_IP 10
+extern  Mensaje * get_files_ip_1();
+extern  Mensaje * get_files_ip_1_svc();
 extern int proy2dfs_1_freeresult ();
 #endif /* K&R C */
 

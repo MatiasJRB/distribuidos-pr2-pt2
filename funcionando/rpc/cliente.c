@@ -43,7 +43,7 @@ void rm();
 void mv();
 void cp();
 int  cpAux(char*,char*);
-
+char* getMyIp();
 /* Structs para el manejo del current working directory */
 
 typedef struct{
@@ -53,6 +53,174 @@ typedef struct{
 SubDirectorio sd_actual;
 SubDirectorio raiz;    	
 
+int isDirectory(const char *path) {
+   struct stat statbuf;
+   if (stat(path, &statbuf) != 0)
+       return 0;
+   return S_ISDIR(statbuf.st_mode);
+}
+
+
+int searchFolderAndFile(char* array, char* folder, char* file)
+{
+    //printf("Entro al searchFolderAndFile, array %s, folder %s, file %s\n",array,folder,file);
+    char* carpetaObtenida = strtok(array,",");
+    while(carpetaObtenida!=NULL)
+    {
+	//printf("Buscando...\n");
+	char* archivoObtenido = strtok(NULL,",");
+	if(!strcmp(carpetaObtenida,folder) && !strcmp(archivoObtenido,file))
+	{
+	    //printf("Encontre.\n");
+	    //Son iguales
+	    return 1;
+	}
+	carpetaObtenida = strtok(NULL,",");
+    }
+    return 0;
+}
+
+int inicializador()
+{
+	system("./getFiles.sh"); //Ejecuto el bash para obtener los archivos del nodo
+	//Ahora tengo que leer el archivo Log
+	FILE *fp = fopen("log", "r");
+	if (fp == 0)
+	{
+		//printf("Ocurrio un error al abrir el archivo.\n");
+		return -1;
+	}
+	else
+	{
+		//Debo leer el contenido
+		char * line = NULL;
+		size_t len = 0;
+		ssize_t read;
+		char* myIp = getMyIp();
+		
+		Mensaje toSend = {
+		    1+strlen(myIp),
+		    myIp
+		};
+		
+		Mensaje* msg = get_files_ip_1(&toSend,clnt);
+		char* arr =malloc(2048*sizeof(char));
+		strcpy(arr, msg->Mensaje_val);
+		//printf("Los archivos que recibi son: %s.\n",msg->Mensaje_val);
+		//Ahora que obtuve los archivos debo revisar lo que tengo en la carpeta
+		getline(&line, &len, fp); //Consumo la primer linea
+		while ((read = getline(&line, &len, fp)) != -1) {
+
+			//printf("Retrieved line of length %zu:\n", read);
+			//printf("%s", line);
+			//Ahora debo obtener el nombre del archivo unicamente
+			char *directory;
+			/* get the first token */
+			directory = strtok(line, "/");
+			char* filename = strtok(NULL,"/");
+			char *c = strchr(filename, '\n');
+			if (c)
+			    *c = '\0';
+			//printf("El nombre del archivo a ingresar es: %s.\n",filename);
+			char direccion[128];
+			sprintf(direccion,"%s/%s",directory,filename);
+			//printf("La direccion generada es: %s\n",direccion);
+			if(!isDirectory(direccion)) //Si es un archivo
+			{
+			    //printf("Es un archivo.\n");
+			    //Deberia primero chequear si existe o no
+			    //Ahora debo ingresarlos a la bd en la raiz
+			    if(!searchFolderAndFile(arr,"raiz",filename))
+			    { //Si no lo tenia
+				//printf("Yo no lo habia subido nunca.\n");
+				if(!exists(clnt,'1',filename,"raiz")){
+				    //printf("No existe asi que lo creo.\n");
+				    report_create(clnt, '1', filename, myIp, "raiz");
+				}
+				else
+				{
+				    //printf("Ya existe con ese nombre.\n");
+				    //Existe en la bd pero no es mio
+				    //Debo renombrar hasta que se pueda meter
+				    char renombrado[128];
+				    int i = 1;
+				    int termine = 0;
+				    while(!termine)
+				    {
+					sprintf(renombrado,"%s(%d)",filename,i);
+					if(!exists(clnt,'1',renombrado,"raiz"))
+					{
+					    //printf("El nuevo nombre para el archivo sera: %s.\n",renombrado);
+					    termine = 1;
+					    report_create(clnt, '1', renombrado, myIp, "raiz");
+					}
+					else
+					    i++;
+				    }
+				}
+			    }
+			    else{
+				//printf("Ya esta subido en la bd con mi IP.\n");
+			    }
+			}
+			else
+			{
+			    //printf("Es una carpeta.\n");
+			    if(!exists(clnt,'0',filename,"raiz")){
+				//printf("No existe, asi que debo crearla.\n");
+				//Creo la carpeta, aunque debo ver si existe antes
+				report_create(clnt, '0', filename, myIp, "raiz");
+			    }
+			    //printf("Voy a crear el archivo.\n");
+			    char* nuevoFilename = strtok(NULL,"/");
+			    if(nuevoFilename != NULL)
+			    {
+				//printf("El nuevo filename que agarre es: %s\n",nuevoFilename);
+				c = strchr(nuevoFilename, '\n');
+				if (c)
+				    *c = '\0';
+				if(!searchFolderAndFile(arr,filename,nuevoFilename))
+				{
+				    if(!exists(clnt,'1',nuevoFilename,filename))
+				    {
+					//printf("Voy a crear en carpeta %s.\n",filename);
+					report_create(clnt, '1', nuevoFilename, myIp, filename);
+					//printf("Cree el archivo.\n");
+				    }
+				    else
+				    {
+					//printf("Ya existe con ese nombre.\n");
+					//Existe en la bd pero no es mio
+					//Debo renombrar hasta que se pueda meter
+					char renombrado[128];
+					int i = 1;
+					int termine = 0;
+					while(!termine)
+					{
+					    sprintf(renombrado,"%s(%d)",filename,i);
+					    if(!exists(clnt,'1',renombrado,filename))
+					    {
+						//printf("El nuevo nombre para el archivo sera: %s.\n",renombrado);
+						termine = 1;
+						report_create(clnt, '1', renombrado, myIp, filename);
+					    }
+					    else
+						i++;
+					}
+				    }
+				}
+				else
+				{
+				    //printf("Ya esta subido en la bd con mi IP.\n");
+				}
+			    }
+			    
+			}
+			strcpy(arr,msg->Mensaje_val);
+		}
+		fclose(fp);
+	}
+}
 
 void* setPath(){
 
@@ -181,7 +349,7 @@ int main(int argc, char *argv[]){
     sd_actual = raiz;    
     
     strcpy((char*)path,"/");
-
+    inicializador();
     while(seguir){
         printf("%s $",path);
         __fpurge(stdin); //Limpia el buffer de entrada del teclado.
@@ -192,8 +360,8 @@ int main(int argc, char *argv[]){
             if (strcmp(args[0],"ls")==0){
                 listarDirectorio();
             }else if(strcmp(args[0],"exit")==0){
-                seguir=0;
-                exit(0);
+                //seguir=0;
+                salir();
             }else if(strcmp(args[0],"cd")==0){
                 ejecutarCD();
             }else if(strcmp(args[0],"editor")==0){
@@ -750,6 +918,93 @@ void mv()
     }
 }
 
+void salir()
+{
+	printf("¿Seguro que deseas salir del sistema? y/n \n");
+	char seleccion[2];
+	scanf("%s",seleccion);
+	seleccion[1] = '\0';
+	if (strcmp(seleccion,"y") == 0)
+	{
+		printf("Apagando el sistema..\n");
+		char* myIp = getMyIp();//"192.168.1.31";
+		char* mis_documentos=get_my_documents(clnt,myIp);
+		printf("Mis documentos: %s\n",mis_documentos);
+		char* copia_mis_documentos=malloc(2048*sizeof(char));
+		strcpy(copia_mis_documentos,mis_documentos);
+		int raiz=0;
+		char* delimiter = ",";
+		char* filename=malloc(512*sizeof(char));
+		char* carpeta=malloc(512*sizeof(char));
+		
+		carpeta = strtok(copia_mis_documentos,delimiter);
+		while(carpeta != NULL)
+		{
+		    filename = strtok(NULL,delimiter);
+		    printf("Voy a eliminar %s/%s\n",carpeta,filename);
+		    
+		    
+		    int res_report_delete=report_delete(clnt,'1',filename,myIp,carpeta);
+		    if (strcmp(carpeta,"raiz")!=0 && is_empty(clnt,carpeta))
+		    {// si la carpeta esta vacia la borro
+			    printf("La carpeta %s quedo vacia.\n",carpeta);
+			    int res_report_delete=report_delete(clnt,'0',carpeta,myIp,NULL);
+		    }
+		    carpeta = strtok(NULL,delimiter);
+		}
+		
+		
+		
+		
+		/*
+		
+		filename=strtok(copia_mis_documentos, delimiter);
+		while(filename!=NULL && raiz)
+		{			
+			if (strcmp(filename,"0"))
+			{
+				//viene una carpeta, termine con los archivos de la raiz
+				raiz=0;
+			}
+			else
+			{				
+				int res_report_delete=report_delete(clnt,'1',filename,"raiz");
+			    
+			}
+			filename=strtok(NULL, delimiter);			
+		}
+		carpeta=strtok(NULL, delimiter);
+		while (carpeta!=NULL)
+		{
+			int carpeta_terminada=0;
+			while (!carpeta_terminada)
+			{
+				filename=strtok(NULL, delimiter);
+				if (strcmp(filename,"0"))
+				{
+					//viene una carpeta, termine con los archivos de la carpeta actual
+					carpeta_terminada=1;
+				}
+				else
+				{				
+					int res_report_delete=report_delete(clnt,'1',filename,carpeta);
+					
+				}
+			}
+			if (is_empty(clnt,carpeta))
+			{// si la carpeta esta vacia la borro
+				int res_report_delete=report_delete(clnt,'0',carpeta,NULL);
+			}
+			carpeta=strtok(NULL, delimiter);
+		}			*/
+		printf("¡Hasta la próxima!");
+		exit(0);
+	}
+	else
+	{
+		printf("Nos alegra que sigas con nosotros\n");
+	}		
+}
 
 
 

@@ -143,3 +143,18 @@ report_update_directory_1(Mensaje *argp, CLIENT *clnt)
 	}
 	return (&clnt_res);
 }
+
+Mensaje *
+get_files_ip_1(Mensaje *argp, CLIENT *clnt)
+{
+	static Mensaje clnt_res;
+
+	memset((char *)&clnt_res, 0, sizeof(clnt_res));
+	if (clnt_call (clnt, GET_FILES_IP,
+		(xdrproc_t) xdr_Mensaje, (caddr_t) argp,
+		(xdrproc_t) xdr_Mensaje, (caddr_t) &clnt_res,
+		TIMEOUT) != RPC_SUCCESS) {
+		return (NULL);
+	}
+	return (&clnt_res);
+}

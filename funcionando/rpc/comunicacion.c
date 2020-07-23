@@ -161,7 +161,7 @@ int report_delete(CLIENT* clnt, char tipo, char* nombre, char* ip, char* ubicaci
     strcat(buf,",");
     strcat(buf,nombre);
 	strcat(buf,",");
-    strcat(buf,nombre);
+    strcat(buf,ip);
     if(tipo == TIPOARCHIVO)
     {   
         strcat(buf,",");
@@ -228,4 +228,20 @@ int is_file(CLIENT* clnt, char* nombre, char* ubicacion)
     };
     int to_return = *is_file_1(&to_send,clnt);
     return to_return;
+}
+
+char* get_my_documents(CLIENT* clnt, char* ip)
+{
+	int size=strlen(ip)+2;
+	char buf[size];
+	strcpy(buf,"");
+	memset(buf,'\0',1);
+    strcat(buf,ip);
+	Mensaje to_send =
+    {
+        1+strlen(buf),
+        buf,
+    };
+    Mensaje mensaje = *get_files_ip_1(&to_send,clnt);
+	return mensaje.Mensaje_val;
 }

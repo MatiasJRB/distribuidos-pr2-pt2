@@ -8,6 +8,7 @@ Mensaje *ls_1_svc(Mensaje *msg, struct svc_req *req)
 	static Mensaje to_return;
 	to_return.Mensaje_val = funcionListar(msg->Mensaje_val);
 	to_return.Mensaje_len = 1 + strlen(to_return.Mensaje_val);
+	//printf("Me rompo en el servidor.\n");
 	return (&to_return);	
 }
 
@@ -137,5 +138,18 @@ int *is_file_1_svc(Mensaje *msg, struct svc_req *req)
         to_return = isFile(nombre, carpeta);
         
         return (&to_return);
+}
+
+Mensaje *get_files_ip_1_svc(Mensaje *msg, struct svc_req *req)
+{
+	
+	//printf("Mensaje_size = %d.\n",msg->Mensaje_len);
+	//printf("Mensaje_val = %s.\n",msg->Mensaje_val);
+	static Mensaje to_return;
+	char* resultado = obtenerArchivoConIp(msg->Mensaje_val);
+	//printf("Return: %s.\n",resultado);
+	to_return.Mensaje_val = resultado;
+	to_return.Mensaje_len = 1+strlen(resultado);
+	return &to_return;
 }
 

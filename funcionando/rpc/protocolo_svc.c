@@ -29,6 +29,7 @@ proy2dfs_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		Mensaje is_empty_1_arg;
 		Mensaje is_file_1_arg;
 		Mensaje report_update_directory_1_arg;
+		Mensaje get_files_ip_1_arg;
 	} argument;
 	char *result;
 	xdrproc_t _xdr_argument, _xdr_result;
@@ -91,6 +92,12 @@ proy2dfs_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		_xdr_argument = (xdrproc_t) xdr_Mensaje;
 		_xdr_result = (xdrproc_t) xdr_int;
 		local = (char *(*)(char *, struct svc_req *)) report_update_directory_1_svc;
+		break;
+
+	case GET_FILES_IP:
+		_xdr_argument = (xdrproc_t) xdr_Mensaje;
+		_xdr_result = (xdrproc_t) xdr_Mensaje;
+		local = (char *(*)(char *, struct svc_req *)) get_files_ip_1_svc;
 		break;
 
 	default:

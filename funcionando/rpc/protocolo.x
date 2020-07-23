@@ -13,6 +13,7 @@ program PROY2DFS
 		int IS_EMPTY(Mensaje)=7;
 		int IS_FILE(Mensaje)=8;
 		int REPORT_UPDATE_DIRECTORY(Mensaje)=9;
+		Mensaje GET_FILES_IP(Mensaje)=10;
 	}=1;
 	
 }=0x20001003;

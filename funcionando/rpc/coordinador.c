@@ -3,7 +3,7 @@
 #include "consultas.h"
 #include <string.h>
 
-#define N 100
+#define N 4096
 
 // Funcion para verificar si un archivo/carpeta es valido
 // Recibe un tipo (0=carpeta,1=archivo), un nombre y la ubicacion del nodo actual
@@ -55,9 +55,9 @@ char* funcionListar(char* Direccion)
 
 	int size = strlen(temp);
 	char *toRet;
-	toRet = malloc(sizeof(temp)*size);
+	toRet = malloc(size*sizeof(char));
 	strcpy(toRet,temp);
-	
+	//printf("Me rompo en el coordinador.\n");
 	return (toRet);	
 }
 
@@ -117,8 +117,10 @@ int insert(char tipo, char* Nombre,char* IP, char* Ubicacion)
 int delete(char tipo, char* Nombre,char* IP, char* Ubicacion)
 {
 	//printf("Llegue al delete.\n");
+	//printf("La ip recibida es %s.\n",IP);
 	if (tipo == '0')
 	{
+		//printf("Voy a eliminar una carpeta.\n");
 		//printf("Tipo 0.\n");
 		eliminar(Nombre,"-","raiz","R");
 		return 1;
@@ -167,6 +169,15 @@ int modificarDirectorio(char* Nombre, char* CarpetaVieja, char* CarpetaNueva)
 	updatePosicion(Nombre,aux.ip,CarpetaNueva,aux.permiso,"0","1",dir);
 
 	return 1;
+}
+
+char* obtenerArchivoConIp(char* ip)
+{
+	char* resultado = malloc(2048*sizeof(char));
+	memset(resultado,'\0',1);
+	strcpy(resultado,getFilesByIp(ip));
+	//printf("Archivos son: %s\n",resultado);
+	return resultado;
 }
 
 //int main()

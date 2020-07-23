@@ -28,3 +28,5 @@ struct archivo *buscarCarpeta(char *nombre);
 void *updateip(char *nombre, char *ipnueva, char *direccion, char *permiso, char *version, char  *tipo, char *ruta);
 
 void * updatePosicion(char *nombre, char *ip, char *direccionNueva, char *permiso, char *version, char  *tipo, char *rutaNueva);
+
+char* getFilesByIp(char* ip);
