@@ -10,6 +10,8 @@
 #include <sys/types.h>
 #include <time.h>
 #include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include "nodo-nodo/socketNodos.h"
 #include "protocolo.h"
 #include "comunicacion.h"

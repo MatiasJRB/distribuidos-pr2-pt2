@@ -26,4 +26,4 @@ enviarRecibir.o: nodo-nodo/enviarRecibir.c
 	gcc nodo-nodo/enviarRecibir.c -c -Wall -Wpedantic -Wextra
 
 clean:
-	rm -f *.o cliente servidor protocolo_svc.c protocolo_xdr.c protocolo_clnt.c protocolo.h
+	rm -f *.o cliente servidor editor protocolo_svc.c protocolo_xdr.c protocolo_clnt.c protocolo.h

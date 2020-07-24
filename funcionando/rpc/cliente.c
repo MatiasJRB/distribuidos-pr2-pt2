@@ -8,6 +8,7 @@
 #include "nodo-nodo/socketNodos.h"
 #include "nodo-nodo/constantes.h"
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <sys/stat.h>
 #include <netdb.h> 
 #include <sys/socket.h> 
@@ -25,6 +26,11 @@
 #define max_args 3  //Numero maximo de argumentos (-1) cuando se trate de un comando externo
 #define max 100  //Numero de caracteres maximo para comando las variables de ambiente
 
+#define AMARILLO "\x1b[33m"
+#define ROJO "\x1b[31m"
+#define VERDE "\x1b[32m"
+#define AZUL "\x1b[34m"
+#define NORMAL "\x1b[0m"
 
 /*Declara variables*/
 char comando[max]; //comando va a leer el comando que ingrese el usuario
@@ -44,6 +50,8 @@ void mv();
 void cp();
 int  cpAux(char*,char*);
 char* getMyIp();
+void salir();
+void help();
 /* Structs para el manejo del current working directory */
 
 typedef struct{
@@ -331,15 +339,15 @@ int main(int argc, char *argv[]){
 		exit(2);
     }
     
-    // iniciar la escucha de pedidos de otros nodos
-	//if (!strcmp(argv[2], "1"))
-	if(argc >2 && argv[2] != '1');
+    // por si hay que testear algo temporal
+	if(argc > 2 && !strcmp(argv[2], "debug")) {
+		// modo debug
+	}
+	else
+		// modo normal
 		startListening(clnt);
     
-    // downloadFile("192.168.0.186", "Makefile", "puto");
-        
     int seguir=1;
-	
 
     raiz.name = (char*) malloc(sizeof(char)*5); /* Reservo lugar para '/' y '\0' */
     strcpy(raiz.name,"raiz");
@@ -351,7 +359,7 @@ int main(int argc, char *argv[]){
     strcpy((char*)path,"/");
     inicializador();
     while(seguir){
-        printf("%s $",path);
+        printf(" "AZUL"%s "VERDE"$"NORMAL" ",path);
         __fpurge(stdin); //Limpia el buffer de entrada del teclado.
         memset(comando,'\0',max);  //Borra cualquier contenido previo del comando.
         scanf("%[^\n]s",comando);   //Espera hasta que el usuario ingrese algun comando.
@@ -375,6 +383,9 @@ int main(int argc, char *argv[]){
             }
 			else if(strcmp(args[0],"mv")==0){
 				mv();
+	    	}
+			else if(strcmp(args[0],"help")==0){
+				help();
 	    	}
 	    	else{
                 printf("No se reconoce el comando ingresado\n");
@@ -1006,9 +1017,15 @@ void salir()
 	}		
 }
 
-
-
-
-
-
-
+void help()
+{
+	printf("Comandos disponibles:\n");
+	printf("- " AMARILLO "mv " ROJO "[origen] " AZUL "[directorio destino]" NORMAL ": mover archivo/directorio a otro directorio. \n");
+	printf("- " AMARILLO "cp " ROJO "[archivo origen] " AZUL "[directorio destino]" NORMAL ": copiar archivo/directorio a otro directorio. \n");
+	printf("- " AMARILLO "rm " VERDE "[-f/-d] " ROJO "[archivo/directorio]" NORMAL ": eliminar un archivo o un directorio vacío. \n");
+	printf("- " AMARILLO "ls" NORMAL ": listar el directorio actual. \n");
+	printf("- " AMARILLO "cd " ROJO "[directorio]" NORMAL ": cambiar de directorio. \n");
+	printf("- " AMARILLO "editor " ROJO "[archivo]" NORMAL ": editar un archivo existente o nuevo. \n");
+	printf("- " AMARILLO "mkdir " ROJO "[directorio]" NORMAL ": crear un directorio nuevo. \n");
+	printf("- " AMARILLO "exit" NORMAL ": salir del DFS. \n");
+}
