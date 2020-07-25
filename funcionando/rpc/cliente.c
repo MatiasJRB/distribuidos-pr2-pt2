@@ -107,9 +107,14 @@ int inicializador()
 		ssize_t read;
 		char* myIp = getMyIp();
 		
+		// Mensaje toSend = {
+		//     1+strlen(myIp),
+		//     myIp
+		// };
+		
 		Mensaje toSend = {
-		    1+strlen(myIp),
-		    myIp
+		    1+strlen(ip),
+		    ip
 		};
 		
 		Mensaje* msg = get_files_ip_1(&toSend,clnt);
@@ -312,7 +317,8 @@ void ejecutarMKDIR()
 }
 
 void obtenerIP(){
-    system("hostname -I > nombre");
+    // system("hostname -I > nombre");
+    system("hostname -I | awk '{print $2}' > nombre");
     FILE* arch = fopen("nombre","r");
     fscanf(arch,"%s",ip);	
     fclose(arch);
@@ -364,7 +370,7 @@ int main(int argc, char *argv[]){
     strcpy((char*)path,"/");
 
 	printf("Sincronizando...\n");
-    inicializador();
+    // inicializador();
 	printf("Sincronización completa.\n");
 
     while(seguir){
@@ -540,8 +546,9 @@ char* getMyIp()
     char *IPbuffer; 
     gethostname(myIp,256);
     host_entry = gethostbyname(myIp); 
-    IPbuffer = inet_ntoa(*((struct in_addr*) 
-                   host_entry->h_addr_list[0])); 
+	printf("host0 %s\n", host_entry->h_addr_list[0]);
+	printf("host1 %s\n", host_entry->h_addr_list[1]);
+    IPbuffer = inet_ntoa(*((struct in_addr*) host_entry->h_addr_list[1])); 
     return IPbuffer;
 }
 
@@ -808,29 +815,32 @@ int cpAux(char* origen,char* destino)
 	    	//En este punto ya se pasaron todos los controles sobre el archivo origen y destino
 	    	//Obtengo IP del nodo que tiene el archivo origen
 
+			char * ip_msg;
 			if (esRaiz){
-				char * ip = getaddress(clnt, origen, "raiz");
+				ip_msg = getaddress(clnt, origen, "raiz");
+				printf("ipraiz: %s\n", ip_msg);
 			}
 			else {
-				char * ip = getaddress(clnt, origen, destino);
+				ip_msg = getaddress(clnt, origen, sd_actual.name);
+				printf("ipnoraiz: %s\n", ip_msg);
 
 			}
 			
-			printf("Mensaje para copyFile %s \n", ip);
-			printf("ip msg: %s \n", ip);
+			printf("Mensaje para copyFile %s \n", ip_msg);
+			printf("ip msg: %s \n", ip_msg);
 			printf("rutaO msg: %s\n", rutaOrigen);
 			printf("rutaD msg: %s\n", destino);
 
 			//TODO: DESCOMENTAR LUEGO PARA REALIZAR LA COPIA FISICA
-			int resCopy = copyFile(ip, rutaOrigen, destino);
+			int resCopy = copyFile(ip_msg, rutaOrigen, destino);
 			if (resCopy == ACK)
 			{	
 			    int result = 0;
 			    if (esRaiz){
-				    result = report_create(clnt, TIPOARCHIVO, origen, ip, "raiz");
+				    result = report_create(clnt, TIPOARCHIVO, origen, ip_msg, "raiz");
 			    }
 			    else {
-			        result = report_create(clnt, TIPOARCHIVO, origen, ip, destino);
+			        result = report_create(clnt, TIPOARCHIVO, origen, ip_msg, destino);
 					printf("cp correcto");
 			    }
                             
