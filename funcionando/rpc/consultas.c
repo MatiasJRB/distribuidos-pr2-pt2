@@ -122,7 +122,7 @@ struct archivo *buscarArchivo(char *nombre, char *direccion){
     strcat(query, nombre);
     strcat(query, "' AND direccion = '");
     strcat(query, direccion);
-    strcat(query, "' AND version = 0 AND permiso!='X';");
+    strcat(query, "' AND permiso!='X';");
 	mysql_query(con, query);
     // Obtengo el resultado de esa consulta
     res = mysql_use_result(con);
