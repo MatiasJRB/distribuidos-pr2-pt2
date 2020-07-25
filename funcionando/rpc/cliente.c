@@ -106,7 +106,7 @@ int inicializador()
 		size_t len = 0;
 		ssize_t read;
 		char* myIp = getMyIp();
-		
+		//printf("Mi ip es: %s.\n",myIp);
 		Mensaje toSend = {
 		    1+strlen(myIp),
 		    myIp
@@ -114,6 +114,7 @@ int inicializador()
 		
 		Mensaje* msg = get_files_ip_1(&toSend,clnt);
 		char* arr =malloc(2048*sizeof(char));
+		//printf("El arreglo que obtuve de la bd con mis archivos es: \n [%s] \n",arr);
 		strcpy(arr, msg->Mensaje_val);
 		//printf("Los archivos que recibi son: %s.\n",msg->Mensaje_val);
 		//Ahora que obtuve los archivos debo revisar lo que tengo en la carpeta
@@ -180,10 +181,10 @@ int inicializador()
 				//Creo la carpeta, aunque debo ver si existe antes
 				report_create(clnt, '0', filename, myIp, "raiz");
 			    }
-			    //printf("Voy a crear el archivo.\n");
 			    char* nuevoFilename = strtok(NULL,"/");
 			    if(nuevoFilename != NULL)
 			    {
+				//printf("Voy a crear el archivo.\n");
 				//printf("El nuevo filename que agarre es: %s\n",nuevoFilename);
 				c = strchr(nuevoFilename, '\n');
 				if (c)
@@ -945,15 +946,14 @@ void salir()
 		char* delimiter = ",";
 		char* filename=malloc(512*sizeof(char));
 		char* carpeta=malloc(512*sizeof(char));
-		
 		carpeta = strtok(copia_mis_documentos,delimiter);
 		while(carpeta != NULL)
 		{
 		    filename = strtok(NULL,delimiter);
 		    printf("Voy a eliminar %s/%s\n",carpeta,filename);
-		    
-		    
 		    int res_report_delete=report_delete(clnt,'1',filename,myIp,carpeta);
+		    if(!res_report_delete)
+			printf("OCURRIO UN ERROR ELIMINANDO %s/%s\n",carpeta,filename);
 		    if (strcmp(carpeta,"raiz")!=0 && is_empty(clnt,carpeta))
 		    {// si la carpeta esta vacia la borro
 			    printf("La carpeta %s quedo vacia.\n",carpeta);
@@ -961,51 +961,6 @@ void salir()
 		    }
 		    carpeta = strtok(NULL,delimiter);
 		}
-		
-		
-		
-		
-		/*
-		
-		filename=strtok(copia_mis_documentos, delimiter);
-		while(filename!=NULL && raiz)
-		{			
-			if (strcmp(filename,"0"))
-			{
-				//viene una carpeta, termine con los archivos de la raiz
-				raiz=0;
-			}
-			else
-			{				
-				int res_report_delete=report_delete(clnt,'1',filename,"raiz");
-			    
-			}
-			filename=strtok(NULL, delimiter);			
-		}
-		carpeta=strtok(NULL, delimiter);
-		while (carpeta!=NULL)
-		{
-			int carpeta_terminada=0;
-			while (!carpeta_terminada)
-			{
-				filename=strtok(NULL, delimiter);
-				if (strcmp(filename,"0"))
-				{
-					//viene una carpeta, termine con los archivos de la carpeta actual
-					carpeta_terminada=1;
-				}
-				else
-				{				
-					int res_report_delete=report_delete(clnt,'1',filename,carpeta);
-					
-				}
-			}
-			if (is_empty(clnt,carpeta))
-			{// si la carpeta esta vacia la borro
-				int res_report_delete=report_delete(clnt,'0',carpeta,NULL);
-			}
-			carpeta=strtok(NULL, delimiter);
-		}			*/
 		printf("¡Hasta la próxima!");
 		exit(0);
 	}

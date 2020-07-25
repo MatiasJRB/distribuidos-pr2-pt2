@@ -9,7 +9,6 @@
 #define N 500
 
 void * insertar(char *nombre, char *ip, char *direccion, char *permiso, char  *version, char  *tipo, char *ruta){
-    printf("Ya entre al insertar db.\n");
     // Inicializo el motor de mysql  
     MYSQL *con = mysql_init(NULL);
     mysql_real_connect(con, "localhost", "ruso", "rusopass", "proyecto", 0, NULL, 0);
@@ -33,13 +32,11 @@ void * insertar(char *nombre, char *ip, char *direccion, char *permiso, char  *v
     strcat(query, "');");
     if (tipo = "1"){ //Agrego un archivo , por lo tanto tengo que cambiar las versiones de los demas y pasarlos a lectura y luego recien ejecuto la query.
         char queryupdate[N];
-        strcpy(queryupdate, "UPDATE indexado SET permiso = 'R',version = version + 1 WHERE nombre = '");
+        strcpy(queryupdate, "UPDATE indexado SET permiso = 'R',version = version + 1 WHERE permiso != 'X' and nombre = '");
         strcat(queryupdate, nombre);
         strcat(queryupdate, "';");
         mysql_query(con, queryupdate); //Ejecuto la query para updatear los registros
     }
-
-    printf("QUERY: %s.\n",query);
     mysql_query(con, query); //Ejecuto la query para agregar el registro
     mysql_close(con);
     //printf("\n Termine de ejecutar el metodo de insertar \n");
@@ -161,7 +158,7 @@ void * eliminar(char *nombre, char *ip, char *direccion, char *permiso){
     strcat(query, "' AND permiso='");
     strcat(query, permiso); 
     strcat(query, "';");
-
+    //printf("Query delete: %s\n",query);
     mysql_query(con, query); //Ejecuto la query para modificar la entrada
     mysql_close(con);
  
@@ -272,7 +269,7 @@ char* getFilesByIp(char* ip)
     strcat(query, ip);
     strcat(query, "' and permiso != 'X';");
     
-    printf("Query: %s.\n",query);
+    //printf("Query: %s.\n",query);
     
     mysql_query(con, query); //Ejecuto la query para modificar la entrada
     
