@@ -1,7 +1,9 @@
-1. terminar el cp.
-2. iniciador: reportar las carpetas y archivos que tiene cada nodo.
+1. Cp caso reemplaza?.
 3. designar una carpeta local como raíz del DFS. podría llamarse "raíz".
-4. updateDirectorio del coordinador (de la tabla?)
 5. servidor duplicado?
+6. Editor andando
 
 --------------------------------- COMPLETADAS ----------------------------------
+. iniciador: reportar las carpetas y archivos que tiene cada nodo
+También el finalizados. Volver a probar en caso de hacer (3)
+4. updateDirectorio del coordinador (de la tabla?)
