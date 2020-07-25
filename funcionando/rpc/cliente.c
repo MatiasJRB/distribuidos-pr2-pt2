@@ -755,6 +755,9 @@ int cpAux(char* origen,char* destino)
 
     //Control de archivo de entrada
 	int validArchivoOrigen = 0;
+	printf("tipo archivo exists: %i\n", TIPOARCHIVO);
+	printf("origen exists: %s\n", origen);
+	printf("actual exists: %s\n", sd_actual.name);
     validArchivoOrigen = exists(clnt, TIPOARCHIVO, origen, sd_actual.name);
 	if(validArchivoOrigen)
     {
@@ -804,32 +807,18 @@ int cpAux(char* origen,char* destino)
 
 			}
 			
-			//Si no es la raiz, le saco la barra a la direccion destino
-		    if (esRaiz == 0)
-		    {
-				int i;
-				for(i=1;i<strlen(destino);i++)
-				{
-					destino[i-1]=destino[i];
-				}
-					destino[i-1]='\0';
-			}
-
 			printf("Mensaje para copyFile %s \n", ip);
 			printf("ip msg: %s \n", ip);
 			printf("rutaO msg: %s\n", rutaOrigen);
 			printf("rutaD msg: %s\n", destino);
 
 			//TODO: DESCOMENTAR LUEGO PARA REALIZAR LA COPIA FISICA
-			//int resCopy = copyFile(ip, rutaOrigen, destino);
-			int resCopy =1;
-			//if (resCopy == ACK)
-			if (resCopy == 1)
+			int resCopy = copyFile(ip, rutaOrigen, destino);
+			if (resCopy == ACK)
 			{	
 			    int result = 0;
 			    if (esRaiz){
-					printf("resport create: el destino es la raiz, no se crea el archivo \n");
-				    //result = report_create(clnt, TIPOARCHIVO, origen, ip, NULL);
+				    result = report_create(clnt, TIPOARCHIVO, origen, ip, "raiz");
 			    }
 			    else {
 			        result = report_create(clnt, TIPOARCHIVO, origen, ip, destino);
