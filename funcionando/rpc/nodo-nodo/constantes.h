@@ -5,7 +5,7 @@
 #define DOWNLOAD 1
 #define COPY 2
 //#define UPLOAD 2
-//#define UPDATE 3
+#define REMOVE 3
 #define ERROR 4
 #define ACK 5
 
