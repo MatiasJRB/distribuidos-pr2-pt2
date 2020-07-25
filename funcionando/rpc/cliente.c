@@ -320,6 +320,8 @@ void obtenerIP(){
     remove("nombre");
 }
 
+char direccionServidor [20];
+
 int main(int argc, char *argv[]){
     memset(ip,'\0',15);
     obtenerIP();
@@ -332,7 +334,7 @@ int main(int argc, char *argv[]){
     }
 
     srv = argv[1];
-
+    strcpy(direccionServidor,srv);
     clnt = clnt_create(srv, PROY2DFS, PROY2DFSVERS,"tcp");
 
     if(clnt == (CLIENT*)NULL)
@@ -522,7 +524,7 @@ void editor(){
     else 
     {
 	if(args[1]!=NULL){
-	    execl("editor",args[1],sd_actual.name,getMyIp(),NULL);
+	    execl("editor",args[1],sd_actual.name,getMyIp(),direccionServidor,NULL);
 	}else{
 	    execl("editor",NULL);
 	}

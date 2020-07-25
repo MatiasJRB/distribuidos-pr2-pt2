@@ -993,7 +993,7 @@ int main(int argc, char *argv[])
 {
 	enableRawMode();
 	initEditor();
-	if (argc == 3) // Si me pasan un archivo y su ubicacion
+	if (argc == 4) // Si me pasan un archivo y su ubicacion
 	{
 		char* nombre= argv[0];
 		char* ubicacion = argv[1];
@@ -1004,7 +1004,7 @@ int main(int argc, char *argv[])
 		free(E.ip);
 		E.ip= strdup(ip_cliente);
 		
-		char* srv = "localhost";
+		char* srv = argv[3];
 
 		CLIENT* clnt = clnt_create(srv, PROY2DFS, PROY2DFSVERS,"tcp");
 
