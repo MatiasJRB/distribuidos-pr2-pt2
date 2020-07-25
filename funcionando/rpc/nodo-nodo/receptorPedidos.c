@@ -134,7 +134,7 @@ void * receptorPedidosNodo(void * arg)
 						  destino[i-1]=destino[i];
 						}
 						destino[i-1]='\0';
-
+						//strcpy(ruta,ruta+1);
 						if(clnt == (CLIENT*)NULL)
 						{
 							clnt_pcreateerror("localhost");
@@ -211,6 +211,24 @@ void * receptorPedidosNodo(void * arg)
 						enviar(newfd,&enviar_paquete,sizeof(struct PAQUETE_SOCKET));
 
 
+						break;
+				case REMOVE:
+						printf("%s\n",recibir_paquete.data);
+						strcpy(recibir_paquete.data,recibir_paquete.data+1);
+						printf("%s\n",recibir_paquete.data);
+						int result = remove(recibir_paquete.data);
+						
+						if(!result)//es exitoso
+						{	
+							enviar_paquete.identificador=ACK;
+							enviar(newfd,&enviar_paquete,sizeof(struct PAQUETE_SOCKET));	
+						}
+						else
+						{
+							enviar_paquete.identificador=ERROR;
+							enviar(newfd,&enviar_paquete,sizeof(struct PAQUETE_SOCKET));
+							exit(ERROR);
+						}
 						break;
 				/*case UPLOAD:
 						printf("Envio de Archivo\n");
