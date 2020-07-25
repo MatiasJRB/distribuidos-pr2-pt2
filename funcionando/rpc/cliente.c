@@ -14,6 +14,7 @@
 #include <sys/socket.h> 
 #include <netinet/in.h> 
 #include <arpa/inet.h> 
+#include <signal.h>
 #include "comunicacion.h"
 
 /*
@@ -37,7 +38,7 @@ char comando[max]; //comando va a leer el comando que ingrese el usuario
 char* args[max_args];
 char *path[max];
 CLIENT *clnt;
-char ip[15];
+char ip[16];
 
 /*Declara funciones*/
 void separarArgumentos();
@@ -339,6 +340,10 @@ int main(int argc, char *argv[]){
 		exit(2);
     }
     
+	struct sigaction sig;
+	sig.sa_handler = salir;
+	sigaction(SIGINT, &sig, NULL);
+
     // por si hay que testear algo temporal
 	if(argc > 2 && !strcmp(argv[2], "debug")) {
 		// modo debug
@@ -357,7 +362,11 @@ int main(int argc, char *argv[]){
     sd_actual = raiz;    
     
     strcpy((char*)path,"/");
+
+	printf("Sincronizando...\n");
     inicializador();
+	printf("Sincronización completa.\n");
+
     while(seguir){
         printf(" "AZUL"%s "VERDE"$"NORMAL" ",path);
         __fpurge(stdin); //Limpia el buffer de entrada del teclado.
@@ -920,7 +929,7 @@ void mv()
 
 void salir()
 {
-	printf("¿Seguro que deseas salir del sistema? y/n \n");
+	printf("\n¿Seguro que deseas salir del sistema? y/n \n");
 	char seleccion[2];
 	scanf("%s",seleccion);
 	seleccion[1] = '\0';
