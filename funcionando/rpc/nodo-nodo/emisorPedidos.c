@@ -135,6 +135,6 @@ int emisorPedidosNodo(char* ip, char* route, char* destino,int opcion)
                 return ERROR;
         }
         close(sockfd);
-        return 0;
+        return ACK;
     
 }

@@ -495,7 +495,7 @@ void editor(){
     else 
     {
 	if(args[1]!=NULL){
-	    execl("editor",args[1],sd_actual.name,NULL);
+	    execl("editor",args[1],sd_actual.name,getMyIp(),NULL);
 	}else{
 	    execl("editor",NULL);
 	}
