@@ -39,7 +39,7 @@ char* args[max_args];
 char *path[max];
 CLIENT *clnt;
 char ip[16];
-
+char carpetaSincronizacion [256];
 /*Declara funciones*/
 void separarArgumentos();
 void listarDirectorio();
@@ -364,10 +364,37 @@ int main(int argc, char *argv[]){
     
     strcpy((char*)path,"/");
 
+
+    printf("Especifique la carpeta de sincronizacion [default: carpeta actual]: \n");
+    
+    scanf("%[^\n]s",carpetaSincronizacion);   //Espera hasta que el usuario ingrese algun comando.
+    printf("Lo que obtuve fue:%s.\n",carpetaSincronizacion);
+    if(strcmp(carpetaSincronizacion,"")==0){
+	printf("Estaba vacio");
+	strcpy(carpetaSincronizacion,"./");
+    }
+
+    //Hacer el chdir
+    char rutita[256];
+    memset(rutita,'\0',1);
+    if(carpetaSincronizacion) //Se fija que cuente con el argumento necesario
+    {
+	printf("Entre.\n");
+        if(chdir(carpetaSincronizacion)!=0) //La llamada al sistema chdir hace el cambio de directorio si regresa un valor
+                                //distinto de cero la operacion no se pudo ejecutar correctamente/
+            printf("%s no existe el directorio ingresado\n",carpetaSincronizacion);
+        else{
+            getcwd(rutita,100); //Como fue exitoso actualiza el pwd
+	    printf("Exitoso.\n");
+	}
+	
+    printf("La ruta actual es: %s\n", rutita); 
+    }	
+    
 	printf("Sincronizando...\n");
     inicializador();
 	printf("Sincronización completa.\n");
-
+    
     while(seguir){
         printf(" "AZUL"%s "VERDE"$"NORMAL" ",path);
         __fpurge(stdin); //Limpia el buffer de entrada del teclado.
@@ -505,7 +532,7 @@ void editor(){
 }
 
 void listarDirectorio(){
-
+/*
     Mensaje msg_test =
     {
 	   sd_actual.size,
@@ -529,7 +556,19 @@ void listarDirectorio(){
 	j++;//saltea la ,
 	printf(" ");
     }
-    printf("\n");    
+    printf("\n");    */
+    
+    
+    char* resultado = ls(clnt, sd_actual.name);
+    int i= 0;
+    while( i<strlen(resultado)){
+	if(resultado[i]!=',')
+	    printf("%c",resultado[i]);
+	else
+	    printf(" ");
+	i++;
+    }
+    printf("\n"); 
 }
 
 
@@ -665,6 +704,8 @@ int rmAux(char* type,char* file)
 		{
 		    //printf("no lo tengo yo.\n");
 		    //No lo tengo yo
+		    strcpy(toSend,"/");
+		    strcat(toSend,file);
 		    if(removeFile(ip,toSend))
 		    {
 			report_delete_1(&msg_to_send3, clnt);
@@ -808,30 +849,30 @@ int cpAux(char* origen,char* destino)
 
 	    	//En este punto ya se pasaron todos los controles sobre el archivo origen y destino
 	    	//Obtengo IP del nodo que tiene el archivo origen
-
+			char* ipArchivo;
 			if (esRaiz){
-				char * ip = getaddress(clnt, origen, "raiz");
+				ipArchivo = getaddress(clnt, origen, "raiz");
 			}
 			else {
-				char * ip = getaddress(clnt, origen, destino);
+				ipArchivo = getaddress(clnt, origen, sd_actual.name);
 
 			}
 			
-			printf("Mensaje para copyFile %s \n", ip);
-			printf("ip msg: %s \n", ip);
+			printf("Mensaje para copyFile %s \n", ipArchivo);
+			printf("ip msg: %s \n", ipArchivo);
 			printf("rutaO msg: %s\n", rutaOrigen);
 			printf("rutaD msg: %s\n", destino);
 
 			//TODO: DESCOMENTAR LUEGO PARA REALIZAR LA COPIA FISICA
-			int resCopy = copyFile(ip, rutaOrigen, destino);
+			int resCopy = copyFile(ipArchivo, rutaOrigen, destino);
 			if (resCopy == ACK)
 			{	
 			    int result = 0;
 			    if (esRaiz){
-				    result = report_create(clnt, TIPOARCHIVO, origen, ip, "raiz");
+				    result = report_create(clnt, TIPOARCHIVO, origen, ipArchivo, "raiz");
 			    }
 			    else {
-			        result = report_create(clnt, TIPOARCHIVO, origen, ip, destino);
+			        result = report_create(clnt, TIPOARCHIVO, origen, ipArchivo, destino);
 					printf("cp correcto");
 			    }
                             

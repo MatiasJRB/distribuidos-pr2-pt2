@@ -120,8 +120,13 @@ void * receptorPedidosNodo(void * arg)
                         printf("\nArchivo enviado\n");
                         break;
 				case COPY:
+						
 						ruta = strtok(recibir_paquete.data," ");
 						destino= strtok(NULL," ");
+						char rutita[256];
+						memset(rutita,'\0',1);
+						getcwd(rutita,100);
+						printf("La ruta actual es: %s\n", rutita); 
 						long unsigned int i=0;
 						for(i=1;i<strlen(ruta);i++)
 						{

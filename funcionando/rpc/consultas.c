@@ -34,6 +34,8 @@ void * insertar(char *nombre, char *ip, char *direccion, char *permiso, char  *v
         char queryupdate[N];
         strcpy(queryupdate, "UPDATE indexado SET permiso = 'R',version = version + 1 WHERE permiso != 'X' and nombre = '");
         strcat(queryupdate, nombre);
+        strcat(queryupdate, "AND ruta = '");
+        strcat(queryupdate, ruta);
         strcat(queryupdate, "';");
         mysql_query(con, queryupdate); //Ejecuto la query para updatear los registros
     }
@@ -60,7 +62,7 @@ struct listado *funcionLS(char *direccion){
     strcat(query, "direccion = '");
     strcat(query, direccion);
     strcat(query, "' AND permiso!='X';"); //si permiso es X, es porque esta borrado
-    
+    printf("query: %s\n",query);
 	mysql_query(con, query);
     // Obtengo el resultado de esa consulta
     res = mysql_use_result(con);
@@ -138,7 +140,7 @@ struct archivo *buscarArchivo(char *nombre, char *direccion){
     if (cantidad == 0){ // si es 0 significa que nunca encontro un archivo.
         strcpy(resultado->permiso, "N"); //Si el resultado es null, te pongo como nombre el NULL
     }
-
+    printf("IP: %s\n",resultado->ip);
     mysql_close(con);
     return resultado;
 }
@@ -155,8 +157,8 @@ void * eliminar(char *nombre, char *ip, char *direccion, char *permiso){
     strcat(query, ip);
     strcat(query, "' AND direccion='");
     strcat(query, direccion);
-    strcat(query, "' AND permiso='");
-    strcat(query, permiso); 
+    //strcat(query, "' AND permiso='");
+    //strcat(query, permiso); 
     strcat(query, "';");
     //printf("Query delete: %s\n",query);
     mysql_query(con, query); //Ejecuto la query para modificar la entrada
