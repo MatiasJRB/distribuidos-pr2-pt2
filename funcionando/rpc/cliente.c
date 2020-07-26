@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <ifaddrs.h>
 #include <stdio_ext.h>
 #include <stdlib.h>
 #include <string.h>
@@ -353,6 +354,7 @@ int main(int argc, char *argv[]){
     memset(ip,'\0',15);
     char * ip_aux = getMyIp();
 	strcpy(ip, ip_aux);
+	printf("mi ip es: %s\n", ip);
     char *srv;
 
     if(argc < 2)
@@ -608,6 +610,35 @@ void listarDirectorio(){
 
 char* getMyIp()
 {
+
+	struct ifaddrs *ifap, *ifa;
+    struct sockaddr_in *sa;
+    static char * addr;
+
+    getifaddrs (&ifap);
+    for (ifa = ifap; ifa; ifa = ifa->ifa_next)
+    {
+        if (ifa->ifa_addr && ifa->ifa_addr->sa_family==AF_INET)
+        {
+            sa = (struct sockaddr_in *) ifa->ifa_addr;
+			if (!strcmp(ifa->ifa_name, "tun0")) {
+				// hay vpn
+				addr = inet_ntoa(sa->sin_addr);
+				break;
+			}
+			else if (strcmp(ifa->ifa_name, "lo")) {
+				addr = inet_ntoa(sa->sin_addr);
+			}
+        }
+    }
+
+    freeifaddrs(ifap);
+	return addr;
+
+
+
+
+
     char myIp[256];
     struct hostent *host_entry;
     static char *IPbuffer; 
@@ -911,13 +942,14 @@ int cpAux(char* origen,char* destino)
 	    	//En este punto ya se pasaron todos los controles sobre el archivo origen y destino
 	    	//Obtengo IP del nodo que tiene el archivo origen
 			char* ipArchivo;
-			if (esRaiz){
-				ipArchivo = getaddress(clnt, origen, "raiz");
-			}
-			else {
-				ipArchivo = getaddress(clnt, origen, sd_actual.name);
+			// if (esRaiz){
+			// 	ipArchivo = getaddress(clnt, origen, "raiz");
+			// }
+			// else {
+			// 	ipArchivo = getaddress(clnt, origen, sd_actual.name);
 
-			}
+			// }
+			ipArchivo = getaddress(clnt, origen, sd_actual.name);
 			
 			printf("Mensaje para copyFile %s \n", ipArchivo);
 			printf("ip msg: %s \n", ipArchivo);
