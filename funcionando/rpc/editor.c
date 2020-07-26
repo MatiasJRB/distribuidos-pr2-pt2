@@ -8,6 +8,7 @@
 #include <sys/ioctl.h>
 #include <string.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <time.h>
 #include <fcntl.h>
 #include "nodo-nodo/socketNodos.h"
