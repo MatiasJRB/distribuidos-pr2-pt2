@@ -1,6 +1,7 @@
 ./
 ./nodo-nodo
 ./nodo-nodo/funciona
+./carpetaNuevaDePrueba
 ./inicializador.c
 ./editor
 ./protocolo_xdr.c

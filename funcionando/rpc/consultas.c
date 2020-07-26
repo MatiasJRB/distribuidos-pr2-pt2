@@ -67,17 +67,17 @@ struct listado *funcionLS(char *direccion){
     // Obtengo el resultado de esa consulta
     res = mysql_use_result(con);
     int i=0;
-
+    int cant =0;
     while ((row = mysql_fetch_row(res)) != NULL) /* recorrer la variable res con todos los registros obtenidos para su uso */
     {   
-        resultado->cantidad = resultado->cantidad +1 ; 
-
+        //resultado->cantidad = resultado->cantidad +1 ; 
+        cant++;
         struct archivo *actual = (struct archivo *)malloc(sizeof (struct archivo));
-        actual->nombre = (char*)malloc (50*sizeof(char));
-        actual->ip    = (char*)malloc (50*sizeof(char));
-        actual->direccion = (char*)malloc (50*sizeof(char));
+        actual->nombre = (char*)malloc (100*sizeof(char));
+        actual->ip    = (char*)malloc (100*sizeof(char));
+        actual->direccion = (char*)malloc (100*sizeof(char));
         actual->permiso = (char*)malloc (1*sizeof(char));
-        actual->ruta = (char*)malloc (100*sizeof(char));
+        actual->ruta = (char*)malloc (200*sizeof(char));
 
         strcpy(actual->nombre, row[0]);
         strcpy(actual->ip, row[1]);
@@ -90,7 +90,9 @@ struct listado *funcionLS(char *direccion){
         resultado->elementos[i] = *actual;
         i=i+1;
     } 
-    //printf("Llegue aca sin problemas\n");
+    resultado->cantidad = cant;
+    printf("Cantidad: %d.\n",resultado->cantidad);
+    printf("Llegue aca sin problemas\n");
     mysql_close(con);
     return resultado;
 
@@ -107,11 +109,11 @@ struct archivo *buscarArchivo(char *nombre, char *direccion){
     MYSQL_ROW row;
     
     struct archivo *resultado = (struct archivo *)malloc(sizeof (struct archivo));
-    resultado->nombre = (char*)malloc (50*sizeof(char));
-    resultado->ip    = (char*)malloc (50*sizeof(char));
-    resultado->direccion = (char*)malloc (50*sizeof(char));
+    resultado->nombre = (char*)malloc (100*sizeof(char));
+    resultado->ip    = (char*)malloc (100*sizeof(char));
+    resultado->direccion = (char*)malloc (100*sizeof(char));
     resultado->permiso = (char*)malloc (1*sizeof(char));
-    resultado->ruta = (char*)malloc (100*sizeof(char));
+    resultado->ruta = (char*)malloc (200*sizeof(char));
        
     char query[N];
     strcpy(query, "SELECT * ");
@@ -174,11 +176,11 @@ struct archivo *buscarCarpeta(char *nombre){
     MYSQL_ROW row;
     
     struct archivo *resultado = (struct archivo *)malloc(sizeof (struct archivo));
-    resultado->nombre = (char*)malloc (50*sizeof(char));
-    resultado->ip    = (char*)malloc (50*sizeof(char));
-    resultado->direccion = (char*)malloc (50*sizeof(char));
+    resultado->nombre = (char*)malloc (100*sizeof(char));
+    resultado->ip    = (char*)malloc (100*sizeof(char));
+    resultado->direccion = (char*)malloc (100*sizeof(char));
     resultado->permiso = (char*)malloc (1*sizeof(char));
-    resultado->ruta = (char*)malloc (100*sizeof(char));
+    resultado->ruta = (char*)malloc (200*sizeof(char));
        
     char query[300];
     strcpy(query, "SELECT * ");
