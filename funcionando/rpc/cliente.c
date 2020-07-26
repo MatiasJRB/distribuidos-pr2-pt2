@@ -594,10 +594,12 @@ void listarDirectorio(){
 	}
 	if(resultado[i]!=',')
 	    printf("%c",resultado[i]);
-	else
+	else{
 	    printf("  ");
+	    contador++;
+	}
 	i++;
-	contador++;
+	
     }
     printf("\n"); 
 }
