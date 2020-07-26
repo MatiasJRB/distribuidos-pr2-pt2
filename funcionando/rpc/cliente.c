@@ -1,5 +1,7 @@
 #include <stdio.h>
+#include <fcntl.h>
 #include <ifaddrs.h>
+#include <errno.h>
 #include <stdio_ext.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1091,11 +1093,24 @@ void salir()
 		    int res_report_delete=report_delete(clnt,'1',filename,myIp,carpeta);
 		    if(!res_report_delete)
 			printf("OCURRIO UN ERROR ELIMINANDO %s/%s\n",carpeta,filename);
-		    if (strcmp(carpeta,"raiz")!=0 && is_empty(clnt,carpeta))
-		    {// si la carpeta esta vacia la borro
-			    printf("La carpeta %s quedo vacia.\n",carpeta);
-			    int res_report_delete=report_delete(clnt,'0',carpeta,myIp,NULL);
-		    }
+			if (strcmp(carpeta,"raiz")!=0 && is_empty(clnt,carpeta))
+			{
+				// si la carpeta esta vacia la borro 
+				// en realidad tengo que borrarla sólo si la tengo fisicamente
+				int error_num = 0;
+				int dir_result = mkdir(carpeta, 0777);
+				error_num=errno;
+				if(dir_result != 0 && error_num != EEXIST)
+				{
+					printf("No la tengo yo...\n");
+					removeLocal(carpeta);
+				}
+				else
+				{
+					printf("La carpeta %s la tengo yo y quedo vacia.\n",carpeta);
+					int res_report_delete=report_delete(clnt,'0',carpeta,myIp,NULL);
+				}			    
+			}
 		    carpeta = strtok(NULL,delimiter);
 		}
 		printf("¡Hasta la próxima!\n");
