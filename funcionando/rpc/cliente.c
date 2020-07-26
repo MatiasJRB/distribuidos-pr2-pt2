@@ -143,7 +143,7 @@ int inicializador()
 		};
 		
 		Mensaje* msg = get_files_ip_1(&toSend,clnt);
-		char* arr =malloc(2048*sizeof(char));
+		char* arr =malloc(4096*sizeof(char));
 		//printf("El arreglo que obtuve de la bd con mis archivos es: \n [%s] \n",arr);
 		strcpy(arr, msg->Mensaje_val);
 		//printf("Los archivos que recibi son: %s.\n",msg->Mensaje_val);
@@ -399,28 +399,31 @@ int main(int argc, char *argv[]){
 	printf("Estaba vacio");
 	strcpy(carpetaSincronizacion,"./");
     }
-
-    //Hacer el chdir
+    char auxiliar [256];
+    strcpy(auxiliar,carpetaSincronizacion);
+	
+    
+	printf("Sincronizando...\n");
+    inicializador();
+	printf("Sincronización completa.\n");
+        //Hacer el chdir
     char rutita[256];
+    
     memset(rutita,'\0',1);
-    if(carpetaSincronizacion) //Se fija que cuente con el argumento necesario
+    if(auxiliar) //Se fija que cuente con el argumento necesario
     {
+	printf("%s.\n",auxiliar);
 	printf("Entre.\n");
-        if(chdir(carpetaSincronizacion)!=0) //La llamada al sistema chdir hace el cambio de directorio si regresa un valor
+        if(chdir(auxiliar)!=0) //La llamada al sistema chdir hace el cambio de directorio si regresa un valor
                                 //distinto de cero la operacion no se pudo ejecutar correctamente/
-            printf("%s no existe el directorio ingresado\n",carpetaSincronizacion);
+            printf("%s no existe el directorio ingresado\n",auxiliar);
         else{
             getcwd(rutita,100); //Como fue exitoso actualiza el pwd
 	    printf("Exitoso.\n");
 	}
 	
     printf("La ruta actual es: %s\n", rutita); 
-    }	
-    
-	printf("Sincronizando...\n");
-    inicializador();
-	printf("Sincronización completa.\n");
-    
+    }
     while(seguir){
         printf(" "AZUL"%s "VERDE"$"NORMAL" ",path);
         __fpurge(stdin); //Limpia el buffer de entrada del teclado.
