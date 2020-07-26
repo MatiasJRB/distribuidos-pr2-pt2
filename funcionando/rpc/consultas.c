@@ -142,7 +142,6 @@ struct archivo *buscarArchivo(char *nombre, char *direccion){
     if (cantidad == 0){ // si es 0 significa que nunca encontro un archivo.
         strcpy(resultado->permiso, "N"); //Si el resultado es null, te pongo como nombre el NULL
     }
-    printf("IP: %s\n",resultado->ip);
     mysql_close(con);
     return resultado;
 }

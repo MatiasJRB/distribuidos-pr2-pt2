@@ -347,19 +347,12 @@ void ejecutarMKDIR()
     }
 }
 
-void obtenerIP(){
-    system("hostname -I > nombre");
-    FILE* arch = fopen("nombre","r");
-    fscanf(arch,"%s",ip);	
-    fclose(arch);
-    remove("nombre");
-}
-
 char direccionServidor [20];
 
 int main(int argc, char *argv[]){
     memset(ip,'\0',15);
-    obtenerIP();
+    char * ip_aux = getMyIp();
+	strcpy(ip, ip_aux);
     char *srv;
 
     if(argc < 2)
@@ -382,20 +375,13 @@ int main(int argc, char *argv[]){
 	sig.sa_handler = salir;
 	sigaction(SIGINT, &sig, NULL);
 
-    // por si hay que testear algo temporal
-	if(argc > 2 && !strcmp(argv[2], "debug")) {
-		// modo debug
-	}
-	else
-		// modo normal
-		startListening(clnt);
+	startListening(clnt);
     
     int seguir=1;
 
     raiz.name = (char*) malloc(sizeof(char)*5); /* Reservo lugar para '/' y '\0' */
     strcpy(raiz.name,"raiz");
     raiz.size = strlen(raiz.name);
-    
  
     sd_actual = raiz;    
     
@@ -622,11 +608,14 @@ char* getMyIp()
 {
     char myIp[256];
     struct hostent *host_entry;
-    char *IPbuffer; 
+    static char *IPbuffer; 
     gethostname(myIp,256);
     host_entry = gethostbyname(myIp); 
-    IPbuffer = inet_ntoa(*((struct in_addr*) 
-                   host_entry->h_addr_list[0])); 
+	int cantidad_direcciones = 0;
+	while (host_entry->h_addr_list[cantidad_direcciones] != NULL)
+		cantidad_direcciones++;
+	// si estamos en la VPN, nos conectamos en la segunda, sino no
+	IPbuffer = inet_ntoa(*((struct in_addr*) host_entry->h_addr_list[cantidad_direcciones-1])); 
     return IPbuffer;
 }
 

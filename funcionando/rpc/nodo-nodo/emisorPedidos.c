@@ -38,8 +38,8 @@ int emisorPedidosNodo(char* ip, char* route, char* destino,int opcion)
 	
 	if ((he=gethostbyname(ip)) == NULL) 
 	{
-		printf("ip recibida: %s------------------------------\n", ip);
-		perror("Error función gethostbyname()\n");
+		// printf("ip recibida: %s------------------------------\n", ip);
+		// perror("Error función gethostbyname()\n");
 		return ERROR;
 	}
 
@@ -58,14 +58,14 @@ int emisorPedidosNodo(char* ip, char* route, char* destino,int opcion)
         // Creamos el socket
         if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) 
         {
-            perror("Error función socket()\n");
+            // perror("Error función socket()\n");
             return ERROR;
         }
 
           int optval = 1;
           if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int)) == -1) 
           {
-              perror("Set socket option\n");        
+              // perror("Set socket option\n");        
               return ERROR;
           }
 
@@ -73,7 +73,7 @@ int emisorPedidosNodo(char* ip, char* route, char* destino,int opcion)
 
         if (connect(sockfd, (struct sockaddr *)&servidorInfo, sizeof(struct sockaddr)) == -1)
         {
-            perror("Error función connect()\n");
+            // perror("Error función connect()\n");
             return ERROR;
         }
 
@@ -93,7 +93,7 @@ int emisorPedidosNodo(char* ip, char* route, char* destino,int opcion)
                 FILE * archivo = fopen(destino, "w");
 
                 if (archivo == NULL) {
-                    perror("fopen\n");
+                    // perror("fopen\n");
                     return ERROR;
                 }
 
@@ -143,9 +143,11 @@ int emisorPedidosNodo(char* ip, char* route, char* destino,int opcion)
 					return ACK;
 				else if(recibir_paquete.identificador==ERROR)
 					return ERROR;
+		        break;
             default:
-                printf("La operación no existe.\n");
+                // printf("La operación no existe.\n");
                 return ERROR;
+				break;
         }
         close(sockfd);
         return ACK;
