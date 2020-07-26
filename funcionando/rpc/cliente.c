@@ -598,15 +598,20 @@ void listarDirectorio(){
     }
     printf("\n");    */
     
-    
+    int contador = 0;
     char* resultado = ls(clnt, sd_actual.name);
     int i= 0;
     while( i<strlen(resultado)){
+	if(contador==5){
+	    printf("\n");
+	    contador = 0;
+	}
 	if(resultado[i]!=',')
 	    printf("%c",resultado[i]);
 	else
-	    printf(" ");
+	    printf("  ");
 	i++;
+	contador++;
     }
     printf("\n"); 
 }
@@ -715,68 +720,78 @@ int rmAux(char* type,char* file)
 	}
 	else //Si es un archivo
 	{
-	    //Debo obtener la ip
-	    Mensaje* msg_to_rec = getaddress_1(&msg_to_send2, clnt);
-	    char* ip = msg_to_rec->Mensaje_val;
-	    printf("Recibi una ip %s.\n",ip);
-	    //Ahora debo revisar que sea valida
-	    if(isValidIpAddress(ip))
+	    printf("toSend %s\n",toSend);
+	    int isFileReturn = is_file(clnt,toSend,sd_actual.name);
+	    if(isFileReturn)
 	    {
-		//Tengo que crear el nuevo paquete con la ip
-		char* cadena3 = malloc(maxChar * sizeof(char));
-		memset(cadena3,'\0',1);
-		char tipoChar2[2];
-		sprintf(tipoChar2,"%d",tipoOperacion);
-		strcat(cadena3,tipoChar2);
-		strcat(cadena3,",");
-		strcat(cadena3,toSend);
-		strcat(cadena3,",");
-		strcat(cadena3, ip);
-		strcat(cadena3,",");
-		strcat(cadena3, sd_actual.name);
-		//printf("La cadena3 a enviar es: %s.\n Su longitud es: %d.\n",cadena3,strlen(cadena3));
-		Mensaje msg_to_send3 = {
-		    strlen(cadena3),
-		    cadena3
-		};
-		//La ip es valida
-		//Ahora debo ver si la ip es mia o no
-		if(strcmp(ip,getMyIp()))
+		//Debo obtener la ip
+		Mensaje* msg_to_rec = getaddress_1(&msg_to_send2, clnt);
+		char* ip = msg_to_rec->Mensaje_val;
+		printf("Recibi una ip %s.\n",ip);
+		//Ahora debo revisar que sea valida
+		if(isValidIpAddress(ip))
 		{
-		    //printf("no lo tengo yo.\n");
-		    //No lo tengo yo
-		    strcpy(toSend,"/"); 
-		    if(strcmp(sd_actual.name,"raiz")){ //Si no estoy en la raiz
-			strcat(toSend,sd_actual.name);
-			strcat(toSend,"/");
-		    }
-		    strcat(toSend,file);
-		    if(removeFile(ip,toSend))
+		    //Tengo que crear el nuevo paquete con la ip
+		    char* cadena3 = malloc(maxChar * sizeof(char));
+		    memset(cadena3,'\0',1);
+		    char tipoChar2[2];
+		    sprintf(tipoChar2,"%d",tipoOperacion);
+		    strcat(cadena3,tipoChar2);
+		    strcat(cadena3,",");
+		    strcat(cadena3,toSend);
+		    strcat(cadena3,",");
+		    strcat(cadena3, ip);
+		    strcat(cadena3,",");
+		    strcat(cadena3, sd_actual.name);
+		    //printf("La cadena3 a enviar es: %s.\n Su longitud es: %d.\n",cadena3,strlen(cadena3));
+		    Mensaje msg_to_send3 = {
+			strlen(cadena3),
+			cadena3
+		    };
+		    //La ip es valida
+		    //Ahora debo ver si la ip es mia o no
+		    if(strcmp(ip,getMyIp()))
 		    {
-			report_delete_1(&msg_to_send3, clnt);
-			return 0;
+			//printf("no lo tengo yo.\n");
+			//No lo tengo yo
+			strcpy(toSend,"/"); 
+			if(strcmp(sd_actual.name,"raiz")){ //Si no estoy en la raiz
+			    strcat(toSend,sd_actual.name);
+			    strcat(toSend,"/");
+			}
+			strcat(toSend,file);
+			if(removeFile(ip,toSend))
+			{
+			    report_delete_1(&msg_to_send3, clnt);
+			    return 0;
+			}
+			return -4;
 		    }
-		    return -4;
-		}
-		else
-		{
-		    strcpy(toSend,"");
-		    if(strcmp(sd_actual.name,"raiz")){ //Si no estoy en la raiz
-			strcpy(toSend,sd_actual.name);
-			strcat(toSend,"/");
-		    }
-		    strcat(toSend,file);
-		    printf("toSend: %s, actual: %s\n",toSend,sd_actual.name);
-		    //printf("Lo tengo yo.\n");
-		    //Lo tengo yo y debo hacer un remove local
-		    if(!removeLocal(toSend))
+		    else
 		    {
-			report_delete_1(&msg_to_send3, clnt);
-			return 0;
+			strcpy(toSend,"");
+			if(strcmp(sd_actual.name,"raiz")){ //Si no estoy en la raiz
+			    strcpy(toSend,sd_actual.name);
+			    strcat(toSend,"/");
+			}
+			strcat(toSend,file);
+			printf("toSend: %s, actual: %s\n",toSend,sd_actual.name);
+			//printf("Lo tengo yo.\n");
+			//Lo tengo yo y debo hacer un remove local
+			if(!removeLocal(toSend))
+			{
+			    report_delete_1(&msg_to_send3, clnt);
+			    return 0;
+			}
+			return -4;
 		    }
-		    return -4;
 		}
 	    }
+	    else
+	    {
+		return -5;
+	    }
+	    
 	}
 	
     
@@ -803,6 +818,9 @@ void rm()
 	    break;
 	case -4:
 	    printf("Ocurrio un error y no se puede eliminar.\n");
+	    break;
+	case -5:
+	    printf("Pusiste a eliminar una carpeta como si fuera un archivo pelotudo.\n");
 	    break;
     }
 }
@@ -1054,7 +1072,7 @@ void salir()
 		    }
 		    carpeta = strtok(NULL,delimiter);
 		}
-		printf("¡Hasta la próxima!");
+		printf("¡Hasta la próxima!\n");
 		exit(0);
 	}
 	else
