@@ -143,7 +143,7 @@ int emisorPedidosNodo(char* ip, char* route, char* destino,int opcion)
 					return ACK;
 				else if(recibir_paquete.identificador==ERROR)
 					return ERROR;
-				break;
+		        break;
             default:
                 // printf("La operación no existe.\n");
                 return ERROR;

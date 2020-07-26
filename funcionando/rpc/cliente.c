@@ -166,25 +166,25 @@ int inicializador()
 			char *c = strchr(filename, '\n');
 			if (c)
 			    *c = '\0';
-			//printf("El nombre del archivo a ingresar es: %s.\n",filename);
+			printf("El nombre del archivo a ingresar es: %s.\n",filename);
 			char direccion[128];
 			sprintf(direccion,"%s/%s",carpetaTotalGenerada,filename);
 			printf("La direccion generada es: %s\n",direccion);
 			if(!isDirectory(direccion)) //Si es un archivo
 			{
-			    //printf("Es un archivo.\n");
+			    printf("Es un archivo.\n");
 			    //Deberia primero chequear si existe o no
 			    //Ahora debo ingresarlos a la bd en la raiz
 			    if(!searchFolderAndFile(arr,"raiz",filename))
 			    { //Si no lo tenia
-				//printf("Yo no lo habia subido nunca.\n");
+				printf("Yo no lo habia subido nunca.\n");
 				if(!exists(clnt,'1',filename,"raiz")){
-				    //printf("No existe asi que lo creo.\n");
+				    printf("No existe asi que lo creo.\n");
 				    report_create(clnt, '1', filename, myIp, "raiz");
 				}
 				else
 				{
-				    //printf("Ya existe con ese nombre.\n");
+				    printf("Ya existe con ese nombre.\n");
 				    //Existe en la bd pero no es mio
 				    //Debo renombrar hasta que se pueda meter
 				    char renombrado[128];
@@ -195,7 +195,7 @@ int inicializador()
 					sprintf(renombrado,"%s(%d)",filename,i);
 					if(!exists(clnt,'1',renombrado,"raiz"))
 					{
-					    //printf("El nuevo nombre para el archivo sera: %s.\n",renombrado);
+					    printf("El nuevo nombre para el archivo sera: %s.\n",renombrado);
 					    termine = 1;
 					    report_create(clnt, '1', renombrado, myIp, "raiz");
 					}
@@ -205,22 +205,22 @@ int inicializador()
 				}
 			    }
 			    else{
-				//printf("Ya esta subido en la bd con mi IP.\n");
+				printf("Ya esta subido en la bd con mi IP.\n");
 			    }
 			}
 			else
 			{
-			    //printf("Es una carpeta.\n");
+			    printf("Es una carpeta.\n");
 			    if(!exists(clnt,'0',filename,"raiz")){
-				//printf("No existe, asi que debo crearla.\n");
+				printf("No existe, asi que debo crearla.\n");
 				//Creo la carpeta, aunque debo ver si existe antes
 				report_create(clnt, '0', filename, myIp, "raiz");
 			    }
 			    char* nuevoFilename = strtok(NULL,"/");
 			    if(nuevoFilename != NULL)
 			    {
-				//printf("Voy a crear el archivo.\n");
-				//printf("El nuevo filename que agarre es: %s\n",nuevoFilename);
+				printf("Voy a crear el archivo.\n");
+				printf("El nuevo filename que agarre es: %s\n",nuevoFilename);
 				c = strchr(nuevoFilename, '\n');
 				if (c)
 				    *c = '\0';
@@ -228,13 +228,13 @@ int inicializador()
 				{
 				    if(!exists(clnt,'1',nuevoFilename,filename))
 				    {
-					//printf("Voy a crear en carpeta %s.\n",filename);
+					printf("Voy a crear en carpeta %s.\n",filename);
 					report_create(clnt, '1', nuevoFilename, myIp, filename);
-					//printf("Cree el archivo.\n");
+					printf("Cree el archivo.\n");
 				    }
 				    else
 				    {
-					//printf("Ya existe con ese nombre.\n");
+					printf("Ya existe con ese nombre.\n");
 					//Existe en la bd pero no es mio
 					//Debo renombrar hasta que se pueda meter
 					char renombrado[128];
@@ -242,10 +242,10 @@ int inicializador()
 					int termine = 0;
 					while(!termine)
 					{
-					    sprintf(renombrado,"%s(%d)",filename,i);
+					    sprintf(renombrado,"%s(%d)",nuevoFilename,i);
 					    if(!exists(clnt,'1',renombrado,filename))
 					    {
-						//printf("El nuevo nombre para el archivo sera: %s.\n",renombrado);
+						printf("El nuevo nombre para el archivo sera: %s.\n",renombrado);
 						termine = 1;
 						report_create(clnt, '1', renombrado, myIp, filename);
 					    }
@@ -256,7 +256,7 @@ int inicializador()
 				}
 				else
 				{
-				    //printf("Ya esta subido en la bd con mi IP.\n");
+				    printf("Ya esta subido en la bd con mi IP.\n");
 				}
 			    }
 			    
