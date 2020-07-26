@@ -38,7 +38,7 @@ char comando[max]; //comando va a leer el comando que ingrese el usuario
 char* args[max_args];
 char *path[max];
 CLIENT *clnt;
-char ip[16];
+char ip[20];
 char carpetaSincronizacion [256];
 char rutaOriginal[256];
 /*Declara funciones*/
@@ -347,19 +347,12 @@ void ejecutarMKDIR()
     }
 }
 
-void obtenerIP(){
-    system("hostname -I > nombre");
-    FILE* arch = fopen("nombre","r");
-    fscanf(arch,"%s",ip);	
-    fclose(arch);
-    remove("nombre");
-}
-
 char direccionServidor [20];
 
 int main(int argc, char *argv[]){
     memset(ip,'\0',15);
-    obtenerIP();
+    char * ip_aux = getMyIp();
+	strcpy(ip, ip_aux);
     char *srv;
 
     if(argc < 2)
@@ -617,11 +610,14 @@ char* getMyIp()
 {
     char myIp[256];
     struct hostent *host_entry;
-    char *IPbuffer; 
+    static char *IPbuffer; 
     gethostname(myIp,256);
     host_entry = gethostbyname(myIp); 
-    IPbuffer = inet_ntoa(*((struct in_addr*) 
-                   host_entry->h_addr_list[0])); 
+	int cantidad_direcciones = 0;
+	while (host_entry->h_addr_list[cantidad_direcciones] != NULL)
+		cantidad_direcciones++;
+	// si estamos en la VPN, nos conectamos en la segunda, sino no
+	IPbuffer = inet_ntoa(*((struct in_addr*) host_entry->h_addr_list[cantidad_direcciones-1])); 
     return IPbuffer;
 }
 
