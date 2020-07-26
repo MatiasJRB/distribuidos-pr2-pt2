@@ -40,6 +40,7 @@ char *path[max];
 CLIENT *clnt;
 char ip[16];
 char carpetaSincronizacion [256];
+char rutaOriginal[256];
 /*Declara funciones*/
 void separarArgumentos();
 void listarDirectorio();
@@ -91,7 +92,35 @@ int searchFolderAndFile(char* array, char* folder, char* file)
 
 int inicializador()
 {
-	system("./getFiles.sh"); //Ejecuto el bash para obtener los archivos del nodo
+	char* copiaCarpeta = carpetaSincronizacion;
+	char comandoGetFiles [256];
+	sprintf(comandoGetFiles,"%s/getFiles.sh %s",rutaOriginal,carpetaSincronizacion);
+	int contador = 0;
+	char* carpetaObtenida = strtok(copiaCarpeta,"/");
+	char carpetaTotalGenerada[256];
+	if(carpetaSincronizacion[0] == '/')
+	    strcpy(carpetaTotalGenerada,"/");
+	else
+	    strcpy(carpetaTotalGenerada,"");
+	
+	while(carpetaObtenida != NULL)
+	{
+	    strcat(carpetaTotalGenerada,carpetaObtenida);
+	    char* obtenido = strtok(NULL,"/");
+	    if(obtenido!=NULL)
+	    {
+		contador++;
+		//printf("Obtuve %s\n",obtenido);
+		strcat(carpetaTotalGenerada,"/");
+		
+	    }
+	carpetaObtenida = obtenido;
+	}
+	printf("La cantidad de veces que tengo que hacer strtok es %d\n",contador);
+	printf("La carpeta original es: %s\n",carpetaTotalGenerada);
+	
+	
+	system(comandoGetFiles); //Ejecuto el bash para obtener los archivos del nodo
 	//Ahora tengo que leer el archivo Log
 	FILE *fp = fopen("log", "r");
 	if (fp == 0)
@@ -121,20 +150,26 @@ int inicializador()
 		getline(&line, &len, fp); //Consumo la primer linea
 		while ((read = getline(&line, &len, fp)) != -1) {
 
-			//printf("Retrieved line of length %zu:\n", read);
-			//printf("%s", line);
+			printf("Retrieved line of length %zu:\n", read);
+			printf("%s", line);
 			//Ahora debo obtener el nombre del archivo unicamente
 			char *directory;
 			/* get the first token */
+			
 			directory = strtok(line, "/");
+			for(int i=0; i<contador; i++)
+			{
+			    directory = strtok(NULL,"/");
+			}
+			printf("Llegue aca, %s\n",directory);
 			char* filename = strtok(NULL,"/");
 			char *c = strchr(filename, '\n');
 			if (c)
 			    *c = '\0';
 			//printf("El nombre del archivo a ingresar es: %s.\n",filename);
 			char direccion[128];
-			sprintf(direccion,"%s/%s",directory,filename);
-			//printf("La direccion generada es: %s\n",direccion);
+			sprintf(direccion,"%s/%s",carpetaTotalGenerada,filename);
+			printf("La direccion generada es: %s\n",direccion);
 			if(!isDirectory(direccion)) //Si es un archivo
 			{
 			    //printf("Es un archivo.\n");
@@ -366,7 +401,8 @@ int main(int argc, char *argv[]){
     
     strcpy((char*)path,"/");
 
-
+    
+    getcwd(rutaOriginal,256);
     printf("Especifique la carpeta de sincronizacion [default: carpeta actual]: \n");
     
     scanf("%[^\n]s",carpetaSincronizacion);   //Espera hasta que el usuario ingrese algun comando.
@@ -523,10 +559,12 @@ void editor(){
     }
     else 
     {
+	char comandoEditor [256];
+	sprintf(comandoEditor,"%s/editor",rutaOriginal);
 	if(args[1]!=NULL){
-	    execl("editor",args[1],sd_actual.name,getMyIp(),direccionServidor,NULL);
+	    execl(comandoEditor,args[1],sd_actual.name,getMyIp(),direccionServidor,NULL);
 	}else{
-	    execl("editor",NULL);
+	    execl(comandoEditor,NULL);
 	}
 	_exit(EXIT_FAILURE);   //exec never returns
     }
