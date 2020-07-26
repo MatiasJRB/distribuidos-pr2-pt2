@@ -711,6 +711,7 @@ int rmAux(char* type,char* file)
 		return -3;
 	    }
 	    //printf("Esta vacio.\n");
+	    removeLocal(toSend);
 	}
 	else //Si es un archivo
 	{
@@ -744,7 +745,11 @@ int rmAux(char* type,char* file)
 		{
 		    //printf("no lo tengo yo.\n");
 		    //No lo tengo yo
-		    strcpy(toSend,"/");
+		    strcpy(toSend,"/"); 
+		    if(strcmp(sd_actual.name,"raiz")){ //Si no estoy en la raiz
+			strcat(toSend,sd_actual.name);
+			strcat(toSend,"/");
+		    }
 		    strcat(toSend,file);
 		    if(removeFile(ip,toSend))
 		    {
@@ -755,6 +760,13 @@ int rmAux(char* type,char* file)
 		}
 		else
 		{
+		    strcpy(toSend,"");
+		    if(strcmp(sd_actual.name,"raiz")){ //Si no estoy en la raiz
+			strcpy(toSend,sd_actual.name);
+			strcat(toSend,"/");
+		    }
+		    strcat(toSend,file);
+		    printf("toSend: %s, actual: %s\n",toSend,sd_actual.name);
 		    //printf("Lo tengo yo.\n");
 		    //Lo tengo yo y debo hacer un remove local
 		    if(!removeLocal(toSend))
