@@ -38,7 +38,7 @@ char comando[max]; //comando va a leer el comando que ingrese el usuario
 char* args[max_args];
 char *path[max];
 CLIENT *clnt;
-char ip[20];
+char ip[16];
 char carpetaSincronizacion [256];
 char rutaOriginal[256];
 /*Declara funciones*/
@@ -375,20 +375,13 @@ int main(int argc, char *argv[]){
 	sig.sa_handler = salir;
 	sigaction(SIGINT, &sig, NULL);
 
-    // por si hay que testear algo temporal
-	if(argc > 2 && !strcmp(argv[2], "debug")) {
-		// modo debug
-	}
-	else
-		// modo normal
-		startListening(clnt);
+	startListening(clnt);
     
     int seguir=1;
 
     raiz.name = (char*) malloc(sizeof(char)*5); /* Reservo lugar para '/' y '\0' */
     strcpy(raiz.name,"raiz");
     raiz.size = strlen(raiz.name);
-    
  
     sd_actual = raiz;    
     
