@@ -43,25 +43,25 @@ char* funcionListar(char* Direccion)
 	int i;
 	struct archivo archivoaux;
 	char* nombreaux;
-	printf("Voy a guardar.\n");
-	printf("La cantidad total a leer es: %d\n",list.cantidad);
+	//printf("Voy a guardar.\n");
+	//printf("La cantidad total a leer es: %d\n",list.cantidad);
 	for (i=0;i<list.cantidad;i++)
 	{	
-		printf("#%d\n",i);
+		//printf("#%d\n",i);
 		archivoaux = list.elementos[i];
 		nombreaux = archivoaux.nombre;
-		printf("Elemento Nombre %s\n",nombreaux);
+		//printf("Elemento Nombre %s\n",nombreaux);
 		strcat(temp, nombreaux);
 		strcat(temp, ",");	
 	}
-	printf("Termine.\n");
+	//printf("Termine.\n");
 
 	int size = strlen(temp);
-	printf("size  = %d.\n",size);
+	//printf("size  = %d.\n",size);
 	char *toRet;
 	toRet = malloc(N*sizeof(char));
 	strcpy(toRet,temp);
-	printf("Me rompo en el coordinador.\n");
+	//printf("Me rompo en el coordinador.\n");
 	return (toRet);	
 }
 
@@ -86,10 +86,10 @@ int carpetaVacia(char* Nombre)
 
 int insert(char tipo, char* Nombre,char* IP, char* Ubicacion)
 {	//printf("INGRESE AL INSERT DEL COORDINADOR.\n");
-	printf("entre al insert.\n");
+	//printf("entre al insert.\n");
 	if (tipo == '0')
 	{
-		printf("TIPO 0.\n");
+		//printf("TIPO 0.\n");
 		char aux[40]="raiz/";
 		strcat(aux,Nombre);
 		insertar(Nombre,"-","raiz","R","0","0",aux);
@@ -98,7 +98,7 @@ int insert(char tipo, char* Nombre,char* IP, char* Ubicacion)
 	else
 		if (tipo == '1')
 		{
-			printf("TIPO 1.\n");
+			//printf("TIPO 1.\n");
 			char aux[40]="raiz";
 			if ( strcmp(Ubicacion,aux) !=0 ) 
 			{
@@ -113,7 +113,7 @@ int insert(char tipo, char* Nombre,char* IP, char* Ubicacion)
 				strcat(aux,Nombre);
 			}
 			insertar(Nombre,IP,Ubicacion,"W","0","1",aux);
-			printf("Termine de insertar \n");
+			//printf("Termine de insertar \n");
 			int pararetornar = 1;
 			return pararetornar;
 		}

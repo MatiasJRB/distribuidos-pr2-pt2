@@ -68,12 +68,12 @@ int *report_create_1_svc(Mensaje *msg, struct svc_req *req)
 	{
 		ubicacion = strtok(NULL, delimiter);
 	}
-	printf("TIPO: %s.\n",tipo);
-	printf("NOMBRE: %s.\n",nombre);
-	printf("UBICACION: %s.\n",ubicacion);
-	printf("IP: %s.\n",IP);
+	//printf("TIPO: %s.\n",tipo);
+	//printf("NOMBRE: %s.\n",nombre);
+	//printf("UBICACION: %s.\n",ubicacion);
+	//printf("IP: %s.\n",IP);
 	int resultado = insert(*tipo, nombre, IP, ubicacion);
-	printf("Llegue al to_return = %d\n",resultado);
+	//printf("Llegue al to_return = %d\n",resultado);
 	to_return = resultado;
 	return &to_return;
 }

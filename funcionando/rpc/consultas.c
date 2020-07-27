@@ -62,7 +62,7 @@ struct listado *funcionLS(char *direccion){
     strcat(query, "direccion = '");
     strcat(query, direccion);
     strcat(query, "' AND permiso!='X';"); //si permiso es X, es porque esta borrado
-    printf("query: %s\n",query);
+    //printf("query: %s\n",query);
 	mysql_query(con, query);
     // Obtengo el resultado de esa consulta
     res = mysql_use_result(con);
@@ -91,8 +91,8 @@ struct listado *funcionLS(char *direccion){
         i=i+1;
     } 
     resultado->cantidad = cant;
-    printf("Cantidad: %d.\n",resultado->cantidad);
-    printf("Llegue aca sin problemas\n");
+    //printf("Cantidad: %d.\n",resultado->cantidad);
+    //printf("Llegue aca sin problemas\n");
     mysql_close(con);
     return resultado;
 
