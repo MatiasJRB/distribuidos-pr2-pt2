@@ -417,6 +417,7 @@ int main(int argc, char *argv[]){
     memset(rutita,'\0',1);
     if(auxiliar) //Se fija que cuente con el argumento necesario
     {
+	chdir(auxiliar);
 	//printf("%s.\n",auxiliar);
 	//printf("Entre.\n");
         //if(chdir(auxiliar)!=0) //La llamada al sistema chdir hace el cambio de directorio si regresa un valor
