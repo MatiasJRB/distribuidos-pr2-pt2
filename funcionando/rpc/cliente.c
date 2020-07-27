@@ -1042,6 +1042,13 @@ void mv()
 		     * como el directorio existe solo tengo que actualizarle el padre
 		     * */
 		    //printf("Destino = %s.\n",destino);
+			printf("getaddress\nprimero: %s\nsegundo: %s\n\n", archivo, sd_actual.name);
+			char * ipArchivo = getaddress(clnt, archivo, sd_actual.name);
+			char destino_socket[100] = "/";
+			if (strcmp(sd_actual.name, "raiz"))
+				strcat(destino_socket, sd_actual.name);
+			printf("moveFile\nprimero: %s\nsegundo: %s\ntercero: %s\n\n", ipArchivo, archivo, destino_socket);
+			moveFile(ipArchivo, archivo, destino_socket);
 		    int res_update_directory= report_update_directory(clnt,archivo,sd_actual.name,destino);
 		    //printf("El resultado es: %d .\n",res_update_directory);
 		}
