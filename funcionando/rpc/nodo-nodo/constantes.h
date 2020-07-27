@@ -4,7 +4,7 @@
 #define MAXDATASIZE 512
 #define DOWNLOAD 1
 #define COPY 2
-//#define UPLOAD 2
+#define MOVE 6
 #define REMOVE 3
 #define ERROR 4
 #define ACK 5

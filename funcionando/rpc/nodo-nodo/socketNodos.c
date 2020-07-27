@@ -38,6 +38,10 @@ int removeFile(char * ip, char * route)
 	return emisorPedidosNodo(ip,route,NULL,REMOVE);
 	
 }
+int moveFile(char* ip, char* route,char* destino)
+{
+	return emisorPedidosNodo(ip,route,destino,MOVE);
+}
 
 void startListening(void *clnt)
 {

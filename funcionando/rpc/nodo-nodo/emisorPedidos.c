@@ -144,6 +144,20 @@ int emisorPedidosNodo(char* ip, char* route, char* destino,int opcion)
 				else if(recibir_paquete.identificador==ERROR)
 					return ERROR;
 		        break;
+	    case MOVE:
+		//copy
+                snprintf(enviar_paquete.data, MAXDATASIZE-1, "%s %s ", route, destino);
+                enviar_paquete.tamanio_data = strlen(destino)+strlen(route);
+		
+		enviar(sockfd, &enviar_paquete, sizeof(struct PAQUETE_SOCKET));
+                // Esperar respuesta del nodo que recibe el archivo
+                recibir(sockfd, &recibir_paquete, sizeof(struct PAQUETE_SOCKET));
+				// printf("%d\n",recibir_paquete.identificador);                
+				if(recibir_paquete.identificador==ACK)
+					return ACK;
+				else if(recibir_paquete.identificador==ERROR)
+					return ERROR;
+		break;
             default:
                 // printf("La operación no existe.\n");
                 return ERROR;

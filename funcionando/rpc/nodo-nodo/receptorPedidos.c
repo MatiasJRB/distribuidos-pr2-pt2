@@ -22,6 +22,114 @@
 
 static PAQUETE_SOCKET enviar_paquete, recibir_paquete;
 
+void move(CLIENT * clnt, int newfd)
+{
+	char * ruta = strtok(recibir_paquete.data," ");
+	char * destino= strtok(NULL," ");
+	char rutita[256];
+	memset(rutita,'\0',1);
+	getcwd(rutita,100);
+	// printf("La ruta actual es: %s\n", rutita); 
+	long unsigned int i=0;
+	for(i=1;i<strlen(ruta);i++)
+	{
+	  ruta[i-1]=ruta[i];
+	}
+	ruta[i-1]='\0';
+	
+	for(i=1;i<strlen(destino);i++)
+	{
+	  destino[i-1]=destino[i];
+	}
+	destino[i-1]='\0';
+	//strcpy(ruta,ruta+1);
+	if(clnt == (CLIENT*)NULL)
+	{
+		clnt_pcreateerror("localhost");
+		// printf("error cliente copy");
+		exit(2);
+	}
+	/*	
+	Mensaje msg ;
+	msg.Mensaje_val=destino;
+	msg.Mensaje_len=strlen(destino);
+
+	int * to_return =is_valid_1(&msg,clnt);
+	printf("%i",*to_return);
+	*/
+	FILE * archivoNuevo;
+	FILE * archivoOrigen;
+
+	char * nombreArchivo;
+	char * ruta_aux;
+	ruta_aux = strdup(ruta);
+	char * pasador= strtok(ruta_aux,"/");
+	while(pasador!=NULL)
+	{
+		nombreArchivo=pasador;
+		pasador= strtok(NULL,"/");
+		
+	}
+	// printf("strlen destino: %i\n", strlen(destino));
+
+	if (strlen(destino)) {
+		mkdir(destino, 0777); //creo la carpeta destino
+		strcat(destino,"/");
+	}
+
+	strcat(destino,nombreArchivo);
+
+	// printf("destino: %s\nruta: %s\n", destino, ruta);
+	if (!strcmp(destino,ruta)) {
+		// printf("son el mismo archivo ...\n");
+		enviar_paquete.identificador=ERROR;
+		enviar(newfd,&enviar_paquete,sizeof(struct PAQUETE_SOCKET));
+		exit(ERROR);
+	}
+
+	// printf("archivo a crear en %s\n", destino);
+	
+	archivoOrigen = fopen(ruta,"r");
+	if(archivoOrigen == NULL)
+	{
+		enviar_paquete.identificador=ERROR;
+		enviar(newfd,&enviar_paquete,sizeof(struct PAQUETE_SOCKET));
+		exit(ERROR);
+	}
+
+	archivoNuevo = fopen(destino,"w+");
+	if(archivoNuevo == NULL)
+	{
+		fclose(archivoOrigen);
+		enviar_paquete.identificador=ERROR;
+		enviar(newfd,&enviar_paquete,sizeof(struct PAQUETE_SOCKET));
+		exit(ERROR);
+	}
+
+	char ch;
+	while ((ch = fgetc(archivoOrigen)) != EOF)
+	{
+		fputc(ch, archivoNuevo);
+	}
+
+	fclose(archivoOrigen);
+	fclose(archivoNuevo);
+	// printf("%s\n",recibir_paquete.data);
+	int result = remove(ruta);
+	
+	if(!result)//es exitoso
+	{	
+		enviar_paquete.identificador=ACK;
+		enviar(newfd,&enviar_paquete,sizeof(struct PAQUETE_SOCKET));	
+	}
+	else
+	{
+		enviar_paquete.identificador=ERROR;
+		enviar(newfd,&enviar_paquete,sizeof(struct PAQUETE_SOCKET));
+		exit(ERROR);
+	}
+}
+
 void * receptorPedidosNodo(void * arg)
 {
 	CLIENT * clnt = arg;
@@ -243,7 +351,10 @@ void * receptorPedidosNodo(void * arg)
 				case UPDATE:
 						printf("Actualizacion de Archivo\n");
 						break;*/
-
+				case MOVE:
+						move(clnt, newfd);
+						break;
+					
 				default:	
                         // printf("No existe la operación.\n");
 						exit(ERROR);
