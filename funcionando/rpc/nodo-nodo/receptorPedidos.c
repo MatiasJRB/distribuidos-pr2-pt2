@@ -327,9 +327,13 @@ void * receptorPedidosNodo(void * arg)
 
 						break;
 				case REMOVE:
-						// printf("%s\n",recibir_paquete.data);
-						strcpy(recibir_paquete.data,recibir_paquete.data+1);
-						// printf("%s\n",recibir_paquete.data);
+						i=0;
+						for(i=1;i<strlen(recibir_paquete.data);i++)
+						{
+						  recibir_paquete.data[i-1]=recibir_paquete.data[i];
+						}
+						recibir_paquete.data[i-1]='\0';
+
 						int result = remove(recibir_paquete.data);
 						
 						if(!result)//es exitoso

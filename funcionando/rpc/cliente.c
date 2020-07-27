@@ -787,7 +787,7 @@ int rmAux(char* type,char* file)
 			    strcat(toSend,"/");
 			}
 			strcat(toSend,file);
-			if(removeFile(ip,toSend))
+			if(removeFile(ip,toSend) == ACK)
 			{
 			    report_delete_1(&msg_to_send3, clnt);
 			    return 0;
@@ -858,7 +858,7 @@ void cp()
     switch (result)
     {
 		case 0:
-			printf("Finaliza cpAux correctamente.\n");
+			printf("Finaliza copy correctamente.\n");
 			break;
 		case -1: 
 			printf("Uso: rm <-d/-f> <ruta archivo/directorio>\n");
@@ -903,9 +903,6 @@ int cpAux(char* origen,char* destino)
 
     //Control de archivo de entrada
 	int validArchivoOrigen = 0;
-	printf("tipo archivo exists: %i\n", TIPOARCHIVO);
-	printf("origen exists: %s\n", origen);
-	printf("actual exists: %s\n", sd_actual.name);
     validArchivoOrigen = exists(clnt, TIPOARCHIVO, origen, sd_actual.name);
 	if(validArchivoOrigen)
     {
@@ -956,12 +953,6 @@ int cpAux(char* origen,char* destino)
 			// }
 			ipArchivo = getaddress(clnt, origen, sd_actual.name);
 			
-			printf("Mensaje para copyFile %s \n", ipArchivo);
-			printf("ip msg: %s \n", ipArchivo);
-			printf("rutaO msg: %s\n", rutaOrigen);
-			printf("rutaD msg: %s\n", destino);
-
-			//TODO: DESCOMENTAR LUEGO PARA REALIZAR LA COPIA FISICA
 			int resCopy = copyFile(ipArchivo, rutaOrigen, destino);
 			if (resCopy == ACK)
 			{	
@@ -971,7 +962,6 @@ int cpAux(char* origen,char* destino)
 			    }
 			    else {
 			        result = report_create(clnt, TIPOARCHIVO, origen, ipArchivo, destino);
-					printf("cp correcto");
 			    }
                             
 			    /*
@@ -1144,10 +1134,10 @@ void salir()
 
 void help()
 {
-	printf("Comandos disponibles:\n");
-	printf("- " AMARILLO "mv " ROJO "[origen] " AZUL "[directorio destino]" NORMAL ": mover archivo/directorio a otro directorio. \n");
-	printf("- " AMARILLO "cp " ROJO "[archivo origen] " AZUL "[directorio destino]" NORMAL ": copiar archivo/directorio a otro directorio. \n");
-	printf("- " AMARILLO "rm " VERDE "[-f/-d] " ROJO "[archivo/directorio]" NORMAL ": eliminar un archivo o un directorio vacío. \n");
+	printf("Comandos disponibles: [obligatorio] (opcional)\n");
+	printf("- " AMARILLO "mv " ROJO "[archivo origen] " AZUL "(directorio destino)" NORMAL ": mover archivo a otro directorio. \n");
+	printf("- " AMARILLO "cp " ROJO "[archivo origen] " AZUL "[directorio destino absoluto]" NORMAL ": copiar archivo a otro directorio. \n");
+	printf("- " AMARILLO "rm " VERDE "[-f/-d] " ROJO "[archivo/directorio]" NORMAL ": eliminar un directorio vacío o un archivo. \n");
 	printf("- " AMARILLO "ls" NORMAL ": listar el directorio actual. \n");
 	printf("- " AMARILLO "cd " ROJO "[directorio]" NORMAL ": cambiar de directorio. \n");
 	printf("- " AMARILLO "editor " ROJO "[archivo]" NORMAL ": editar un archivo existente o nuevo. \n");
