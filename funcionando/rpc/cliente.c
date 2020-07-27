@@ -358,8 +358,7 @@ int main(int argc, char *argv[]){
     strcpy(ip, ip_aux);
     printf("============================================\n");
     printf(VERDE"D"ROJO"F"AMARILLO"S"VERDE"2020\n"NORMAL);
-    printf("============================================\n");
-    printf("Mi IP es: %s\n\n\n", ip);
+    printf("============================================\n\n\n");
     
     char *srv;
 
