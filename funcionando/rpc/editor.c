@@ -8,11 +8,11 @@
 #include <sys/ioctl.h>
 #include <string.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <time.h>
 #include <fcntl.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include "nodo-nodo/socketNodos.h"
+#include "nodo-nodo/constantes.h"
 #include "protocolo.h"
 #include "comunicacion.h"
 
@@ -56,6 +56,8 @@ struct editorConfig
 	char *filename;
 	int nuevo;
 	char* ubicacion;
+	char* ruta;
+	char* ip;
 	CLIENT* clnt;
 	char statusmsg[80];
 	time_t statusmsg_time;
@@ -77,7 +79,7 @@ void die(const char *s)
 	write(STDOUT_FILENO, "\x1b[2J", 4);
 	write(STDOUT_FILENO, "\x1b[H", 3);
 
-	exit(1); //codigo de error desconocido
+	exit(5); //codigo de error desconocido
 }
 
 void disableRawMode()
@@ -445,16 +447,19 @@ char *editorRowsToString(int *buflen)
 	return buf;
 }
 
-void editorOpen(char *filename)
+void editorOpen(char *filename, char *nombre)
 {
 	free(E.filename);
-	E.filename = strdup(filename);
+	E.filename = strdup(nombre);
 	
-	editorSetStatusMessage(filename);
-
+	editorSetStatusMessage(nombre);
+	
+	
 	FILE *fp = fopen(filename, "r");
 	if (!fp)
-		die("fopen");
+		fp = fopen(filename, "a");
+		if (!fp)
+			die("fopen");
 
 	char *line = NULL;
 	size_t linecap = 0;
@@ -477,9 +482,10 @@ void updateCoordinador(){
 	char* ip="localhost";
 	
 	if(!E.nuevo){
-		//report_update(E.clnt,E.filename,ip,E.ubicacion);
+		report_update(E.clnt,E.filename,E.ip,E.ubicacion);
 	}else{
-		report_create(E.clnt,TIPOARCHIVO,E.filename,ip,E.ubicacion);
+		report_create(E.clnt,TIPOARCHIVO,E.filename,E.ip,E.ubicacion);
+		E.nuevo=0;
 	}
 	
 }
@@ -495,11 +501,11 @@ void editorSave()
 			return;
 		}
 	}
-
+	
 	int len;
 	char *buf = editorRowsToString(&len);
 
-	int fd = open(E.filename, O_RDWR | O_CREAT, 0644);
+	int fd = open(E.ruta, O_RDWR | O_CREAT, 0777);
 	if (fd != -1)
 	{
 		if (ftruncate(fd, len) != -1)
@@ -513,7 +519,7 @@ void editorSave()
 				//Update de sistema distribuido
 				updateCoordinador();
 				
-				editorSetStatusMessage("%d bytes en disco", len);
+				editorSetStatusMessage("%d bytes en disco: %s", len, E.ruta);
 				return;
 			}
 		}
@@ -522,6 +528,7 @@ void editorSave()
 
 	free(buf);
 	editorSetStatusMessage("Error al guardar, error I/O: %s", strerror(errno));
+	
 }
 
 void editorSaveBeforeExit()
@@ -987,12 +994,18 @@ int main(int argc, char *argv[])
 {
 	enableRawMode();
 	initEditor();
-	if (argc == 2) // Si me pasan un archivo y su ubicacion
+	if (argc == 4) // Si me pasan un archivo y su ubicacion
 	{
 		char* nombre= argv[0];
 		char* ubicacion = argv[1];
+		free(E.ubicacion);
+		E.ubicacion = strdup(ubicacion);
 		
-		char* srv = "localhost";
+		char* ip_cliente = argv[2];
+		free(E.ip);
+		E.ip= strdup(ip_cliente);
+		
+		char* srv = argv[3];
 
 		CLIENT* clnt = clnt_create(srv, PROY2DFS, PROY2DFSVERS,"tcp");
 
@@ -1001,8 +1014,6 @@ int main(int argc, char *argv[])
 			clnt_pcreateerror(srv);
 			exit(2);
 		}
-		
-		
 		
 		E.clnt = clnt;
 		
@@ -1014,36 +1025,55 @@ int main(int argc, char *argv[])
 		}
 		
 		char ruta [strlen(nombre)+strlen(ubicacion)+1];
-		sprintf(ruta,"%s/%s",ubicacion,nombre);
-		
-		
-		// Esto lo hacemos porque estamos en localhost y le pedimos a la misma carpeta...
-		char rutaDestino [strlen(nombre)+strlen(ubicacion)+1];
-		sprintf(rutaDestino,"%s/%s","Carpeta2",nombre);
-		
 		char carpetaNueva [200];
-		sprintf(carpetaNueva,"/%s/%s",cwd,"Carpeta2");
-		
 		char archivoNuevo [200];
-		sprintf(archivoNuevo,"%s/%s",carpetaNueva,nombre);
 		
+		if(strcmp(ubicacion,"raiz")==0){
+			
+			//Ruta de descarga
+			sprintf(ruta,"%s",nombre);
+			
+			//Ruta local carpeta destino
+			sprintf(carpetaNueva,"%s",cwd);
+			
+			//Ruta local destino
+			sprintf(archivoNuevo,"%s/%s",carpetaNueva,nombre);
+		}else {
+			
+			//Ruta de descarga
+			sprintf(ruta,"%s/%s",ubicacion,nombre);
+			
+			//Ruta local carpeta destino
+			sprintf(carpetaNueva,"%s/%s",cwd,ubicacion);
+			
+			//Carpeta nueva
+			mkdir(carpetaNueva, 0777);
+			
+			//Ruta local destino
+			sprintf(archivoNuevo,"%s/%s",carpetaNueva,nombre);
+		}
 		
-		mkdir(carpetaNueva, 0777);
+		free(E.ruta);
+		E.ruta= strdup(ruta);
 		
 		if(exists(clnt,TIPOARCHIVO,nombre,ubicacion)) { //Pregunta al coordinador si es valido un archivo.
 			
 			char* ip = getaddress(clnt,nombre,ubicacion);
 			
-			int descarga = downloadFile("localhost",ruta,archivoNuevo); //en localhost iria la ip
+			if(strcmp(ip,ip_cliente)){
+				int descarga = downloadFile(ip,ruta,archivoNuevo); //en localhost iria la ip
 			
-			if(descarga == 0){
-				editorOpen(archivoNuevo); //abro el archivo
+				if(descarga == ACK){
+					editorOpen(archivoNuevo,nombre); //abro el archivo
+				}else{
+					exit(1); //codigo de error de descarga del archivo
+				}
 			}else{
-				exit(1); //codigo de error de descarga del archivo
-			}
+				editorOpen(archivoNuevo,nombre); //abro el archivo
+			}		
 		}else{
 			E.nuevo=1;
-			editorOpen(archivoNuevo); //creo el archivo que no existe en el sistema distribuido
+			editorOpen(archivoNuevo,nombre); //creo el archivo que no existe en el sistema distribuido
 		}
 	}
 	editorSetStatusMessage("Ctrl-S = Guardar | Ctrl-Q = Cerrar");

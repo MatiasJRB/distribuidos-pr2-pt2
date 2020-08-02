@@ -35,8 +35,12 @@ int copyFile(char* ip, char* route, char* destino)
 
 int removeFile(char * ip, char * route)
 {
-	printf("%s %s\n", ip, route);
-	return 1;
+	return emisorPedidosNodo(ip,route,NULL,REMOVE);
+	
+}
+int moveFile(char* ip, char* route,char* destino)
+{
+	return emisorPedidosNodo(ip,route,destino,MOVE);
 }
 
 void startListening(void *clnt)

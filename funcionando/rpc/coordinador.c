@@ -3,7 +3,7 @@
 #include "consultas.h"
 #include <string.h>
 
-#define N 4096
+#define N 8192
 
 // Funcion para verificar si un archivo/carpeta es valido
 // Recibe un tipo (0=carpeta,1=archivo), un nombre y la ubicacion del nodo actual
@@ -43,19 +43,23 @@ char* funcionListar(char* Direccion)
 	int i;
 	struct archivo archivoaux;
 	char* nombreaux;
-	
+	//printf("Voy a guardar.\n");
+	//printf("La cantidad total a leer es: %d\n",list.cantidad);
 	for (i=0;i<list.cantidad;i++)
 	{	
+		//printf("#%d\n",i);
 		archivoaux = list.elementos[i];
 		nombreaux = archivoaux.nombre;
+		//printf("Elemento Nombre %s\n",nombreaux);
 		strcat(temp, nombreaux);
-		strcat(temp, ",");
+		strcat(temp, ",");	
 	}
-
+	//printf("Termine.\n");
 
 	int size = strlen(temp);
+	//printf("size  = %d.\n",size);
 	char *toRet;
-	toRet = malloc(size*sizeof(char));
+	toRet = malloc(N*sizeof(char));
 	strcpy(toRet,temp);
 	//printf("Me rompo en el coordinador.\n");
 	return (toRet);	
@@ -82,6 +86,7 @@ int carpetaVacia(char* Nombre)
 
 int insert(char tipo, char* Nombre,char* IP, char* Ubicacion)
 {	//printf("INGRESE AL INSERT DEL COORDINADOR.\n");
+	//printf("entre al insert.\n");
 	if (tipo == '0')
 	{
 		//printf("TIPO 0.\n");
@@ -108,7 +113,9 @@ int insert(char tipo, char* Nombre,char* IP, char* Ubicacion)
 				strcat(aux,Nombre);
 			}
 			insertar(Nombre,IP,Ubicacion,"W","0","1",aux);
-			return 1;
+			//printf("Termine de insertar \n");
+			int pararetornar = 1;
+			return pararetornar;
 		}
 		else
 			return 0;
