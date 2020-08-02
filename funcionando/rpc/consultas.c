@@ -9,6 +9,7 @@
 #define N 500
 
 void * insertar(char *nombre, char *ip, char *direccion, char *permiso, char  *version, char  *tipo, char *ruta){
+    printf("Ya entre al insertar db.\n");
     // Inicializo el motor de mysql  
     MYSQL *con = mysql_init(NULL);
     mysql_real_connect(con, "localhost", "ruso", "rusopass", "proyecto", 0, NULL, 0);
@@ -32,13 +33,13 @@ void * insertar(char *nombre, char *ip, char *direccion, char *permiso, char  *v
     strcat(query, "');");
     if (tipo = "1"){ //Agrego un archivo , por lo tanto tengo que cambiar las versiones de los demas y pasarlos a lectura y luego recien ejecuto la query.
         char queryupdate[N];
-        strcpy(queryupdate, "UPDATE indexado SET permiso = 'R',version = version + 1 WHERE permiso != 'X' and nombre = '");
+        strcpy(queryupdate, "UPDATE indexado SET permiso = 'R',version = version + 1 WHERE nombre = '");
         strcat(queryupdate, nombre);
-        strcat(queryupdate, "AND ruta = '");
-        strcat(queryupdate, ruta);
         strcat(queryupdate, "';");
         mysql_query(con, queryupdate); //Ejecuto la query para updatear los registros
     }
+
+    printf("QUERY: %s.\n",query);
     mysql_query(con, query); //Ejecuto la query para agregar el registro
     mysql_close(con);
     //printf("\n Termine de ejecutar el metodo de insertar \n");
@@ -62,22 +63,22 @@ struct listado *funcionLS(char *direccion){
     strcat(query, "direccion = '");
     strcat(query, direccion);
     strcat(query, "' AND permiso!='X';"); //si permiso es X, es porque esta borrado
-    //printf("query: %s\n",query);
+    
 	mysql_query(con, query);
     // Obtengo el resultado de esa consulta
     res = mysql_use_result(con);
     int i=0;
-    int cant =0;
+
     while ((row = mysql_fetch_row(res)) != NULL) /* recorrer la variable res con todos los registros obtenidos para su uso */
     {   
-        //resultado->cantidad = resultado->cantidad +1 ; 
-        cant++;
+        resultado->cantidad = resultado->cantidad +1 ; 
+
         struct archivo *actual = (struct archivo *)malloc(sizeof (struct archivo));
-        actual->nombre = (char*)malloc (100*sizeof(char));
-        actual->ip    = (char*)malloc (100*sizeof(char));
-        actual->direccion = (char*)malloc (100*sizeof(char));
+        actual->nombre = (char*)malloc (50*sizeof(char));
+        actual->ip    = (char*)malloc (50*sizeof(char));
+        actual->direccion = (char*)malloc (50*sizeof(char));
         actual->permiso = (char*)malloc (1*sizeof(char));
-        actual->ruta = (char*)malloc (200*sizeof(char));
+        actual->ruta = (char*)malloc (100*sizeof(char));
 
         strcpy(actual->nombre, row[0]);
         strcpy(actual->ip, row[1]);
@@ -90,8 +91,6 @@ struct listado *funcionLS(char *direccion){
         resultado->elementos[i] = *actual;
         i=i+1;
     } 
-    resultado->cantidad = cant;
-    //printf("Cantidad: %d.\n",resultado->cantidad);
     //printf("Llegue aca sin problemas\n");
     mysql_close(con);
     return resultado;
@@ -109,11 +108,11 @@ struct archivo *buscarArchivo(char *nombre, char *direccion){
     MYSQL_ROW row;
     
     struct archivo *resultado = (struct archivo *)malloc(sizeof (struct archivo));
-    resultado->nombre = (char*)malloc (100*sizeof(char));
-    resultado->ip    = (char*)malloc (100*sizeof(char));
-    resultado->direccion = (char*)malloc (100*sizeof(char));
+    resultado->nombre = (char*)malloc (50*sizeof(char));
+    resultado->ip    = (char*)malloc (50*sizeof(char));
+    resultado->direccion = (char*)malloc (50*sizeof(char));
     resultado->permiso = (char*)malloc (1*sizeof(char));
-    resultado->ruta = (char*)malloc (200*sizeof(char));
+    resultado->ruta = (char*)malloc (100*sizeof(char));
        
     char query[N];
     strcpy(query, "SELECT * ");
@@ -123,7 +122,7 @@ struct archivo *buscarArchivo(char *nombre, char *direccion){
     strcat(query, nombre);
     strcat(query, "' AND direccion = '");
     strcat(query, direccion);
-    strcat(query, "' AND permiso!='X';");
+    strcat(query, "' AND version = 0 AND permiso!='X';");
 	mysql_query(con, query);
     // Obtengo el resultado de esa consulta
     res = mysql_use_result(con);
@@ -142,6 +141,7 @@ struct archivo *buscarArchivo(char *nombre, char *direccion){
     if (cantidad == 0){ // si es 0 significa que nunca encontro un archivo.
         strcpy(resultado->permiso, "N"); //Si el resultado es null, te pongo como nombre el NULL
     }
+
     mysql_close(con);
     return resultado;
 }
@@ -158,10 +158,10 @@ void * eliminar(char *nombre, char *ip, char *direccion, char *permiso){
     strcat(query, ip);
     strcat(query, "' AND direccion='");
     strcat(query, direccion);
-    //strcat(query, "' AND permiso='");
-    //strcat(query, permiso); 
+    strcat(query, "' AND permiso='");
+    strcat(query, permiso); 
     strcat(query, "';");
-    //printf("Query delete: %s\n",query);
+
     mysql_query(con, query); //Ejecuto la query para modificar la entrada
     mysql_close(con);
  
@@ -175,11 +175,11 @@ struct archivo *buscarCarpeta(char *nombre){
     MYSQL_ROW row;
     
     struct archivo *resultado = (struct archivo *)malloc(sizeof (struct archivo));
-    resultado->nombre = (char*)malloc (100*sizeof(char));
-    resultado->ip    = (char*)malloc (100*sizeof(char));
-    resultado->direccion = (char*)malloc (100*sizeof(char));
+    resultado->nombre = (char*)malloc (50*sizeof(char));
+    resultado->ip    = (char*)malloc (50*sizeof(char));
+    resultado->direccion = (char*)malloc (50*sizeof(char));
     resultado->permiso = (char*)malloc (1*sizeof(char));
-    resultado->ruta = (char*)malloc (200*sizeof(char));
+    resultado->ruta = (char*)malloc (100*sizeof(char));
        
     char query[300];
     strcpy(query, "SELECT * ");
@@ -272,7 +272,7 @@ char* getFilesByIp(char* ip)
     strcat(query, ip);
     strcat(query, "' and permiso != 'X';");
     
-    //printf("Query: %s.\n",query);
+    printf("Query: %s.\n",query);
     
     mysql_query(con, query); //Ejecuto la query para modificar la entrada
     

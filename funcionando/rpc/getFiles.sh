@@ -1,4 +1,3 @@
-FOLDER=$1
 > "log"
-find $FOLDER -type d  >> "log"
-find $FOLDER -type f  >> "log"
+find ./ -type d  >> log
+find ./ -type f  >> log

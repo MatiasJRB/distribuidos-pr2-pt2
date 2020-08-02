@@ -11,7 +11,7 @@ struct archivo
 
 struct listado
 {
-    struct archivo elementos[100];
+    struct archivo elementos[40];
     int cantidad;    
 };
 
